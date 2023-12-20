@@ -87,12 +87,24 @@ export default function Home() {
           </p>
           <Image src="/images/pocket.png" alt="pocket" width={40} height={40} />
         </div>
+        <div className={styles.example_div}>
+          <div className={styles.ment_wrapper}>
+            {mentList.map((ment, index) => (
+              <MentExample
+                key={index}
+                profile={ment.profile}
+                ment={ment.ment}
+              />
+            ))}
+          </div>
+        </div>
         <div
           style={{
             display: "flex",
             flexDirection: "column",
             justifyContent: "center",
             alignItems: "center",
+            marginTop: "0.5rem",
           }}
         >
           <p className={styles.mention}>
@@ -102,17 +114,6 @@ export default function Home() {
               건너뛰기
             </Link>
           </p>
-          <div className={styles.example_div}>
-            <div className={styles.ment_wrapper}>
-              {mentList.map((ment, index) => (
-                <MentExample
-                  key={index}
-                  profile={ment.profile}
-                  ment={ment.ment}
-                />
-              ))}
-            </div>
-          </div>
           <textarea
             className={styles.text_field}
             placeholder="새해 덕담을 적어주세요"
