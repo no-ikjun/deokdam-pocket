@@ -4,6 +4,7 @@ import "./globals.css";
 import Image from "next/image";
 import styles from "./page.module.css";
 import backgroundImg from "../../public/images/background.webp";
+import Head from "next/head";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,16 +20,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="kr">
-      <link
-        href="https://hangeul.pstatic.net/hangeul_static/css/NanumMyeongjoYetHangul.css"
-        rel="stylesheet"
-      />
       <body className={inter.className}>
         <Image
           className={styles.background_img}
           src={backgroundImg}
           alt="img"
-          layout="fill"
+          fill
         />
         {children}
       </body>
