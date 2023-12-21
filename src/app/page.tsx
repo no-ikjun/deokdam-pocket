@@ -86,6 +86,15 @@ export default function Home() {
   const count = useCountNum(tempCount);
 
   useEffect(() => {
+    const intervalId = setInterval(async () => {
+      const newCount = await getCount();
+      setTempCount(newCount); // 상태 업데이트
+    }, 5000); // 예: 5초마다 데이터를 요청
+
+    return () => clearInterval(intervalId); // 컴포넌트 언마운트 시 인터벌 정리
+  }, []);
+
+  useEffect(() => {
     // getCount 함수를 호출하고 결과를 tempCount에 저장합니다.
     async function fetchCount() {
       const count = await getCount();
