@@ -2,7 +2,7 @@
 
 import Head from "next/head";
 import styles from "./page.module.css";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import useCountNum from "@/hooks/countUp";
 import Link from "next/link";
@@ -53,7 +53,7 @@ const mentList = [
 
 export default function Home() {
   const [showDiv, setShowDiv] = useState(false);
-  const count = useCountNum(14023);
+  const count = useCountNum(423420);
 
   useEffect(() => {
     const timer = setTimeout(() => {
