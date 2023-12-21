@@ -7,6 +7,7 @@ import Image from "next/image";
 import useCountNum from "@/hooks/countUp";
 import Link from "next/link";
 import MentExample from "@/components/ment_example";
+import axios from "axios";
 
 const mentList = [
   {
@@ -51,15 +52,57 @@ const mentList = [
   },
 ];
 
+const getCount = async (): Promise<number> => {
+  try {
+    const res = await axios.get("/api/ment/count");
+    if (res.status === 200) {
+      return res.data.count;
+    }
+  } catch (err) {
+    console.log(err);
+    return 0;
+  }
+  return 0;
+};
+
+const setMent = async () => {
+  const ment = "good";
+  try {
+    const res = await axios.post("/api/ment", { ment });
+    if (res.status === 201) {
+      alert("덕담이 전달되었습니다!");
+    } else {
+      alert("적어주신 덕담을 다시 확인해주세요.");
+    }
+  } catch (err) {
+    console.log(err);
+    alert("적어주신 덕담을 다시 확인해주세요.");
+  }
+};
+
 export default function Home() {
   const [showDiv, setShowDiv] = useState(false);
-  const count = useCountNum(423420);
+  const [tempCount, setTempCount] = useState(0);
+  const count = useCountNum(tempCount);
 
   useEffect(() => {
+    // getCount 함수를 호출하고 결과를 tempCount에 저장합니다.
+    async function fetchCount() {
+      const count = await getCount();
+      console.log(count);
+      setTempCount(count);
+    }
+
+    fetchCount();
+
+    // setShowDiv 관련 로직
     const timer = setTimeout(() => {
       setShowDiv(true);
     }, 500);
-    return () => clearTimeout(timer);
+
+    return () => {
+      clearTimeout(timer);
+    };
   }, []);
 
   return (
@@ -119,7 +162,9 @@ export default function Home() {
             placeholder="새해 덕담을 적어주세요"
           />
           <div className={styles.button_div}>
-            <button className={styles.submit_btn}>전달하기</button>
+            <button className={styles.submit_btn} onClick={setMent}>
+              전달하기
+            </button>
           </div>
         </div>
       </div>
