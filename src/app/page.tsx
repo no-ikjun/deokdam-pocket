@@ -54,7 +54,13 @@ const mentList = [
 
 const getCount = async (): Promise<number> => {
   try {
-    const res = await axios.get("/api/ment/count");
+    const res = await axios.get("/api/ment/count", {
+      headers: {
+        "Cache-Control": "no-cache",
+        Pragma: "no-cache",
+        Expires: "0",
+      },
+    });
     if (res.status === 200) {
       return res.data.count;
     }
