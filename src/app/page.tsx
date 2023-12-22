@@ -71,10 +71,13 @@ const getCount = async (): Promise<number> => {
   return 0;
 };
 
-const setMent = async () => {
-  const ment = "good";
+const sendMent = async (ment: string) => {
   try {
-    const res = await axios.post("/api/ment", { ment });
+    const res = await axios.post("/api/ment", {
+      uuid: "asjdl;kfajsdlf",
+      ment: ment,
+    });
+
     if (res.status === 201) {
       alert("덕담이 전달되었습니다!");
     } else {
@@ -90,6 +93,8 @@ export default function Home() {
   const [showDiv, setShowDiv] = useState(false);
   const [tempCount, setTempCount] = useState(0);
   const count = useCountNum(tempCount);
+
+  const [ment, setMent] = useState("");
 
   useEffect(() => {
     const intervalId = setInterval(async () => {
@@ -175,9 +180,17 @@ export default function Home() {
           <textarea
             className={styles.text_field}
             placeholder="새해 덕담을 적어주세요"
+            onChange={(e) => {
+              setMent(e.target.value);
+            }}
           />
           <div className={styles.button_div}>
-            <button className={styles.submit_btn} onClick={setMent}>
+            <button
+              className={styles.submit_btn}
+              onClick={async () => {
+                await sendMent(ment);
+              }}
+            >
               전달하기
             </button>
           </div>
