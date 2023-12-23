@@ -10,6 +10,15 @@ import MentExample from "@/components/ment_example";
 import axios from "axios";
 import { generateRandomString } from "@/utils/getRandomString";
 import { getDateString } from "@/utils/getDateString";
+import {
+  useRouter,
+  usePathname,
+  useSearchParams,
+  useSelectedLayoutSegment,
+  useSelectedLayoutSegments,
+  redirect,
+  notFound,
+} from "next/navigation";
 
 const mentList = [
   {
@@ -83,13 +92,13 @@ const sendMent = async (ment: string) => {
     });
 
     if (res.status === 201) {
-      alert("덕담이 전달되었습니다!");
+      return true;
     } else {
-      alert("적어주신 덕담을 다시 확인해주세요.");
+      return false;
     }
   } catch (err) {
     console.log(err);
-    alert("적어주신 덕담을 다시 확인해주세요.");
+    return false;
   }
 };
 
@@ -99,6 +108,15 @@ export default function Home() {
   const count = useCountNum(tempCount);
 
   const [ment, setMent] = useState("");
+  const [animation, setAnimation] = useState(false);
+  const router = useRouter();
+
+  const loading = async () => {
+    setTimeout(() => {
+      setAnimation(false);
+      router.push("/select");
+    }, 1000);
+  };
 
   useEffect(() => {
     const intervalId = setInterval(async () => {
@@ -130,76 +148,118 @@ export default function Home() {
   }, []);
 
   return (
-    <div className={styles.main}>
-      <Head>
-        <link
-          href="https://hangeul.pstatic.net/hangeul_static/css/nanum-myeongjo.css"
-          rel="stylesheet"
-        />
-      </Head>
-      <h1 className={styles.title}>
-        2024년은 새해 덕담과 함께
-        <br />
-        빛나는 한 해가 되기를 기원합니다
-      </h1>
+    <>
       <div
-        className={
-          showDiv ? [styles.show, styles.fade_div].join(" ") : styles.fade_div
-        }
+        style={{ display: `${animation ? "flex" : "none"}` }}
+        className={styles.sending_div}
       >
-        <div className={styles.count_div}>
-          <Image src="/images/pocket.png" alt="pocket" width={40} height={40} />
-          <p className={styles.count}>
-            지금까지 총 {count.toLocaleString()}개의 덕담이 모였어요
-          </p>
-          <Image src="/images/pocket.png" alt="pocket" width={40} height={40} />
-        </div>
-        <div className={styles.example_div}>
-          <div className={styles.ment_wrapper}>
-            {mentList.map((ment, index) => (
-              <MentExample
-                key={index}
-                profile={ment.profile}
-                ment={ment.ment}
-              />
-            ))}
-          </div>
-        </div>
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            alignItems: "center",
-            marginTop: "0.5rem",
-          }}
-        >
-          <p className={styles.mention}>
-            덕담을 적어주시면 다른 사용자들이 작성한 덕담을 전달받을 수
-            있어요.&nbsp;&nbsp;
-            <Link href="/" className={styles.jump_ment}>
-              건너뛰기
-            </Link>
-          </p>
-          <textarea
-            className={styles.text_field}
-            placeholder="새해 덕담을 적어주세요"
-            onChange={(e) => {
-              setMent(e.target.value);
+        <Image
+          src="/images/kite_icon.png"
+          alt="kite"
+          width={100}
+          height={100}
+          className={styles.sending_icon}
+        />
+        <p className={styles.sending_ment}>
+          덕담을 전달 중입니다...
+          <br />
+          <span
+            onClick={() => {
+              window.location.href = "/";
             }}
-          />
-          <div className={styles.button_div}>
-            <button
-              className={styles.submit_btn}
-              onClick={async () => {
-                await sendMent(ment);
+            style={{ cursor: "pointer", color: "#6f6f6f", fontSize: "0.9rem" }}
+          >
+            새로고침
+          </span>
+        </p>
+      </div>
+      <div className={animation ? styles.blur_background : ""}>
+        <div className={styles.main}>
+          <Head>
+            <link
+              href="https://hangeul.pstatic.net/hangeul_static/css/nanum-myeongjo.css"
+              rel="stylesheet"
+            />
+          </Head>
+          <h1 className={styles.title}>
+            2024년은 새해 덕담과 함께
+            <br />
+            빛나는 한 해가 되기를 기원합니다
+          </h1>
+          <div
+            className={
+              showDiv
+                ? [styles.show, styles.fade_div].join(" ")
+                : styles.fade_div
+            }
+          >
+            <div className={styles.count_div}>
+              <Image
+                src="/images/pocket.png"
+                alt="pocket"
+                width={35}
+                height={35}
+              />
+              <p className={styles.count}>
+                지금까지 총 {count.toLocaleString()}개의 덕담이 모였어요
+              </p>
+              <Image
+                src="/images/pocket.png"
+                alt="pocket"
+                width={35}
+                height={35}
+              />
+            </div>
+            <div className={styles.example_div}>
+              <div className={styles.ment_wrapper}>
+                {mentList.map((ment, index) => (
+                  <MentExample
+                    key={index}
+                    profile={ment.profile}
+                    ment={ment.ment}
+                  />
+                ))}
+              </div>
+            </div>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                alignItems: "center",
+                marginTop: "0.5rem",
               }}
             >
-              전달하기
-            </button>
+              <p className={styles.mention}>
+                덕담을 적어주시면 다른 사용자들이 작성한 덕담을 전달받을 수
+                있어요.&nbsp;&nbsp;
+                <Link href="/select" className={styles.jump_ment}>
+                  건너뛰기
+                </Link>
+              </p>
+              <textarea
+                className={styles.text_field}
+                placeholder="새해 덕담을 적어주세요"
+                onChange={(e) => {
+                  setMent(e.target.value);
+                }}
+              />
+              <div className={styles.button_div}>
+                <button
+                  className={styles.submit_btn}
+                  onClick={async () => {
+                    setAnimation(true);
+                    const result = await sendMent(ment);
+                    if (result) loading();
+                  }}
+                >
+                  전달하기
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

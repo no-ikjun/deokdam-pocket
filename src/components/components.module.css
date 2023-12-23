@@ -29,3 +29,13 @@
 .visible {
   opacity: 0.2;
 }
+
+@media screen and (max-width: 768px) {
+  .ment_div {
+    padding: 0.4rem 0.7rem 0.4rem 0.7rem;
+    gap: 0.5rem;
+  }
+  .ment {
+    font-size: 0.8rem;
+  }
+}
