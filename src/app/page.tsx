@@ -8,6 +8,8 @@ import useCountNum from "@/hooks/countUp";
 import Link from "next/link";
 import MentExample from "@/components/ment_example";
 import axios from "axios";
+import { generateRandomString } from "@/utils/getRandomString";
+import { getDateString } from "@/utils/getDateString";
 
 const mentList = [
   {
@@ -74,8 +76,10 @@ const getCount = async (): Promise<number> => {
 const sendMent = async (ment: string) => {
   try {
     const res = await axios.post("/api/ment", {
-      uuid: "asjdl;kfajsdlf",
+      uuid: `MT${getDateString()}${generateRandomString(10)}`,
       ment: ment,
+      cache: "no-store",
+      dynamic: "force-dynamic",
     });
 
     if (res.status === 201) {

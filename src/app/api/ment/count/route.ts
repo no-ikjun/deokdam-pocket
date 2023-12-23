@@ -8,6 +8,7 @@ export async function GET() {
     client.release;
     return NextResponse.json({ count: rows[0].count }, { status: 200 });
   } catch (error) {
+    client.release;
     return NextResponse.json({ message: "error" }, { status: 500 });
   }
 }
