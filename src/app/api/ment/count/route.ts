@@ -9,6 +9,9 @@ export async function GET() {
     return NextResponse.json({ count: rows[0].count }, { status: 200 });
   } catch (error) {
     client.release;
-    return NextResponse.json({ message: "error" }, { status: 500 });
+    return NextResponse.json({ message: "error" }, { status: 500 }).headers.set(
+      "Cache-Control",
+      "no-cache"
+    );
   }
 }
