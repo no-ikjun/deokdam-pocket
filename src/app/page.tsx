@@ -84,21 +84,22 @@ const getCount = async (): Promise<number> => {
 
 const sendMent = async (ment: string) => {
   try {
+    const uuid = `MT${getDateString()}${generateRandomString(10)}`;
     const res = await axios.post("/api/ment", {
-      uuid: `MT${getDateString()}${generateRandomString(10)}`,
+      uuid: uuid,
       ment: ment,
       cache: "no-store",
       dynamic: "force-dynamic",
     });
 
     if (res.status === 201) {
-      return true;
+      return uuid;
     } else {
-      return false;
+      return "error";
     }
   } catch (err) {
     console.log(err);
-    return false;
+    return "error";
   }
 };
 
@@ -250,7 +251,17 @@ export default function Home() {
                   onClick={async () => {
                     setAnimation(true);
                     const result = await sendMent(ment);
-                    if (result) loading();
+                    if (result != "error") {
+                      let uuids = JSON.parse(
+                        localStorage.getItem("new-year-ment") ?? "[]"
+                      );
+                      uuids.push(result);
+                      localStorage.setItem(
+                        "new-year-ment",
+                        JSON.stringify(uuids)
+                      );
+                      loading();
+                    }
                   }}
                 >
                   전달하기

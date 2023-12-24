@@ -223,22 +223,18 @@
 }
 
 .sending_icon {
-  animation: move 1.5s linear infinite;
+  animation: move 2s linear infinite;
 }
 
 @keyframes move {
-  0%,
-  100% {
-    transform: translate(10px, 0);
-  }
-  25% {
-    transform: translate(0, 10px);
+  0% {
+    transform: translateY(0);
   }
   50% {
-    transform: translate(-10px, 0);
+    transform: translateY(-0.5rem);
   }
-  75% {
-    transform: translate(0, -10px);
+  100% {
+    transform: translateY(0);
   }
 }
 
@@ -247,7 +243,7 @@
     padding: 2rem;
   }
   .title {
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     line-height: 2rem;
   }
   .count_div {
@@ -261,6 +257,10 @@
     text-align: center;
   }
   .mention {
+    line-height: 1.5rem;
+  }
+  .sending_ment {
+    font-size: 1rem;
     line-height: 1.5rem;
   }
 }
