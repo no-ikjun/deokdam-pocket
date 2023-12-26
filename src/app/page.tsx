@@ -108,23 +108,6 @@ const sendMent = async (ment: string) => {
   }
 };
 
-const sendLog = async () => {
-  try {
-    const res = await axios.post("/api/log", {
-      cache: "no-store",
-      dynamic: "force-dynamic",
-    });
-    if (res.status === 201) {
-      return "success";
-    } else {
-      return "error";
-    }
-  } catch (err) {
-    console.log(err);
-    return "error";
-  }
-};
-
 export default function Home() {
   const [showDiv, setShowDiv] = useState(false);
   const [tempCount, setTempCount] = useState(0);
@@ -157,8 +140,6 @@ export default function Home() {
       setTempCount(count);
     }
     fetchCount();
-
-    sendLog();
 
     const timer = setTimeout(() => {
       setShowDiv(true);
