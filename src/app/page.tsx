@@ -19,6 +19,11 @@ import {
   redirect,
   notFound,
 } from "next/navigation";
+import localFont from "next/font/local";
+
+const myFont = localFont({
+  src: "./fonts/NanumMyeongjo.ttf",
+});
 
 const mentList = [
   {
@@ -176,12 +181,6 @@ export default function Home() {
       </div>
       <div className={animation ? styles.blur_background : ""}>
         <div className={styles.main}>
-          <Head>
-            <link
-              href="https://hangeul.pstatic.net/hangeul_static/css/nanum-myeongjo.css"
-              rel="stylesheet"
-            />
-          </Head>
           <h1 className={styles.title}>
             2024년은 새해 덕담과 함께
             <br />
@@ -239,7 +238,7 @@ export default function Home() {
                 </Link>
               </p>
               <textarea
-                className={styles.text_field}
+                className={[styles.text_field, myFont.className].join(" ")}
                 placeholder="새해 덕담을 적어주세요"
                 onChange={(e) => {
                   setMent(e.target.value);
@@ -247,7 +246,7 @@ export default function Home() {
               />
               <div className={styles.button_div}>
                 <button
-                  className={styles.submit_btn}
+                  className={[styles.submit_btn, myFont.className].join(" ")}
                   onClick={async () => {
                     setAnimation(true);
                     const result = await sendMent(ment);
