@@ -108,6 +108,23 @@ const sendMent = async (ment: string) => {
   }
 };
 
+const sendLog = async () => {
+  try {
+    const res = await axios.post("/api/log", {
+      cache: "no-store",
+      dynamic: "force-dynamic",
+    });
+    if (res.status === 201) {
+      return "success";
+    } else {
+      return "error";
+    }
+  } catch (err) {
+    console.log(err);
+    return "error";
+  }
+};
+
 export default function Home() {
   const [showDiv, setShowDiv] = useState(false);
   const [tempCount, setTempCount] = useState(0);
@@ -134,16 +151,15 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    // getCount 함수를 호출하고 결과를 tempCount에 저장합니다.
     async function fetchCount() {
       const count = await getCount();
       console.log(count);
       setTempCount(count);
     }
-
     fetchCount();
 
-    // setShowDiv 관련 로직
+    sendLog();
+
     const timer = setTimeout(() => {
       setShowDiv(true);
     }, 500);
