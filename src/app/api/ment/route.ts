@@ -7,7 +7,6 @@ export const revalidate = 0;
 
 export async function POST(req: Request) {
   const client = await db.connect();
-
   try {
     const request = await req.json();
     const { uuid, ment } = request as { uuid: string; ment: string };

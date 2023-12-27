@@ -4,13 +4,12 @@ import { NextRequest, NextResponse } from "next/server";
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-export async function POST(req: NextRequest) {
+export async function POST(req: Request) {
   const client = await db.connect();
-  console.log(req.ip);
   try {
-    await client.sql`INSERT INTO user_log (ip_address) VALUES (${
-      req.ip ?? ""
-    });`;
+    const request = await req.json();
+    const { selected_icon } = request as { selected_icon: string };
+    await client.sql`INSERT INTO user_log (selected_icon) VALUES (${selected_icon});`;
     client.release;
     return NextResponse.json({ message: "success" }, { status: 201 });
   } catch (error) {

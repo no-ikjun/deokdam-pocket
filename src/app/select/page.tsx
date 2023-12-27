@@ -12,6 +12,7 @@ import {
   redirect,
   notFound,
 } from "next/navigation";
+import axios from "axios";
 
 const iconList = [
   {
@@ -32,6 +33,25 @@ const iconList = [
   },
 ];
 
+const sendLog = async (icon: string) => {
+  try {
+    const res = await axios.post("/api/log", {
+      selected_icon: icon,
+      cache: "no-store",
+      dynamic: "force-dynamic",
+    });
+
+    if (res.status === 201) {
+      return true;
+    } else {
+      return false;
+    }
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+};
+
 export default function Select() {
   const [showDiv, setShowDiv] = useState(false);
   const [showArray, setShowArray] = useState(iconList);
@@ -39,7 +59,8 @@ export default function Select() {
   const [animation, setAnimation] = useState(false);
   const router = useRouter();
 
-  const loading = async () => {
+  const loading = async (selectedIcon: string) => {
+    sendLog(selectedIcon);
     setTimeout(() => {
       setAnimation(false);
       router.push("/ment");
@@ -109,7 +130,7 @@ export default function Select() {
                   key={icon.icon}
                   onClick={async () => {
                     setAnimation(true);
-                    await loading();
+                    await loading(icon.icon);
                   }}
                 >
                   <Image
