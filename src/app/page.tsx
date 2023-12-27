@@ -2,7 +2,7 @@
 
 import Head from "next/head";
 import styles from "./page.module.css";
-import { useEffect, useState } from "react";
+import { ChangeEvent, ChangeEventHandler, useEffect, useState } from "react";
 import Image from "next/image";
 import useCountNum from "@/hooks/countUp";
 import Link from "next/link";
@@ -112,10 +112,18 @@ export default function Home() {
   const [showDiv, setShowDiv] = useState(false);
   const [tempCount, setTempCount] = useState(0);
   const count = useCountNum(tempCount);
+  const [inputCount, setInputCount] = useState(0);
 
   const [ment, setMent] = useState("");
   const [animation, setAnimation] = useState(false);
   const router = useRouter();
+
+  const onInputHandler = (e: ChangeEvent<HTMLTextAreaElement>) => {
+    if (e.target.value.length > 150) {
+      e.target.value = e.target.value.slice(0, 150);
+    }
+    setInputCount(e.target.value.length);
+  };
 
   const loading = async () => {
     setTimeout(() => {
@@ -238,9 +246,19 @@ export default function Home() {
                 className={[styles.text_field, myFont.className].join(" ")}
                 placeholder="새해 덕담을 적어주세요"
                 onChange={(e) => {
+                  onInputHandler(e);
                   setMent(e.target.value);
                 }}
               />
+              <div style={{ width: "100%" }}>
+                <p
+                  className={styles.word_length}
+                  style={{ color: inputCount == 150 ? "red" : "#949494" }}
+                >
+                  {inputCount} / 150자
+                  <br />
+                </p>
+              </div>
               <div className={styles.button_div}>
                 <button
                   className={[styles.submit_btn, myFont.className].join(" ")}

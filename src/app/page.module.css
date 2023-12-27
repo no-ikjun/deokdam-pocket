@@ -157,6 +157,14 @@
   transition: 0.2s;
 }
 
+.word_length {
+  font-size: 0.8rem;
+  font-weight: 400;
+  text-align: right;
+  margin-top: 0.5rem;
+  color: #949494;
+}
+
 .button_div {
   width: 105%;
   margin-top: 1rem;

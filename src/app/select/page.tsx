@@ -63,7 +63,7 @@ export default function Select() {
     sendLog(selectedIcon);
     setTimeout(() => {
       setAnimation(false);
-      router.push("/ment");
+      router.replace("/ment?s=" + selectedIcon);
     }, 1000);
   };
 
