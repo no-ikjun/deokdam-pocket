@@ -24,7 +24,7 @@ export async function GET() {
   const client = await db.connect();
   try {
     const { rows } =
-      await client.sql`SELECT * FROM ment_tb WHERE checked=true ORDER BY RAND() LIMIT 1;`;
+      await client.sql`SELECT * FROM ment_tb WHERE checked=true ORDER BY RANDOM() LIMIT 1;`;
     client.release;
     return NextResponse.json({ ment: rows[0] }, { status: 200 });
   } catch (error) {
