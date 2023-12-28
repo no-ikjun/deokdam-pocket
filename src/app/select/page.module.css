@@ -133,6 +133,10 @@
   .select_div {
     gap: 2rem;
   }
+  .sending_ment {
+    font-size: 1rem;
+    line-height: 1.6rem;
+  }
 }
 
 .blur_background {
@@ -156,7 +160,7 @@
 
 .sending_ment {
   color: #000000;
-  font-weight: 700;
+  font-weight: 500;
   font-size: 1.3rem;
   text-align: center;
   line-height: 1.6rem;
