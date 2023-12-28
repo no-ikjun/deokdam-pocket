@@ -170,7 +170,7 @@ export default function Ment() {
             </div>
           </div>
           <div className={styles.next_div}>
-            <Link href="/" className={styles.next_ment}>
+            <Link href="/data" className={styles.next_ment}>
               다음으로&nbsp;&rarr;
             </Link>
           </div>

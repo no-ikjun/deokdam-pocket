@@ -248,7 +248,7 @@
 
 @media screen and (max-width: 768px) {
   .main {
-    padding: 2rem;
+    padding: 1.5rem;
   }
   .title {
     font-size: 1.3rem;
@@ -258,7 +258,7 @@
     gap: 0.5rem;
   }
   .count {
-    font-size: 1rem;
+    font-size: 0.9rem;
   }
   .example_div {
     max-width: 20rem;

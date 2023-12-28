@@ -132,6 +132,7 @@
 
 .next_div {
   margin-top: 2rem;
+  transition: 0.5s;
 }
 
 .next_ment {
