@@ -250,17 +250,18 @@
   font-size: 0.8rem;
   font-weight: 400;
   color: #949494;
+  text-align: center;
 }
 
 .footer {
   width: 728px;
   height: 90px;
-  box-sizing: content-box;
+  box-sizing: border-box;
 }
 
 @media screen and (max-width: 768px) {
   .main {
-    padding: 1.5rem;
+    padding: 1rem;
   }
   .title {
     font-size: 1.3rem;
