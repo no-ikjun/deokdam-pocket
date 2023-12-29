@@ -6,6 +6,7 @@ import styles from "./page.module.css";
 import backgroundImg from "../../public/images/background.webp";
 import Head from "next/head";
 import localFont from "next/font/local";
+import Script from "next/script";
 
 export const metadata: Metadata = {
   title: "덕담 주머니 - 갑진년 새해 덕담 프로젝트",
@@ -36,6 +37,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="kr" className={myFont.className}>
+      <Script
+        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2222926756194557"
+        crossOrigin="anonymous"
+        async
+      ></Script>
       <body>
         <Image
           className={styles.background_img}
