@@ -20,6 +20,7 @@ import {
   notFound,
 } from "next/navigation";
 import localFont from "next/font/local";
+import Script from "next/script";
 
 const myFont = localFont({
   src: "./fonts/NanumMyeongjo.ttf",
@@ -282,6 +283,25 @@ export default function Home() {
                 </button>
               </div>
             </div>
+          </div>
+          <div style={{ marginTop: "1.5rem" }}>
+            <p className={styles.ad_ment}>
+              발생한 광고수익은 독거노인종합지원센터를 통해 기부됩니다
+            </p>
+            <Script
+              async
+              src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2222926756194557"
+              crossOrigin="anonymous"
+            ></Script>
+            <div style={{ width: "728px", height: "90px" }}>
+              <ins
+                className="adsbygoogle"
+                style={{ display: "inline-block", width: 728, height: 90 }}
+                data-ad-client="ca-pub-2222926756194557"
+                data-ad-slot="6532910299"
+              ></ins>
+            </div>
+            <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
           </div>
         </div>
       </div>
