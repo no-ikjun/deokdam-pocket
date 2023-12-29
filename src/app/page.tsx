@@ -109,6 +109,12 @@ const sendMent = async (ment: string) => {
   }
 };
 
+declare global {
+  interface Window {
+    adsbygoogle: any;
+  }
+}
+
 export default function Home() {
   const [showDiv, setShowDiv] = useState(false);
   const [tempCount, setTempCount] = useState(0);
@@ -132,6 +138,10 @@ export default function Home() {
       router.push("/select");
     }, 1000);
   };
+
+  useEffect(() => {
+    (window.adsbygoogle = window.adsbygoogle || []).push({});
+  }, []);
 
   useEffect(() => {
     const intervalId = setInterval(async () => {
