@@ -12,6 +12,13 @@ import { Analytics } from "@vercel/analytics/react";
 export const metadata: Metadata = {
   title: "덕담 주머니 - 갑진년 새해 덕담 프로젝트",
   description: "갑진년 새해는 모두 함께 덕담을 나누며 힘차게 출발합시다!",
+  keywords:
+    "갑진년, 새해 덕담, 행복한 새해, 덕담 나눔, 새해 축하, 덕담 주머니, 새해 소망, 온라인 커뮤니티, 기부 프로젝트, 2024년 새해, 새해 인사",
+  openGraph: {
+    title: "덕담 주머니 - 갑진년 새해 덕담 프로젝트",
+    description: "갑진년 새해는 따뜻한 덕담과 함께 시작하세요",
+    images: ["https://new-year.app/pocket.png"],
+  },
 };
 
 const myFont = localFont({
