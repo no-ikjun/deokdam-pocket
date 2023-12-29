@@ -271,10 +271,19 @@
     font-size: 1rem;
     line-height: 1.5rem;
   }
+  .footer {
+    width: 300;
+    height: 50;
+  }
 }
 
 .ad_ment {
   font-size: 0.8rem;
   font-weight: 400;
   color: #949494;
+}
+
+.footer {
+  width: 728;
+  height: 90;
 }

@@ -303,15 +303,16 @@ export default function Home() {
               src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2222926756194557"
               crossOrigin="anonymous"
             ></Script>
-            <div style={{ width: "728px", height: "90px" }}>
+            <div className={styles.footer}>
               <ins
                 className="adsbygoogle"
-                style={{ display: "inline-block", width: 728, height: 90 }}
+                style={{ display: "block" }}
                 data-ad-client="ca-pub-2222926756194557"
-                data-ad-slot="6532910299"
+                data-ad-slot="4808765086"
+                data-ad-format="auto"
+                data-full-width-responsive="true"
               ></ins>
             </div>
-            <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
           </div>
         </div>
       </div>
