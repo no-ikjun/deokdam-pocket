@@ -303,16 +303,12 @@ export default function Home() {
               src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2222926756194557"
               crossOrigin="anonymous"
             ></Script>
-            <div className={styles.footer}>
-              <ins
-                className="adsbygoogle"
-                style={{ display: "block" }}
-                data-ad-client="ca-pub-2222926756194557"
-                data-ad-slot="4808765086"
-                data-ad-format="auto"
-                data-full-width-responsive="true"
-              ></ins>
-            </div>
+            <ins
+              className={["adsbygoogle", styles.footer].join(" ")}
+              style={{ display: "block" }}
+              data-ad-client="ca-pub-2222926756194557"
+              data-ad-slot="4808765086"
+            ></ins>
           </div>
         </div>
       </div>
