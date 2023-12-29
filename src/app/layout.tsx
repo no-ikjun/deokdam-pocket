@@ -7,6 +7,7 @@ import backgroundImg from "../../public/images/background.webp";
 import Head from "next/head";
 import localFont from "next/font/local";
 import Script from "next/script";
+import { Analytics } from "@vercel/analytics/react";
 
 export const metadata: Metadata = {
   title: "덕담 주머니 - 갑진년 새해 덕담 프로젝트",
@@ -55,6 +56,7 @@ export default function RootLayout({
           fill
         />
         {children}
+        <Analytics />
       </body>
     </html>
   );
