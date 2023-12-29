@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "덕담 주머니 - 갑진년 새해 덕담 프로젝트",
     description: "갑진년 새해는 따뜻한 덕담과 함께 시작하세요",
-    images: ["https://new-year.app/pocket.png"],
+    images: ["blob:https://vercel.com/cad787c2-bdd1-4f59-af3a-63273c25f244"],
   },
 };
 
