@@ -42,6 +42,11 @@ export default function RootLayout({
         crossOrigin="anonymous"
         async
       ></Script>
+      <Script
+        async
+        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2222926756194557"
+        crossOrigin="anonymous"
+      ></Script>
       <body>
         <Image
           className={styles.background_img}
