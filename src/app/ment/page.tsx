@@ -35,6 +35,59 @@ const getCount = async (): Promise<any> => {
   return "";
 };
 
+const setShare = async (uuid: string): Promise<boolean> => {
+  try {
+    const res = await axios.put(
+      `/api/ment/share`,
+      {
+        uuid: uuid,
+      },
+      {
+        headers: {
+          "Cache-Control": "no-cache",
+          Pragma: "no-cache",
+          Expires: "0",
+        },
+      }
+    );
+    if (res.status === 200) {
+      return true;
+    } else {
+      return false;
+    }
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+};
+
+const setLike = async (uuid: string, kind: string): Promise<boolean> => {
+  try {
+    const res = await axios.put(
+      `/api/ment/like`,
+      {
+        uuid: uuid,
+        kind: kind,
+      },
+      {
+        headers: {
+          "Cache-Control": "no-cache",
+          Pragma: "no-cache",
+          Expires: "0",
+        },
+      }
+    );
+    if (res.status === 200) {
+      return true;
+    } else {
+      return false;
+    }
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+};
+
 export default function Ment() {
   const router = useRouter();
   const [showDiv, setShowDiv] = useState(false);
@@ -46,7 +99,7 @@ export default function Ment() {
   const [ment, setMent] = useState("");
   const [mentUuid, setMentUuid] = useState("");
 
-  const [like, setLike] = useState("");
+  const [liked, setLiked] = useState(false);
 
   const [showNotification, setShowNotification] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState("");
@@ -62,17 +115,35 @@ export default function Ment() {
     }, notificationDuration);
   };
 
+  const like = (kind: string) => {
+    if (liked) {
+      setNotificationMessage("반응은 한 번만 가능해요!");
+      setShowNotification(true);
+      setTimeout(() => {
+        setShowNotification(false);
+      }, notificationDuration);
+    } else {
+      setLike(mentUuid, kind);
+      setLiked(true);
+      setNotificationMessage("덕담에 반응해주셔서 감사해요!");
+      setShowNotification(true);
+      setTimeout(() => {
+        setShowNotification(false);
+      }, notificationDuration);
+    }
+  };
+
   useEffect(() => {
     async function fetchMent() {
       const ment = await getCount();
       if (ment !== "") {
+        setShare(ment.uuid);
         setAnimation(false);
         setMent(ment.ment);
         setMentUuid(ment.uuid);
         const timer = setTimeout(() => {
           setShowDiv(true);
         }, 500);
-
         return () => {
           clearTimeout(timer);
         };
@@ -175,6 +246,9 @@ export default function Ment() {
                 className={[styles.ment_like_icon_div, styles.like_button].join(
                   " "
                 )}
+                onClick={() => {
+                  like("01");
+                }}
               >
                 🥹 감동이에요
               </div>
@@ -182,6 +256,9 @@ export default function Ment() {
                 className={[styles.ment_like_icon_div, styles.like_button].join(
                   " "
                 )}
+                onClick={() => {
+                  like("02");
+                }}
               >
                 😊 훈훈해요
               </div>
@@ -189,6 +266,9 @@ export default function Ment() {
                 className={[styles.ment_like_icon_div, styles.like_button].join(
                   " "
                 )}
+                onClick={() => {
+                  like("03");
+                }}
               >
                 😑 별로에요
               </div>
