@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import styles from "./page.module.css";
 import {
   useRouter,
@@ -14,10 +14,11 @@ import {
 import axios from "axios";
 import Image from "next/image";
 import Link from "next/link";
+import Notification from "@/components/notification_popup";
 
 const getCount = async (): Promise<any> => {
   try {
-    const res = await axios.get("/api/ment", {
+    const res = await axios.get("/api/ment/random", {
       headers: {
         "Cache-Control": "no-cache",
         Pragma: "no-cache",
@@ -35,6 +36,7 @@ const getCount = async (): Promise<any> => {
 };
 
 export default function Ment() {
+  const router = useRouter();
   const [showDiv, setShowDiv] = useState(false);
   const [animation, setAnimation] = useState(true);
 
@@ -45,6 +47,20 @@ export default function Ment() {
   const [mentUuid, setMentUuid] = useState("");
 
   const [like, setLike] = useState("");
+
+  const [showNotification, setShowNotification] = useState(false);
+  const [notificationMessage, setNotificationMessage] = useState("");
+  const notificationDuration = 3000;
+
+  const copyLink = (message: string) => {
+    navigator.clipboard.writeText("https://new-year.app");
+    setNotificationMessage(message);
+    setShowNotification(true);
+
+    setTimeout(() => {
+      setShowNotification(false);
+    }, notificationDuration);
+  };
 
   useEffect(() => {
     async function fetchMent() {
@@ -71,6 +87,7 @@ export default function Ment() {
 
   return (
     <>
+      <Notification show={showNotification} message={notificationMessage} />
       <div
         style={{ display: `${animation ? "flex" : "none"}` }}
         className={styles.sending_div}
@@ -122,7 +139,12 @@ export default function Ment() {
             <p className={styles.ment}>{ment}</p>
           </div>
           <div className={styles.share_div}>
-            <div className={styles.share_button}>
+            <Link
+              target="_blank"
+              href={`ment/card?id=${mentUuid}`}
+              className={styles.share_button}
+              style={{ textDecoration: "none", color: "black" }}
+            >
               <Image
                 src="/images/picture_icon.png"
                 alt="picture"
@@ -131,8 +153,11 @@ export default function Ment() {
                 style={{ opacity: 0.5, marginRight: "0.5rem" }}
               />
               덕담카드 사진 저장
-            </div>
-            <div className={styles.share_button}>
+            </Link>
+            <div
+              className={styles.share_button}
+              onClick={() => copyLink("덕담 주머니 링크가 복사됐어요!")}
+            >
               <Image
                 src="/images/link_icon.png"
                 alt="picture"

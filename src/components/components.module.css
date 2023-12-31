@@ -30,6 +30,27 @@
   opacity: 0.2;
 }
 
+/* Notification Popup Css */
+.notification {
+  position: fixed;
+  bottom: 5rem;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 15px;
+  padding-left: 20px;
+  padding-right: 20px;
+  border-radius: 12px;
+  transition: transform 0.5s ease, opacity 0.5s ease;
+  opacity: 0;
+}
+
+.notification.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+
 @media screen and (max-width: 768px) {
   .ment_div {
     padding: 0.4rem 0.7rem 0.4rem 0.7rem;

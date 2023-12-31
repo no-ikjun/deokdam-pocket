@@ -140,7 +140,8 @@ export default function Home() {
   };
 
   useEffect(() => {
-    (window.adsbygoogle = window.adsbygoogle || []).push({});
+    if (window.adsbygoogle && !window.adsbygoogle.loaded)
+      (window.adsbygoogle = (window as any).adsbygoogle || []).push({});
   }, []);
 
   useEffect(() => {
