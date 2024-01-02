@@ -115,6 +115,7 @@ export default function Data() {
       const uuids = JSON.parse(localStorage.getItem("new-year-ment") ?? "[]");
       let result: MentItem[] = [];
       for (let i = uuids.length - 1; i > uuids.length - 4; i--) {
+        if (i < 0) break;
         const ment = await getMent(uuids[i]);
         result.push([
           ment.ment.ment,

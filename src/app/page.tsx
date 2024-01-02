@@ -296,9 +296,9 @@ export default function Home() {
             </div>
           </div>
           <div style={{ marginTop: "1.5rem" }}>
-            <p className={styles.ad_ment}>
+            {/* <p className={styles.ad_ment}>
               발생한 광고수익은 독거노인종합지원센터를 통해 기부됩니다
-            </p>
+            </p> */}
             <Script
               async
               src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2222926756194557"
