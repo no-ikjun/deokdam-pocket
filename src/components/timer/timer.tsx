@@ -4,12 +4,27 @@ import React, { useState, useEffect } from "react";
 import _ from "./timer.module.css";
 import Image from "next/image";
 import localFont from "next/font/local";
+import Modal from "../modal/modal";
+import Link from "next/link";
 
 const myFont = localFont({
   src: "fonts/NanumMyeongjo.ttf",
 });
 
 const Timer = () => {
+  const [showDiv, setShowDiv] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowDiv(true);
+    }, 500);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, []);
+
   const [timeLeft, setTimeLeft] = useState<{
     days: string;
     hours: string;
@@ -71,42 +86,88 @@ const Timer = () => {
     ));
 
   return (
-    <div className={_.timer}>
-      <div className={_.ment_div}>
-        <Image src="/images/pocket.png" alt="pocket" width={35} height={35} />
-        <p className={_.ment}>
-          2025년 1월 1일이 되면
-          <br />
-          덕담 주머니를 만들어 덕담을 주고받을 수 있어요
-        </p>
-        <Image src="/images/pocket.png" alt="pocket" width={35} height={35} />
-      </div>
-      <div className={_.timer_wrapper}>
-        <div className={_.digit_container}>
-          <div className={_.digit_row}>{renderDigits(timeLeft.days)}</div>
-          <div className={_.label}>:</div>
-        </div>
-        <div className={_.digit_container}>
-          <div className={_.digit_row}>{renderDigits(timeLeft.hours)}</div>
-          <div className={_.label}>:</div>
-        </div>
-        <div className={_.digit_container}>
-          <div className={_.digit_row}>{renderDigits(timeLeft.minutes)}</div>
-          <div className={_.label}>:</div>
-        </div>
-        {timeLeft.seconds && (
-          <div className={_.digit_container}>
-            <div className={_.digit_row}>{renderDigits(timeLeft.seconds)}</div>
-          </div>
-        )}
-      </div>
-      <div className={_.button_div}>
+    <div className={_.main}>
+      <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
+        <p>오픈 알림을 받으시겠어요?</p>
         <button
           className={[_.submit_btn, myFont.className].join(" ")}
-          onClick={() => {}}
+          onClick={() => setShowModal(false)}
         >
-          전달하기
+          네
         </button>
+        <button
+          className={[_.submit_btn, myFont.className].join(" ")}
+          onClick={() => setShowModal(false)}
+        >
+          아니요
+        </button>
+      </Modal>
+      <p className={_.title}>2024년이 얼마 남지 않았어요!</p>
+      <div className={showDiv ? [_.show, _.fade_div].join(" ") : _.fade_div}>
+        <div className={_.timer_div}>
+          <div className={_.timer}>
+            <div className={_.ment_div}>
+              <Image
+                src="/images/pocket.png"
+                alt="pocket"
+                width={35}
+                height={35}
+              />
+              <p className={_.ment}>
+                2025년 1월 1일이 되면
+                <br />
+                덕담 주머니를 만들어 덕담을 주고받을 수 있어요
+              </p>
+              <Image
+                src="/images/pocket.png"
+                alt="pocket"
+                width={35}
+                height={35}
+              />
+            </div>
+            <div className={_.timer_wrapper}>
+              <div className={_.digit_container}>
+                <div className={_.digit_row}>{renderDigits(timeLeft.days)}</div>
+                <div className={_.label}>:</div>
+              </div>
+              <div className={_.digit_container}>
+                <div className={_.digit_row}>
+                  {renderDigits(timeLeft.hours)}
+                </div>
+                <div className={_.label}>:</div>
+              </div>
+              <div className={_.digit_container}>
+                <div className={_.digit_row}>
+                  {renderDigits(timeLeft.minutes)}
+                </div>
+                <div className={_.label}>:</div>
+              </div>
+              {timeLeft.seconds && (
+                <div className={_.digit_container}>
+                  <div className={_.digit_row}>
+                    {renderDigits(timeLeft.seconds)}
+                  </div>
+                </div>
+              )}
+            </div>
+            <p className={_.notification_ment}>
+              알림 신청하고 첫 덕담의 주인공이 되어보세요!
+            </p>
+            <div className={_.button_div}>
+              <button
+                className={[_.submit_btn, myFont.className].join(" ")}
+                onClick={() => {
+                  setShowModal(true);
+                }}
+              >
+                오픈 알림 받기
+              </button>
+            </div>
+            <Link href="/select" className={_.info_ment}>
+              덕담 주머니란?
+            </Link>
+          </div>
+        </div>
       </div>
     </div>
   );

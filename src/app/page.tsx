@@ -21,6 +21,7 @@ import {
 } from "next/navigation";
 import localFont from "next/font/local";
 import Script from "next/script";
+import Timer from "@/components/timer/timer";
 
 const myFont = localFont({
   src: "./fonts/NanumMyeongjo.ttf",
@@ -116,6 +117,8 @@ declare global {
 }
 
 export default function Home() {
+  const [showTimer, setShowTimer] = useState(true);
+
   const [showDiv, setShowDiv] = useState(false);
   const [tempCount, setTempCount] = useState(0);
   const count = useCountNum(tempCount);
@@ -140,6 +143,12 @@ export default function Home() {
   };
 
   useEffect(() => {
+    const now = new Date();
+    const targetDate = new Date("2025-01-01T00:00:00+09:00"); // KST
+    if (now >= targetDate) {
+      setShowTimer(false); // 2025년이 지나면 타이머 숨기기
+    }
+
     if (window.adsbygoogle && !window.adsbygoogle.loaded)
       (window.adsbygoogle = (window as any).adsbygoogle || []).push({});
   }, []);
@@ -169,6 +178,10 @@ export default function Home() {
       clearTimeout(timer);
     };
   }, []);
+
+  if (showTimer) {
+    return <Timer />;
+  }
 
   return (
     <>
