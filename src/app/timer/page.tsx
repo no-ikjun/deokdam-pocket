@@ -10,7 +10,7 @@ export default function TimerPage() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowDiv(true);
-    }, 0);
+    }, 500);
 
     return () => {
       clearTimeout(timer);
