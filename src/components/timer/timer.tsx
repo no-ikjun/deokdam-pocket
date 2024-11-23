@@ -4,8 +4,8 @@ import React, { useState, useEffect } from "react";
 import _ from "./timer.module.css";
 import Image from "next/image";
 import localFont from "next/font/local";
-import Modal from "../modal/modal";
 import Link from "next/link";
+import Modal from "@/components/modal/modal";
 
 const myFont = localFont({
   src: "fonts/NanumMyeongjo.ttf",
