@@ -1,0 +1,288 @@
+.background_img {
+  z-index: -100;
+  object-fit: cover;
+  position: fixed;
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 3rem;
+  min-height: 100vh;
+  padding-bottom: 0;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  text-align: center;
+  line-height: 3rem;
+  opacity: 0;
+  animation: fade 0.7s ease-in-out forwards;
+  transition: 2s;
+}
+
+.fade_div {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  height: fit-content;
+  transform: translateY(0);
+  transition: height 2s ease-in-out opacity 0.6s ease-in-out,
+    transform 0.6s ease-in-out;
+  visibility: hidden;
+  gap: 1rem;
+}
+
+.show {
+  height: fit-content;
+  opacity: 1;
+  transform: translateY(0);
+  visibility: visible;
+  animation: fade2 0.5s ease-in-out forwards;
+}
+
+@keyframes fade {
+  0% {
+    opacity: 0;
+    transform: translateY(1rem);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade2 {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.count_div {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+}
+
+.count {
+  font-size: 1.2rem;
+  font-weight: 400;
+  line-height: 2rem;
+  text-align: center;
+}
+
+.mention {
+  font-size: 1rem;
+  font-weight: 3200;
+  text-align: center;
+  word-break: keep-all;
+}
+
+.example_div {
+  height: 6rem;
+  max-width: 34rem;
+  overflow-y: hidden;
+  scroll-behavior: smooth;
+  mask-image: linear-gradient(
+    to bottom,
+    transparent,
+    black 10%,
+    black 90%,
+    transparent
+  );
+}
+
+.example_div::-webkit-scrollbar {
+  width: none;
+  -ms-overflow-style: none;
+}
+
+.ment_wrapper {
+  position: relative;
+  white-space: nowrap;
+  height: fit-content;
+  animation: roll 25s linear infinite;
+}
+
+@keyframes roll {
+  from {
+    top: 0rem;
+  }
+  to {
+    top: -24rem;
+  }
+}
+
+.jump_ment {
+  color: #949494;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.jump_ment:hover {
+  color: #f86161;
+  text-decoration: underline;
+}
+
+.button_div {
+  width: 105%;
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  vertical-align: middle;
+}
+
+.submit_btn {
+  width: 50%;
+  height: 3.5rem;
+  border: 2px solid #f86161;
+  border-radius: 0.8rem;
+  padding: 0.5rem;
+  font-size: 1.2rem;
+  font-weight: 700;
+  text-align: center;
+  vertical-align: middle;
+  box-sizing: border-box;
+  transition: 0.2s;
+  max-height: 6rem;
+  min-height: 2rem;
+  background-color: #f86161;
+  color: #fff;
+  cursor: pointer;
+  letter-spacing: 0.1rem;
+}
+
+.submit_btn:hover {
+  background-color: #f95050;
+  border: 1px solid #f95050;
+  transition: 0.2s;
+}
+.visible {
+  opacity: 1;
+}
+
+.blur_background {
+  width: 100%;
+  height: 100vh;
+  filter: blur(10px);
+}
+
+.sending_div {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 100;
+  transition: 0.3s;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.sending_ment {
+  color: #000000;
+  font-weight: 500;
+  font-size: 1.3rem;
+  text-align: center;
+}
+
+.sending_icon {
+  animation: move 2s linear infinite;
+}
+
+@keyframes move {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-0.5rem);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+.ad_ment {
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: #949494;
+}
+
+.footer {
+  width: 728px;
+  height: 90px;
+}
+
+.sub_mention {
+  margin-top: 1rem;
+  font-size: 1rem;
+  font-weight: 400;
+  color: #949494;
+  text-align: center;
+  animation: bounce-infinite 5s ease-in-out infinite; /* 무한 반복 애니메이션 */
+}
+
+@keyframes bounce-infinite {
+  0% {
+    transform: translateY(0); /* 시작 위치 */
+  }
+  50% {
+    transform: translateY(7px) scale(1.05);
+  }
+  100% {
+    transform: translateY(0); /* 원래 위치로 돌아옴 */
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .main {
+    padding: 1rem;
+  }
+  .title {
+    font-size: 1.5rem;
+    line-height: 2rem;
+  }
+  .count_div {
+    gap: 0.5rem;
+  }
+  .count {
+    font-size: 1.2rem;
+    line-height: 1.7rem;
+  }
+  .example_div {
+    max-width: 20rem;
+    text-align: center;
+  }
+  .mention {
+    font-size: 1rem;
+    line-height: 1.5rem;
+  }
+  .sending_ment {
+    font-size: 1rem;
+    line-height: 1.5rem;
+  }
+  .ad_ment {
+    font-size: 0.7rem;
+  }
+  .footer {
+    width: 320px;
+    height: 100px;
+  }
+  .sub_mention {
+    font-size: 0.8rem;
+  }
+}

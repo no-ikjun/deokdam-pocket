@@ -10,13 +10,14 @@ import Script from "next/script";
 import { Analytics } from "@vercel/analytics/react";
 
 export const metadata: Metadata = {
-  title: "덕담 주머니 - 갑진년 새해 덕담 프로젝트",
-  description: "갑진년 새해는 모두 함께 덕담을 나누며 힘차게 출발합시다!",
+  title: "덕담 주머니",
+  description: "덕담 주머니를 만들고 새해 덕담을 모아 보세요!",
   keywords:
-    "갑진년, 새해 덕담, 행복한 새해, 덕담 나눔, 새해 축하, 덕담 주머니, 새해 소망, 온라인 커뮤니티, 기부 프로젝트, 2024년 새해, 새해 인사",
+    "을사년, 새해 덕담, 행복한 새해, 덕담 나눔, 새해 축하, 덕담 주머니, 새해 소망, 온라인 커뮤니티, 기부 프로젝트, 2025년 새해, 새해 인사",
   openGraph: {
-    title: "덕담 주머니 - 갑진년 새해 덕담 프로젝트",
-    description: "갑진년 새해는 따뜻한 덕담과 함께 시작하세요",
+    title: "덕담 주머니",
+    description: "덕담 주머니를 만들고 새해 덕담을 모아 보세요!",
+    //TODO: 공유했을 때 보일 이미지 수정
     images: ["https://ifh.cc/g/RGTZd3.jpg"],
   },
 };
