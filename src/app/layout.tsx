@@ -17,8 +17,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "덕담 주머니",
     description: "덕담 주머니를 만들고 새해 덕담을 모아 보세요!",
-    //TODO: 공유했을 때 보일 이미지 수정
-    images: ["https://ifh.cc/g/RGTZd3.jpg"],
+    images: ["https://d3ob3cint7tr3s.cloudfront.net/deokdam_pocket.png"],
   },
 };
 
