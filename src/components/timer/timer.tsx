@@ -6,6 +6,7 @@ import Image from "next/image";
 import localFont from "next/font/local";
 import Link from "next/link";
 import Modal from "@/components/modal/modal";
+import axios from "axios";
 
 const myFont = localFont({
   src: "fonts/NanumMyeongjo.ttf",
@@ -14,6 +15,36 @@ const myFont = localFont({
 const Timer = () => {
   const [showDiv, setShowDiv] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [email, setEmail] = useState("");
+  const [isChecked, setIsChecked] = useState(false);
+  const [error, setError] = useState("");
+
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const handleSubmit = async () => {
+    if (!validateEmail(email)) {
+      setError("올바른 이메일 주소를 입력해주세요.");
+      return;
+    }
+
+    if (!isChecked) {
+      setError("개인정보 수집 및 이용에 동의해야 합니다.");
+      return;
+    }
+
+    try {
+      const result = await axios.post("/api/subscribe", { email });
+      console.log(result);
+      alert("구독이 완료되었습니다! 🎉");
+      setShowModal(false);
+    } catch (error) {
+      console.error(error);
+      alert("구독 요청에 실패했습니다. 다시 시도해주세요.");
+    }
+  };
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -88,18 +119,45 @@ const Timer = () => {
   return (
     <div className={_.main}>
       <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
-        <p>오픈 알림을 받으시겠어요?</p>
+        <Image src="/images/pocket.png" alt="pocket" width={35} height={35} />
+        <p className={_.modal_title}>덕담 주머니 소식 받기</p>
+        <p className={_.modal_ment}>
+          이메일 주소를 입력하면
+          <br />
+          오픈 및 이벤트 소식을 빠르게 받아볼 수 있어요!
+        </p>
+        <input
+          onChange={(val) => {
+            setEmail(val.target.value);
+            setError("");
+          }}
+          className={_.input}
+          placeholder="이메일 주소를 입력해주세요"
+        />
+
+        <div className={_.check_div}>
+          <input
+            type="checkbox"
+            value="text/html"
+            onChange={() => setIsChecked(!isChecked)}
+          />
+          <p>
+            (필수) 개인정보 수집 및 이용에 동의합니다.{" "}
+            <Link
+              href="https://ikjun.notion.site/148ee261b89580b59763da5773d1ea72?pvs=4"
+              className={_.show_policy}
+              target="_blank"
+            >
+              약관 보기
+            </Link>
+          </p>
+        </div>
+        {error && <p className={_.error}>{error}</p>}
         <button
           className={[_.submit_btn, myFont.className].join(" ")}
-          onClick={() => setShowModal(false)}
+          onClick={handleSubmit}
         >
-          네
-        </button>
-        <button
-          className={[_.submit_btn, myFont.className].join(" ")}
-          onClick={() => setShowModal(false)}
-        >
-          아니요
+          확인
         </button>
       </Modal>
       <p className={_.title}>2024년이 얼마 남지 않았어요!</p>
@@ -163,7 +221,11 @@ const Timer = () => {
                 오픈 알림 받기
               </button>
             </div>
-            <Link href="/select" className={_.info_ment}>
+            <Link
+              href="https://ikjun.notion.site/148ee261b89580ac9ad5defe33a92f65?pvs=4"
+              className={_.info_ment}
+              target="_blank"
+            >
               덕담 주머니란?
             </Link>
           </div>

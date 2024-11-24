@@ -47,15 +47,11 @@
   opacity: 0; /* 투명 */
 }
 
-/* 닫기 버튼 */
 .close_button {
   position: absolute;
   top: 1rem;
   right: 1rem;
-  background-color: transparent;
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
+  font-size: 1.3rem;
 }
 
 .close_button:hover {
@@ -66,5 +62,12 @@
 @media screen and (max-width: 768px) {
   .modal_content {
     padding: 1rem;
+  }
+  .modal_content {
+    padding: 2rem;
+  }
+  .close_button {
+    top: 0.5rem;
+    right: 0.5rem;
   }
 }

@@ -28,8 +28,8 @@ const iconList = [
     ment: "엽전",
   },
   {
-    icon: "dragon",
-    ment: "청룡",
+    icon: "snake",
+    ment: "푸른 뱀",
   },
 ];
 
@@ -95,9 +95,7 @@ export default function Select() {
           className={styles.sending_icon}
         />
         <p className={styles.sending_ment}>
-          두근두근...
-          <br />
-          어떤 덕담이 올까요?
+          덕담 주머니 만드는 중...
           <br />
           <span
             onClick={() => {
@@ -111,7 +109,7 @@ export default function Select() {
       </div>
       <div className={animation ? styles.blur_background : ""}>
         <div className={styles.main}>
-          <h1 className={styles.title}>덕담이 준비되었어요</h1>
+          <h1 className={styles.title}>덕담 주머니 만들기</h1>
           <div
             className={
               showDiv
@@ -121,7 +119,7 @@ export default function Select() {
           >
             <p className={styles.mention}>
               아래 <span style={{ fontWeight: 900 }}>그림 중 하나</span>를
-              선택하면 다른 사용자들이 작성한 덕담을 볼 수 있어요
+              선택하면 나만의 덕담 주머니가 만들어져요
             </p>
             <div className={styles.select_div}>
               {showArray.map((icon) => (
