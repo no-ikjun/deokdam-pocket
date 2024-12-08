@@ -116,6 +116,19 @@ const Timer = () => {
       </div>
     ));
 
+  useEffect(() => {
+    const fetchSubscribers = async () => {
+      try {
+        const response = await axios.get("/api/subscribe");
+        console.log(response.data);
+      } catch (error) {
+        console.error("Failed to fetch subscribers:", error);
+      }
+    };
+
+    fetchSubscribers();
+  }, []);
+
   return (
     <div className={_.main}>
       <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
