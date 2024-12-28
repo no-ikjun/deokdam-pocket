@@ -18,3 +18,16 @@ export async function POST(req: Request) {
     return NextResponse.json({ message: "error" }, { status: 500 });
   }
 }
+
+export async function GET(req: Request) {
+  const client = await db.connect();
+  try {
+    const { rows } = await client.sql`SELECT COUNT(*) FROM subscribe_tb;`;
+    client.release;
+    return NextResponse.json({ count: rows[0] }, { status: 200 });
+  } catch (error) {
+    console.log(error);
+    client.release;
+    return NextResponse.json({ message: "error" }, { status: 500 });
+  }
+}

@@ -47,6 +47,17 @@ const Timer = () => {
   };
 
   useEffect(() => {
+    const fetchSubscribers = async () => {
+      try {
+        const response = await axios.get("/api/subscribe");
+        console.log(response.data);
+      } catch (error) {
+        console.error("Failed to fetch subscribers:", error);
+      }
+    };
+
+    fetchSubscribers();
+    
     const timer = setTimeout(() => {
       setShowDiv(true);
     }, 500);
