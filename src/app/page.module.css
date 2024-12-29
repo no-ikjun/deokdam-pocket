@@ -84,6 +84,7 @@
   font-size: 1rem;
   font-weight: 3200;
   text-align: center;
+  word-break: keep-all;
 }
 
 .example_div {
@@ -131,10 +132,50 @@
   text-decoration: underline;
 }
 
-.text_field {
+.input_div {
+  width: 110%;
   margin-top: 1rem;
-  width: 105%;
-  height: 4rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: stretch;
+  gap: 1rem;
+}
+
+.input_btn {
+  border: 2px solid #f86161;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  width: 15%;
+  line-height: 1.3rem;
+  font-weight: 400;
+  letter-spacing: 0.04rem;
+  text-align: center;
+  vertical-align: middle;
+  box-sizing: border-box;
+  transition: 0.2s;
+  background-color: #f86161;
+  color: #fff;
+  cursor: pointer;
+}
+
+.input_btn:hover {
+  background-color: #f95050;
+  border: 2px solid #f95050;
+  transition: 0.2s;
+}
+
+.input_div > .input_btn {
+  flex: 0 0 auto;
+}
+
+.input_length {
+  width: 70%;
+}
+
+.text_field {
+  width: 80%;
+  height: 3.8rem;
   border: 1px solid #949494;
   border-radius: 0.5rem;
   padding: 0.5rem;
@@ -168,38 +209,52 @@
 
 .button_div {
   width: 105%;
-  margin-top: 1rem;
+  margin-top: 0.5rem;
   display: flex;
   flex-direction: row;
+  gap: 0.6rem;
   justify-content: center;
-  align-items: center;
+  align-items: stretch;
   vertical-align: middle;
 }
 
 .submit_btn {
-  width: 10rem;
-  height: 2.5rem;
-  border: 2px solid #f86161;
-  border-radius: 0.5rem;
-  padding: 0.5rem;
-  font-size: 1rem;
+  border: 2px solid #c4c4c4;
+  border-radius: 0.7rem;
+  padding: 0.8rem 2rem;
+  font-size: 1.2rem;
   font-weight: 700;
+  letter-spacing: 0.04rem;
   text-align: center;
   vertical-align: middle;
   box-sizing: border-box;
-  transition: 0.2s;
-  max-height: 6rem;
-  min-height: 2rem;
-  background-color: #f86161;
+  transition: 0.4s;
+  background-color: #c4c4c4;
   color: #fff;
   cursor: pointer;
-  letter-spacing: 0.1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+}
+
+.submit_btn_ment {
+  font-size: 0.8rem;
+  font-weight: 300;
+  margin: 0 1rem;
+  margin-bottom: 0.53rem;
+  color: #fff;
+}
+
+.button_div > .submit_btn {
+  flex: 0 0 auto;
 }
 
 .submit_btn:hover {
-  background-color: #f95050;
-  border: 1px solid #f95050;
-  transition: 0.2s;
+  background-color: #f37878;
+  border: 2px solid #f37878;
+  transition: 0.4s;
 }
 .visible {
   opacity: 1;
@@ -263,14 +318,14 @@
     padding: 1rem;
   }
   .title {
-    font-size: 1.3rem;
+    font-size: 1.4rem;
     line-height: 2rem;
   }
   .count_div {
     gap: 0.5rem;
   }
   .count {
-    font-size: 0.9rem;
+    font-size: 1rem;
   }
   .example_div {
     max-width: 20rem;
@@ -278,6 +333,23 @@
   }
   .mention {
     line-height: 1.5rem;
+  }
+  .input_div {
+    width: 100%;
+  }
+  .input_length {
+    width: 60%;
+  }
+  .submit_btn {
+    margin-top: 1rem;
+    padding: 0.8rem 2rem;
+    font-size: 1rem;
+  }
+  .text_field {
+    font-size: 0.9rem;
+  }
+  .submit_btn_ment {
+    font-size: 0.8rem;
   }
   .sending_ment {
     font-size: 1rem;
