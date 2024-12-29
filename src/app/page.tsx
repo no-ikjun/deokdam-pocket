@@ -144,7 +144,7 @@ export default function Home() {
 
   useEffect(() => {
     const now = new Date();
-    const targetDate = new Date("2025-01-01T00:00:00+09:00"); // KST
+    const targetDate = new Date("2024-12-01T00:00:00+09:00"); // KST
     if (now >= targetDate) {
       setShowTimer(false); // 2025년이 지나면 타이머 숨기기
     }
@@ -261,21 +261,26 @@ export default function Home() {
               }}
             >
               <p className={styles.mention}>
-                덕담을 적어주시면 다른 사용자들이 작성한 덕담을 전달받을 수
-                있어요.&nbsp;&nbsp;
-                <Link href="/select" className={styles.jump_ment}>
-                  건너뛰기
-                </Link>
+                대표 덕담을 적어주시면 다른 유저들에게 덕담이 전달되고 회답을
+                받을 수 있어요.
               </p>
-              <textarea
-                className={[styles.text_field, myFont.className].join(" ")}
-                placeholder="새해 덕담을 적어주세요"
-                onChange={(e) => {
-                  onInputHandler(e);
-                  setMent(e.target.value);
-                }}
-              />
-              <div style={{ width: "100%" }}>
+              <div className={styles.input_div}>
+                <textarea
+                  className={[styles.text_field, myFont.className].join(" ")}
+                  placeholder="내 덕담 주머니의 대표 덕담을 적어주세요"
+                  onChange={(e) => {
+                    onInputHandler(e);
+                    setMent(e.target.value);
+                  }}
+                />
+                <button
+                  className={[styles.input_btn, myFont.className].join(" ")}
+                >
+                  입력
+                </button>
+              </div>
+
+              <div className={styles.input_length}>
                 <p
                   className={styles.word_length}
                   style={{ color: inputCount == 150 ? "red" : "#949494" }}
@@ -287,23 +292,11 @@ export default function Home() {
               <div className={styles.button_div}>
                 <button
                   className={[styles.submit_btn, myFont.className].join(" ")}
-                  onClick={async () => {
-                    setAnimation(true);
-                    const result = await sendMent(ment);
-                    if (result != "error") {
-                      let uuids = JSON.parse(
-                        localStorage.getItem("new-year-ment") ?? "[]"
-                      );
-                      uuids.push(result);
-                      localStorage.setItem(
-                        "new-year-ment",
-                        JSON.stringify(uuids)
-                      );
-                      loading();
-                    }
-                  }}
                 >
-                  전달하기
+                  <p className={styles.submit_btn_ment}>
+                    이미 덕담 주머니가 있다면?
+                  </p>
+                  덕담 주머니 조회
                 </button>
               </div>
             </div>
