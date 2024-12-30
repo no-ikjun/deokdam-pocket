@@ -156,7 +156,7 @@ export default function Home() {
     }
 
     if (localStorage.getItem("pocket_uuid")) {
-      router.push("/ment");
+      router.replace("/pocket");
     }
 
     if (window.adsbygoogle && !window.adsbygoogle.loaded)

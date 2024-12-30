@@ -303,8 +303,8 @@ export default function Ment() {
           </Slider>
 
           <div className={styles.next_div}>
-            <Link href="/data" className={styles.next_ment}>
-              다음으로&nbsp;&rarr;
+            <Link href="/pocket" className={styles.next_ment}>
+              내 덕담 주머니 보러가기&nbsp;&rarr;
             </Link>
           </div>
         </div>
