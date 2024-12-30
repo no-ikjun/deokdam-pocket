@@ -8,6 +8,8 @@ import { toPng } from "html-to-image";
 import { useEffect, useRef, useState, Suspense } from "react";
 import axios from "axios";
 
+export const dynamic = "force-dynamic";
+
 const getMent = async (uuid: string): Promise<any> => {
   try {
     const res = await axios.get(`/api/ment?uuid=${uuid}`, {
