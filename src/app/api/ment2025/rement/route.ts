@@ -1,5 +1,6 @@
 import { db } from "@vercel/postgres";
 import { NextResponse } from "next/server";
+import { v4 as uuidv4 } from "uuid";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -27,7 +28,8 @@ export async function POST(req: Request) {
         { status: 400 }
       );
     } else {
-      await client.sql`INSERT INTO rement (pocket_uuid, ment_uuid, ment) VALUES (${pocket_uuid}, ${ment_uuid}, ${ment});`;
+      const rementUuid = uuidv4();
+      await client.sql`INSERT INTO rement (rement_uuid, pocket_uuid, ment_uuid, ment) VALUES (${rementUuid}, ${pocket_uuid}, ${ment_uuid}, ${ment});`;
     }
 
     client.release();

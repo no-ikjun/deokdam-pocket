@@ -15,7 +15,7 @@ export async function POST(req: Request) {
       type: string;
     };
 
-    if (!pocket_uuid || !ment_uuid || !type) {
+    if (!pocket_uuid || !ment_uuid) {
       return NextResponse.json({ message: "error" }, { status: 400 });
     }
 
@@ -28,6 +28,7 @@ export async function POST(req: Request) {
       const reactionUuid = uuidv4();
       await client.sql`INSERT INTO reaction (reaction_uuid, pocket_uuid, ment_uuid, type) VALUES (${reactionUuid}, ${pocket_uuid}, ${ment_uuid}, ${type});`;
     }
+    return NextResponse.json({ message: "success" }, { status: 201 });
   } catch (error) {
     console.log(error);
     client.release();

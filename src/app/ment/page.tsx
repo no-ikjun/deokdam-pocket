@@ -42,10 +42,15 @@ const getMents = async () => {
 
 export default function Ment() {
   const [animation, setAnimation] = useState(true);
+
+  const [isLoading, setIsLoading] = useState(false);
+
   const [ments, setMents] = useState([]);
   const [showNotification, setShowNotification] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState("");
-  const notificationDuration = 3000;
+  const notificationDuration = 1000;
+
+  const [replies, setReplies] = useState<{ [key: string]: string }>({});
 
   const copyLink = (message: string) => {
     navigator.clipboard.writeText("https://deokdam.app");
@@ -55,6 +60,105 @@ export default function Ment() {
     setTimeout(() => {
       setShowNotification(false);
     }, notificationDuration);
+  };
+
+  const reactMent = async (mentUuid: string, type: string) => {
+    try {
+      const pocketUuid = localStorage.getItem("pocket_uuid");
+      const res = await axios.post("/api/ment2025/reaction", {
+        pocket_uuid: pocketUuid,
+        ment_uuid: mentUuid,
+        type: type,
+      });
+      if (res.status === 201) {
+        setShowNotification(false);
+        setNotificationMessage("반응이 등록되었어요!");
+        setShowNotification(true);
+        setTimeout(() => {
+          setShowNotification(false);
+        }, notificationDuration);
+        return true;
+      } else {
+        setShowNotification(false);
+        setNotificationMessage("한 번만 반응할 수 있어요!");
+        setShowNotification(true);
+        setTimeout(() => {
+          setShowNotification(false);
+        }, notificationDuration);
+        return false;
+      }
+    } catch (err) {
+      console.log(err);
+      setShowNotification(false);
+      setNotificationMessage("한 번만 반응할 수 있어요!");
+      setShowNotification(true);
+      setTimeout(() => {
+        setShowNotification(false);
+      }, notificationDuration);
+      return false;
+    }
+  };
+
+  const handleReplyChange = (mentUuid: string, value: string) => {
+    setReplies((prevReplies) => ({
+      ...prevReplies,
+      [mentUuid]: value,
+    }));
+  };
+
+  const rement = async (ment_uuid: string) => {
+    setIsLoading(true);
+    const ment = replies[ment_uuid];
+    if (!ment) {
+      setShowNotification(false);
+      setNotificationMessage("회답을 입력해주세요!");
+      setShowNotification(true);
+      setTimeout(() => {
+        setShowNotification(false);
+      }, notificationDuration);
+      return false;
+    }
+    try {
+      const pocketUuid = localStorage.getItem("pocket_uuid");
+      const res = await axios.post("/api/ment2025/rement", {
+        pocket_uuid: pocketUuid,
+        ment_uuid: ment_uuid,
+        ment: ment,
+      });
+      if (res.status === 201) {
+        setShowNotification(false);
+        setNotificationMessage("회답이 등록되었어요!");
+        setShowNotification(true);
+        setTimeout(() => {
+          setShowNotification(false);
+        }, notificationDuration);
+        setReplies((prevReplies) => ({
+          ...prevReplies,
+          [ment_uuid]: "",
+        }));
+        setIsLoading(false);
+        return true;
+      } else {
+        setShowNotification(false);
+        setNotificationMessage("이미 회답한 덕담이에요!");
+        setShowNotification(true);
+        setTimeout(() => {
+          setShowNotification(false);
+        }, notificationDuration);
+        setIsLoading(false);
+        return false;
+      }
+    } catch (err) {
+      console.log(err);
+      setShowNotification(false);
+      setNotificationMessage("이미 회답한 덕담이에요!");
+      setShowNotification(true);
+      setTimeout(() => {
+        setShowNotification(false);
+      }, notificationDuration);
+      setIsLoading(false);
+      return false;
+    }
   };
 
   useEffect(() => {
@@ -77,6 +181,30 @@ export default function Ment() {
   return (
     <>
       <Notification show={showNotification} message={notificationMessage} />
+      <div
+        style={{ display: `${isLoading ? "flex" : "none"}` }}
+        className={styles.sending_div}
+      >
+        <Image
+          src="/images/kite_icon.png"
+          alt="kite"
+          width={100}
+          height={100}
+          className={styles.sending_icon}
+        />
+        <p className={styles.sending_ment}>
+          회답 전달 중...
+          <br />
+          <span
+            onClick={() => {
+              window.location.href = "/select";
+            }}
+            style={{ cursor: "pointer", color: "#6f6f6f", fontSize: "0.9rem" }}
+          >
+            새로고침
+          </span>
+        </p>
+      </div>
       <div
         style={{ display: `${animation ? "flex" : "none"}` }}
         className={styles.sending_div}
@@ -101,7 +229,7 @@ export default function Ment() {
           </span>
         </p>
       </div>
-      <div className={animation ? styles.blur_background : ""}>
+      <div className={animation || isLoading ? styles.blur_background : ""}>
         <div className={styles.main}>
           <div className={styles.title_container}>
             <Image
@@ -126,13 +254,28 @@ export default function Ment() {
                   <div className={styles.ment_like_div}>
                     <p className={styles.ment_like}>덕담이 마음에 드셨나요?</p>
                     <div className={styles.ment_like_button_div}>
-                      <div className={styles.ment_like_icon_div}>
+                      <div
+                        className={styles.ment_like_icon_div}
+                        onClick={() => {
+                          reactMent(ment.ment_uuid, "1");
+                        }}
+                      >
                         🥹 감동이에요
                       </div>
-                      <div className={styles.ment_like_icon_div}>
+                      <div
+                        className={styles.ment_like_icon_div}
+                        onClick={() => {
+                          reactMent(ment.ment_uuid, "2");
+                        }}
+                      >
                         😊 훈훈해요
                       </div>
-                      <div className={styles.ment_like_icon_div}>
+                      <div
+                        className={styles.ment_like_icon_div}
+                        onClick={() => {
+                          reactMent(ment.ment_uuid, "3");
+                        }}
+                      >
                         😑 별로에요
                       </div>
                     </div>
@@ -143,9 +286,14 @@ export default function Ment() {
                   <input
                     className={styles.rement_input}
                     placeholder="회답을 입력하세요"
+                    value={replies[ment.ment_uuid] || ""}
+                    onChange={(e) =>
+                      handleReplyChange(ment.ment_uuid, e.target.value)
+                    }
                   />
                   <button
                     className={[styles.rement_btn, myFont.className].join(" ")}
+                    onClick={() => rement(ment.ment_uuid)}
                   >
                     전송
                   </button>
