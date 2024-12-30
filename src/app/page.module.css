@@ -317,6 +317,22 @@
   height: 90px;
 }
 
+.info_ment {
+  margin-top: 1.5rem;
+  font-size: 1rem;
+  font-weight: 3200;
+  text-align: center;
+  color: #696969;
+  text-decoration: underline;
+  transition: 0.5s;
+}
+
+.info_ment:hover {
+  text-decoration: none;
+  color: #f86161;
+  transition: 0.5s;
+}
+
 @media screen and (max-width: 768px) {
   .main {
     padding: 1rem;

@@ -29,13 +29,13 @@ export async function GET(req: Request) {
       SELECT 
         m.ment_uuid, 
         m.ment, 
-        COUNT(mip.recieved_uuid) AS shared_count,
-        ARRAY_AGG(r.type) FILTER (WHERE r.type IS NOT NULL) AS reactions,
+        COUNT(DISTINCT mip.recieved_uuid) AS shared_count,
+        ARRAY_AGG(DISTINCT r.type) FILTER (WHERE r.type IS NOT NULL) AS reactions,
         JSON_AGG(
-          JSON_BUILD_OBJECT(
+          DISTINCT JSONB_BUILD_OBJECT(  -- JSONB로 변환하여 중복 처리
             'rement', re.ment,
             'pocket_name', p.name
-          )
+          )::TEXT  -- 문자열로 변환 후 처리
         ) FILTER (WHERE re.ment IS NOT NULL) AS rements
       FROM ment m
       LEFT JOIN ment_in_pocket mip 

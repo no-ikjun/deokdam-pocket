@@ -75,7 +75,7 @@ const mentList = [
 
 const getCount = async (): Promise<number> => {
   try {
-    const res = await axios.get("/api/ment/count", {
+    const res = await axios.get("/api/ment2025/count", {
       headers: {
         "Cache-Control": "no-cache",
         Pragma: "no-cache",
@@ -333,6 +333,7 @@ export default function Home() {
                   <br />
                 </p>
               </div>
+
               <div className={styles.button_div}>
                 <button
                   className={[styles.submit_btn, myFont.className].join(" ")}
@@ -346,6 +347,14 @@ export default function Home() {
                   덕담 주머니 조회
                 </button>
               </div>
+
+              <Link
+                href="https://ikjun.notion.site/148ee261b89580ac9ad5defe33a92f65?pvs=4"
+                className={styles.info_ment}
+                target="_blank"
+              >
+                덕담 주머니란?
+              </Link>
             </div>
           </div>
           <div style={{ marginTop: "1.5rem" }}>

@@ -102,11 +102,7 @@ export default function Pocket() {
             className={[styles.modal_btn, myFont.className].join(" ")}
             onClick={async () => {
               if (addMent === "") {
-                setNotificationMessage("덕담을 입력해주세요!");
-                setShowNotification(true);
-                setTimeout(() => {
-                  setShowNotification(false);
-                }, notificationDuration);
+                alert("덕담을 입력해주세요!");
                 return;
               }
               setAnimation(true);
@@ -285,7 +281,7 @@ export default function Pocket() {
                   <div>
                     {ment.rements.map((rement: any, j: number) => (
                       <div
-                        key={j}
+                        key={rement + j}
                         style={{
                           display: "flex",
                           justifyContent: "space-between",
@@ -303,18 +299,18 @@ export default function Pocket() {
                           }}
                         >
                           <Image
-                            key={j}
+                            key={rement + "profile"}
                             src={`/images/profile_${(j % 4) + 1}.png`}
                             alt="profile"
                             width={30}
                             height={30}
                           />
                           <p key={j} className={styles.rement}>
-                            {rement.rement}
+                            {JSON.parse(rement).rement}
                           </p>
                         </div>
                         <p className={styles.shared_count}>
-                          {rement.pocket_name}
+                          {JSON.parse(rement).pocket_name}
                         </p>
                       </div>
                     ))}
