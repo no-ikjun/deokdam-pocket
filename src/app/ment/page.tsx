@@ -12,6 +12,7 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import localFont from "next/font/local";
+import { useRouter } from "next/navigation";
 
 const myFont = localFont({
   src: "../fonts/NanumMyeongjo.ttf",
@@ -52,8 +53,9 @@ export default function Ment() {
 
   const [replies, setReplies] = useState<{ [key: string]: string }>({});
 
-  const copyLink = (message: string) => {
-    navigator.clipboard.writeText("https://deokdam.app");
+  const router = useRouter();
+
+  const handleNotification = (message: string) => {
     setNotificationMessage(message);
     setShowNotification(true);
 
@@ -71,30 +73,15 @@ export default function Ment() {
         type: type,
       });
       if (res.status === 201) {
-        setShowNotification(false);
-        setNotificationMessage("반응이 등록되었어요!");
-        setShowNotification(true);
-        setTimeout(() => {
-          setShowNotification(false);
-        }, notificationDuration);
+        handleNotification("반응이 등록되었어요!");
         return true;
       } else {
-        setShowNotification(false);
-        setNotificationMessage("한 번만 반응할 수 있어요!");
-        setShowNotification(true);
-        setTimeout(() => {
-          setShowNotification(false);
-        }, notificationDuration);
+        handleNotification("한 번만 반응할 수 있어요!");
         return false;
       }
     } catch (err) {
       console.log(err);
-      setShowNotification(false);
-      setNotificationMessage("한 번만 반응할 수 있어요!");
-      setShowNotification(true);
-      setTimeout(() => {
-        setShowNotification(false);
-      }, notificationDuration);
+      handleNotification("한 번만 반응할 수 있어요");
       return false;
     }
   };
@@ -110,12 +97,7 @@ export default function Ment() {
     setIsLoading(true);
     const ment = replies[ment_uuid];
     if (!ment) {
-      setShowNotification(false);
-      setNotificationMessage("회답을 입력해주세요!");
-      setShowNotification(true);
-      setTimeout(() => {
-        setShowNotification(false);
-      }, notificationDuration);
+      handleNotification("회답을 입력해주세요!");
       return false;
     }
     try {
@@ -126,12 +108,7 @@ export default function Ment() {
         ment: ment,
       });
       if (res.status === 201) {
-        setShowNotification(false);
-        setNotificationMessage("회답이 등록되었어요!");
-        setShowNotification(true);
-        setTimeout(() => {
-          setShowNotification(false);
-        }, notificationDuration);
+        handleNotification("회답이 등록되었어요!");
         setReplies((prevReplies) => ({
           ...prevReplies,
           [ment_uuid]: "",
@@ -139,34 +116,28 @@ export default function Ment() {
         setIsLoading(false);
         return true;
       } else {
-        setShowNotification(false);
-        setNotificationMessage("이미 회답한 덕담이에요!");
-        setShowNotification(true);
-        setTimeout(() => {
-          setShowNotification(false);
-        }, notificationDuration);
+        handleNotification("이미 회답한 덕담이에요!");
         setIsLoading(false);
         return false;
       }
     } catch (err) {
       console.log(err);
-      setShowNotification(false);
-      setNotificationMessage("이미 회답한 덕담이에요!");
-      setShowNotification(true);
-      setTimeout(() => {
-        setShowNotification(false);
-      }, notificationDuration);
+      handleNotification("이미 회답한 덕담이에요!");
       setIsLoading(false);
       return false;
     }
   };
 
   useEffect(() => {
+    if (!localStorage.getItem("pocket_uuid")) {
+      router.replace("/");
+    }
+
     getMents().then((data) => {
       setMents(data.ments);
     });
     setAnimation(false);
-  }, []);
+  }, [router]);
 
   const sliderSettings = {
     dots: false,

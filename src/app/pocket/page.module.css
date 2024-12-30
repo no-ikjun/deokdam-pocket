@@ -1,0 +1,203 @@
+/* 공통 스타일 */
+.sending_div {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 100;
+  transition: 0.3s;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.sending_ment {
+  color: #000000;
+  font-weight: 500;
+  font-size: 1.3rem;
+  text-align: center;
+  line-height: 1.6rem;
+}
+
+.sending_icon {
+  animation: move 2s linear infinite;
+}
+
+@keyframes move {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-0.5rem);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+.blur_background {
+  width: 100%;
+  height: 100vh;
+  filter: blur(10px);
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  min-height: 100vh;
+}
+
+/* 사이드바 고정 및 프로필 섹션 */
+.sidebar {
+  width: 250px;
+  height: 100vh;
+  background-color: #f5f5f5;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 10; /* 모바일에서 위로 올라오게 */
+}
+
+.profile {
+  text-align: center;
+  padding: 1rem;
+  width: 100%;
+}
+
+.profile_info_div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.profile_name {
+  font-size: 1.2rem;
+  color: #000000;
+  font-weight: 600;
+  line-height: 1.7rem;
+  word-break: keep-all;
+}
+
+.profile_info {
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+  color: #666;
+}
+
+.profile_buttons_div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+
+.profile_btn {
+  width: 100%;
+  height: 2.5rem;
+  border: 2px solid #f86161;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  line-height: 1.3rem;
+  font-weight: 700;
+  letter-spacing: 0.04rem;
+  text-align: center;
+  vertical-align: middle;
+  box-sizing: border-box;
+  transition: 0.2s;
+  background-color: #f86161;
+  color: #fff;
+  cursor: pointer;
+}
+
+.profile_btn:hover {
+  background-color: #de4d4d;
+  border-color: #de4d4d;
+  transition: 0.2s;
+}
+
+/* 오른쪽 콘텐츠 섹션 */
+.content {
+  margin-left: 250px; /* 프로필 섹션 너비만큼 이동 */
+  width: calc(100% - 250px);
+  padding: 2rem;
+  overflow-y: auto;
+}
+
+.scroll_content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-height: 80vh;
+  overflow-y: auto; /* 스크롤 가능 */
+  padding-right: 1rem;
+}
+
+.card {
+  background-color: white;
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  font-size: 1.1rem;
+}
+
+/* 모바일 대응 */
+@media screen and (max-width: 768px) {
+  .main {
+    padding: 1rem;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .sidebar {
+    width: 100%;
+    height: auto;
+    position: relative;
+    box-shadow: none;
+    padding: 1rem;
+  }
+
+  .profile_info_div {
+    flex-direction: row;
+    gap: 1rem;
+  }
+
+  .profile_info {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .profile_img {
+    width: 80px;
+    height: 80px;
+  }
+
+  .content {
+    margin-left: 0;
+    width: 100%;
+    padding: 1rem;
+  }
+
+  .scroll_content {
+    max-height: none;
+    padding-right: 0;
+  }
+
+  .card {
+    font-size: 1rem;
+    padding: 1rem;
+  }
+}

@@ -60,7 +60,6 @@ export default function RootLayout({
           className={styles.background_img}
           src={backgroundImg}
           alt="img"
-          fill
         />
         {children}
         <Analytics />
