@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "./page.module.css";
 import Image from "next/image";
 import localFont from "next/font/local";
 import Notification from "@/components/notification_popup";
 import { useRouter } from "next/navigation";
+import axios from "axios";
 
 const myFont = localFont({
   src: "../fonts/NanumMyeongjo.ttf",
@@ -18,6 +19,12 @@ export default function Pocket() {
   const [notificationMessage, setNotificationMessage] = useState("");
   const notificationDuration = 1000;
 
+  const [writtenMents, setWrittenMents] = useState([]);
+  const [receivedMents, setReceivedMents] = useState([]);
+
+  const [pocketType, setPocketType] = useState("");
+  const [pocketName, setPocketName] = useState("");
+
   const router = useRouter();
 
   const copyLink = () => {
@@ -28,6 +35,35 @@ export default function Pocket() {
       setShowNotification(false);
     }, notificationDuration);
   };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setAnimation(true);
+      try {
+        const pocket_uuid = localStorage.getItem("pocket_uuid");
+
+        const res = await axios.get(
+          `/api/pocket/info?pocket_uuid=${pocket_uuid}`
+        );
+        console.log(res.data);
+        setPocketType(res.data.pocket.type);
+        setWrittenMents(res.data.writtenMents);
+        setReceivedMents(res.data.receivedMents);
+        setPocketName(res.data.pocket.name);
+      } catch (error) {
+        console.error(error);
+      }
+      setAnimation(false);
+    };
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    const pocket_uuid = localStorage.getItem("pocket_uuid");
+    if (!pocket_uuid) {
+      router.replace("/");
+    }
+  }, [router]);
 
   return (
     <>
@@ -44,7 +80,7 @@ export default function Pocket() {
           className={styles.sending_icon}
         />
         <p className={styles.sending_ment}>
-          덕담 주머니 여는 중...
+          덕담 주머니 확인 중...
           <br />
           <span
             onClick={() => {
@@ -61,16 +97,24 @@ export default function Pocket() {
           <div className={styles.profile}>
             <div className={styles.profile_info_div}>
               <Image
-                src="/images/snake_icon.svg"
+                src={
+                  pocketType !== ""
+                    ? `/images/${pocketType}_icon.svg`
+                    : "/images/placeholder.png"
+                }
                 alt="profile"
                 width={120}
                 height={120}
                 className={styles.profile_img}
               />
               <div className={styles.profile_info}>
-                <h3 className={styles.profile_name}>을사년 덕담 주머니</h3>
-                <p className={styles.profile_info}>보낸 덕담: 5개</p>
-                <p className={styles.profile_info}>받은 덕담: 5개</p>
+                <h3 className={styles.profile_name}>{pocketName}</h3>
+                <p className={styles.profile_info}>
+                  나의 덕담: {writtenMents.length}개
+                </p>
+                <p className={styles.profile_info}>
+                  받은 덕담: {receivedMents.length}개
+                </p>
               </div>
             </div>
             <div className={styles.profile_buttons_div}>
@@ -98,14 +142,183 @@ export default function Pocket() {
 
         {/* 오른쪽 스크롤 가능한 콘텐츠 섹션 */}
         <main className={styles.content}>
-          <h1 className={styles.title}>덕담 리스트</h1>
-          <div className={styles.scroll_content}>
-            {[...Array(20)].map((_, i) => (
-              <div key={i} className={styles.card}>
-                <p>덕담 {i + 1}</p>
+          <h1 className={styles.title}>내가 보낸 덕담</h1>
+
+          {writtenMents.map((ment: any, i: number) => (
+            <div key={i} className={styles.card}>
+              <div className={styles.card_header}>
+                <Image
+                  src={`/images/${pocketType}_icon.svg`}
+                  alt="profile"
+                  width={30}
+                  height={30}
+                />
+                <p className={styles.ment_highlight}>{ment.ment}</p>
               </div>
-            ))}
-          </div>
+              <div
+                style={{
+                  display: "flex",
+                  width: "100%",
+                  justifyContent: "space-between",
+                }}
+              >
+                <div className={styles.reaction_icon_div}>
+                  <div className={styles.ment_like_icon}>
+                    🥹&nbsp;&nbsp;
+                    {(ment.reactions?.length ?? 0) > 0
+                      ? ment.reactions.filter((r: string) => r === "1").length
+                      : 0}
+                  </div>
+                  <div className={styles.ment_like_icon}>
+                    😊&nbsp;&nbsp;
+                    {(ment.reactions?.length ?? 0) > 0
+                      ? ment.reactions.filter((r: string) => r === "2").length
+                      : 0}
+                  </div>
+                  <div className={styles.ment_like_icon}>
+                    😑&nbsp;&nbsp;
+                    {(ment.reactions?.length ?? 0) > 0
+                      ? ment.reactions.filter((r: string) => r === "3").length
+                      : 0}
+                  </div>
+                </div>
+                <p className={styles.shared_count}>
+                  {ment.shared_count}명에게 전달됨
+                </p>
+              </div>
+              {ment.rements.length > 0 ? (
+                <>
+                  <p>회답</p>
+                  <div>
+                    {ment.rements.map((rement: any, j: number) => (
+                      <div
+                        key={j}
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                          gap: "10px",
+                          marginTop: "7px",
+                        }}
+                      >
+                        <div
+                          style={{
+                            display: "flex",
+                            justifyContent: "flex-start",
+                            alignItems: "center",
+                            gap: "10px",
+                          }}
+                        >
+                          <Image
+                            key={j}
+                            src={`/images/profile_${(j % 4) + 1}.png`}
+                            alt="profile"
+                            width={30}
+                            height={30}
+                          />
+                          <p key={j} className={styles.rement}>
+                            {rement.rement}
+                          </p>
+                        </div>
+                        <p className={styles.shared_count}>
+                          {rement.pocket_name}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <></>
+              )}
+            </div>
+          ))}
+
+          <h1 className={styles.title}>받은 덕담</h1>
+          {receivedMents.map((ment: any, i: number) => (
+            <div key={i} className={styles.card}>
+              <div className={styles.card_header}>
+                <Image
+                  src={`/images/${ment.writer_type}_icon.svg`}
+                  alt="profile"
+                  width={30}
+                  height={30}
+                />
+                <p className={styles.ment_highlight}>{ment.ment}</p>
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  width: "100%",
+                  justifyContent: "space-between",
+                }}
+              >
+                <div className={styles.reaction_icon_div}>
+                  <div className={styles.ment_like_icon}>
+                    🥹&nbsp;&nbsp;
+                    {(ment.reactions?.length ?? 0) > 0
+                      ? ment.reactions.filter((r: string) => r === "1").length
+                      : 0}
+                  </div>
+                  <div className={styles.ment_like_icon}>
+                    😊&nbsp;&nbsp;
+                    {(ment.reactions?.length ?? 0) > 0
+                      ? ment.reactions.filter((r: string) => r === "2").length
+                      : 0}
+                  </div>
+                  <div className={styles.ment_like_icon}>
+                    😑&nbsp;&nbsp;
+                    {(ment.reactions?.length ?? 0) > 0
+                      ? ment.reactions.filter((r: string) => r === "3").length
+                      : 0}
+                  </div>
+                </div>
+              </div>
+              {ment.rements.length > 0 ? (
+                <>
+                  <p>회답</p>
+                  <div>
+                    {ment.rements.map((rement: any, j: number) => (
+                      <div
+                        key={j}
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                          gap: "10px",
+                          marginTop: "7px",
+                        }}
+                      >
+                        <div
+                          style={{
+                            display: "flex",
+                            justifyContent: "flex-start",
+                            alignItems: "center",
+                            gap: "10px",
+                          }}
+                        >
+                          <Image
+                            key={j}
+                            src={`/images/profile_${(j % 4) + 1}.png`}
+                            alt="profile"
+                            width={30}
+                            height={30}
+                          />
+                          <p key={j} className={styles.rement}>
+                            {rement.rement}
+                          </p>
+                        </div>
+                        <p className={styles.shared_count}>
+                          {rement.pocket_name}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <></>
+              )}
+            </div>
+          ))}
         </main>
       </div>
     </>

@@ -2,6 +2,8 @@ import React, { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import styles from "./signin.module.css";
 import localFont from "next/font/local";
+import axios from "axios";
+import Link from "next/link";
 
 const myFont = localFont({
   src: "./fonts/NanumMyeongjo.ttf",
@@ -115,12 +117,32 @@ const SignIn = () => {
       </div>
       <button
         className={[styles.submit_btn, myFont.className].join(" ")}
-        onClick={() => {
-          console.log(name, pin);
+        onClick={async () => {
+          try {
+            const response = await axios.get(
+              "/api/pocket?name=" + name + "&password=" + pin.join("")
+            );
+            if (response.status === 200) {
+              console.log(response.data);
+              localStorage.setItem("pocket_uuid", response.data.pocket_uuid);
+              window.location.href = "/pocket";
+            } else {
+              alert("다시 시도해주세요.");
+            }
+          } catch (error) {
+            console.log(error);
+            alert("다시 시도해주세요.");
+          }
         }}
       >
-        만들기
+        조회하기
       </button>
+      <p className={styles.modal_contact}>
+        내 덕담 주머니 정보가 기억나지 않나요?{" "}
+        <Link href="https://www.instagram.com/deokdam_pocket/" target="_blank">
+          문의하기
+        </Link>
+      </p>
     </>
   );
 };

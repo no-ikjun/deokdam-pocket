@@ -209,8 +209,8 @@ export default function Home() {
             loading(); // 로딩 완료
           }}
           onCanceled={() => {
-            alert("등록에 실패했습니다."); // 실패 시 사용자에게 알림
-            setSignUpModal(true); // 모달 유지
+            alert("사용할 수 없는 이름입니다.");
+            setSignUpModal(true);
           }}
         />
       </Modal>
