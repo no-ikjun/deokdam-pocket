@@ -98,7 +98,9 @@ const SignIn = () => {
                 // 입력된 값이 없을 경우 입력창 표시
                 <input
                   ref={(el) => (inputRefs.current[index] = el)}
-                  type="text"
+                  type="tel"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                   maxLength={1}
                   className={styles.pin_input}
                   value={digit}
