@@ -1,11 +1,14 @@
 "use client";
+
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import styles from "../page.module.css";
 
-import { toPng, toJpeg, toBlob, toPixelData, toSvg } from "html-to-image";
-import { useEffect, useRef, useState } from "react";
+import { toPng } from "html-to-image";
+import { useEffect, useRef, useState, Suspense } from "react";
 import axios from "axios";
+
+export const dynamic = "force-dynamic";
 
 const getMent = async (uuid: string): Promise<any> => {
   try {
@@ -26,12 +29,12 @@ const getMent = async (uuid: string): Promise<any> => {
   return "";
 };
 
-export default function MentCard() {
+// 컴포넌트 정의
+function MentCardContent() {
   const elementRef = useRef(null);
-
   const [ment, setMent] = useState("");
 
-  const searchParams = useSearchParams();
+  const searchParams = useSearchParams(); // 클라이언트 훅
   const search = searchParams.get("id");
 
   const downloadImg = () => {
@@ -100,5 +103,14 @@ export default function MentCard() {
         다운로드
       </div>
     </div>
+  );
+}
+
+// Suspense로 감싼 최상위 컴포넌트
+export default function MentCard() {
+  return (
+    <Suspense fallback={<div>로딩 중...</div>}>
+      <MentCardContent />
+    </Suspense>
   );
 }

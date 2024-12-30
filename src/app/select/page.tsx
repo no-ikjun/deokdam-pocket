@@ -33,10 +33,50 @@ const iconList = [
   },
 ];
 
-const sendLog = async (icon: string) => {
+// const sendLog = async (icon: string) => {
+//   try {
+//     const res = await axios.post("/api/log", {
+//       selected_icon: icon,
+//       cache: "no-store",
+//       dynamic: "force-dynamic",
+//     });
+
+//     if (res.status === 201) {
+//       return true;
+//     } else {
+//       return false;
+//     }
+//   } catch (err) {
+//     console.log(err);
+//     return false;
+//   }
+// };
+
+const setType = async (pocket_uuid: string, selectedIcon: string) => {
   try {
-    const res = await axios.post("/api/log", {
-      selected_icon: icon,
+    const res = await axios.post("/api/pocket/type", {
+      pocket_uuid: pocket_uuid,
+      type: selectedIcon,
+      cache: "no-store",
+      dynamic: "force-dynamic",
+    });
+
+    if (res.status === 201) {
+      return true;
+    } else {
+      return false;
+    }
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+};
+
+const recieve_ments = async (pocket_uuid: string, count: number) => {
+  try {
+    const res = await axios.post("/api/ment2025/recieve", {
+      pocket_uuid: pocket_uuid,
+      count: count,
       cache: "no-store",
       dynamic: "force-dynamic",
     });
@@ -60,10 +100,12 @@ export default function Select() {
   const router = useRouter();
 
   const loading = async (selectedIcon: string) => {
-    sendLog(selectedIcon);
+    const pocket_uuid = window.localStorage.getItem("pocket_uuid");
+    setType(pocket_uuid!, selectedIcon);
+    recieve_ments(pocket_uuid!, 3);
     setTimeout(() => {
       setAnimation(false);
-      router.replace("/ment?s=" + selectedIcon);
+      router.replace("/ment");
     }, 1000);
   };
 

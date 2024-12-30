@@ -1,47 +1,28 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+export const dynamic = "force-dynamic";
+
+import { useEffect, useState } from "react";
 import styles from "./page.module.css";
-import {
-  useRouter,
-  usePathname,
-  useSearchParams,
-  useSelectedLayoutSegment,
-  useSelectedLayoutSegments,
-  redirect,
-  notFound,
-} from "next/navigation";
 import axios from "axios";
 import Image from "next/image";
 import Link from "next/link";
 import Notification from "@/components/notification_popup";
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+import localFont from "next/font/local";
+import { useRouter } from "next/navigation";
 
-const getCount = async (): Promise<any> => {
-  try {
-    const res = await axios.get("/api/ment/random", {
-      headers: {
-        "Cache-Control": "no-cache",
-        Pragma: "no-cache",
-        Expires: "0",
-      },
-    });
-    if (res.status === 200) {
-      return res.data.ment;
-    }
-  } catch (err) {
-    console.log(err);
-    return "";
-  }
-  return "";
-};
+const myFont = localFont({
+  src: "../fonts/NanumMyeongjo.ttf",
+});
 
-const setShare = async (uuid: string): Promise<boolean> => {
+const getMents = async () => {
   try {
-    const res = await axios.put(
-      `/api/ment/share`,
-      {
-        uuid: uuid,
-      },
+    const pocketUuid = localStorage.getItem("pocket_uuid");
+    const res = await axios.get(
+      `/api/ment2025/recieve?pocket_uuid=${pocketUuid}`,
       {
         headers: {
           "Cache-Control": "no-cache",
@@ -51,62 +32,30 @@ const setShare = async (uuid: string): Promise<boolean> => {
       }
     );
     if (res.status === 200) {
-      return true;
-    } else {
-      return false;
+      return res.data;
     }
   } catch (err) {
     console.log(err);
-    return false;
+    return {};
   }
-};
-
-const setLike = async (uuid: string, kind: string): Promise<boolean> => {
-  try {
-    const res = await axios.put(
-      `/api/ment/like`,
-      {
-        uuid: uuid,
-        kind: kind,
-      },
-      {
-        headers: {
-          "Cache-Control": "no-cache",
-          Pragma: "no-cache",
-          Expires: "0",
-        },
-      }
-    );
-    if (res.status === 200) {
-      return true;
-    } else {
-      return false;
-    }
-  } catch (err) {
-    console.log(err);
-    return false;
-  }
+  return {};
 };
 
 export default function Ment() {
-  const router = useRouter();
-  const [showDiv, setShowDiv] = useState(false);
   const [animation, setAnimation] = useState(true);
 
-  const searchParams = useSearchParams();
-  const search = searchParams.get("s");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const [ment, setMent] = useState("");
-  const [mentUuid, setMentUuid] = useState("");
-
-  const [liked, setLiked] = useState(false);
-
+  const [ments, setMents] = useState([]);
   const [showNotification, setShowNotification] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState("");
-  const notificationDuration = 3000;
+  const notificationDuration = 1000;
 
-  const copyLink = (message: string) => {
-    navigator.clipboard.writeText("https://new-year.app");
+  const [replies, setReplies] = useState<{ [key: string]: string }>({});
+
+  const router = useRouter();
+
+  const handleNotification = (message: string) => {
     setNotificationMessage(message);
     setShowNotification(true);
 
@@ -115,50 +64,118 @@ export default function Ment() {
     }, notificationDuration);
   };
 
-  const like = (kind: string) => {
-    if (liked) {
-      setNotificationMessage("반응은 한 번만 가능해요!");
-      setShowNotification(true);
-      setTimeout(() => {
-        setShowNotification(false);
-      }, notificationDuration);
-    } else {
-      setLike(mentUuid, kind);
-      setLiked(true);
-      setNotificationMessage("덕담에 반응해주셔서 감사해요!");
-      setShowNotification(true);
-      setTimeout(() => {
-        setShowNotification(false);
-      }, notificationDuration);
+  const reactMent = async (mentUuid: string, type: string) => {
+    try {
+      const pocketUuid = localStorage.getItem("pocket_uuid");
+      const res = await axios.post("/api/ment2025/reaction", {
+        pocket_uuid: pocketUuid,
+        ment_uuid: mentUuid,
+        type: type,
+      });
+      if (res.status === 201) {
+        handleNotification("반응이 등록되었어요!");
+        return true;
+      } else {
+        handleNotification("한 번만 반응할 수 있어요!");
+        return false;
+      }
+    } catch (err) {
+      console.log(err);
+      handleNotification("한 번만 반응할 수 있어요");
+      return false;
+    }
+  };
+
+  const handleReplyChange = (mentUuid: string, value: string) => {
+    setReplies((prevReplies) => ({
+      ...prevReplies,
+      [mentUuid]: value,
+    }));
+  };
+
+  const rement = async (ment_uuid: string) => {
+    setIsLoading(true);
+    const ment = replies[ment_uuid];
+    if (!ment) {
+      handleNotification("회답을 입력해주세요!");
+      return false;
+    }
+    try {
+      const pocketUuid = localStorage.getItem("pocket_uuid");
+      const res = await axios.post("/api/ment2025/rement", {
+        pocket_uuid: pocketUuid,
+        ment_uuid: ment_uuid,
+        ment: ment,
+      });
+      if (res.status === 201) {
+        handleNotification("회답이 등록되었어요!");
+        setReplies((prevReplies) => ({
+          ...prevReplies,
+          [ment_uuid]: "",
+        }));
+        setIsLoading(false);
+        return true;
+      } else {
+        handleNotification("이미 회답한 덕담이에요!");
+        setIsLoading(false);
+        return false;
+      }
+    } catch (err) {
+      console.log(err);
+      handleNotification("이미 회답한 덕담이에요!");
+      setIsLoading(false);
+      return false;
     }
   };
 
   useEffect(() => {
-    async function fetchMent() {
-      const ment = await getCount();
-      if (ment !== "") {
-        setShare(ment.uuid);
-        setAnimation(false);
-        setMent(ment.ment);
-        setMentUuid(ment.uuid);
-        const timer = setTimeout(() => {
-          setShowDiv(true);
-        }, 500);
-        return () => {
-          clearTimeout(timer);
-        };
-      }
+    if (!localStorage.getItem("pocket_uuid")) {
+      router.replace("/");
     }
-    fetchMent();
-  }, []);
 
-  useEffect(() => {
-    console.log(search);
-  }, [search]);
+    getMents().then((data) => {
+      setMents(data.ments);
+    });
+    setAnimation(false);
+  }, [router]);
+
+  const sliderSettings = {
+    dots: false,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    arrows: true,
+    adaptiveHeight: false,
+  };
 
   return (
     <>
       <Notification show={showNotification} message={notificationMessage} />
+      <div
+        style={{ display: `${isLoading ? "flex" : "none"}` }}
+        className={styles.sending_div}
+      >
+        <Image
+          src="/images/kite_icon.png"
+          alt="kite"
+          width={100}
+          height={100}
+          className={styles.sending_icon}
+        />
+        <p className={styles.sending_ment}>
+          회답 전달 중...
+          <br />
+          <span
+            onClick={() => {
+              window.location.href = "/select";
+            }}
+            style={{ cursor: "pointer", color: "#6f6f6f", fontSize: "0.9rem" }}
+          >
+            새로고침
+          </span>
+        </p>
+      </div>
       <div
         style={{ display: `${animation ? "flex" : "none"}` }}
         className={styles.sending_div}
@@ -171,7 +188,7 @@ export default function Ment() {
           className={styles.sending_icon}
         />
         <p className={styles.sending_ment}>
-          덕담을 전달 중입니다...
+          덕담 찾는 중...
           <br />
           <span
             onClick={() => {
@@ -183,9 +200,9 @@ export default function Ment() {
           </span>
         </p>
       </div>
-      <div className={animation ? styles.blur_background : ""}>
+      <div className={animation || isLoading ? styles.blur_background : ""}>
         <div className={styles.main}>
-          <div style={{ display: "flex", flexDirection: "row", gap: "1.5rem" }}>
+          <div className={styles.title_container}>
             <Image
               src="/images/pocket.png"
               alt="pocket"
@@ -200,83 +217,68 @@ export default function Ment() {
               height={35}
             />
           </div>
-          <div
-            className={
-              showDiv
-                ? [styles.show, styles.fade_div].join(" ")
-                : styles.fade_div
-            }
-          >
-            <p className={styles.ment}>{ment}</p>
-          </div>
-          <div className={styles.share_div}>
-            <Link
-              target="_blank"
-              href={`ment/card?id=${mentUuid}`}
-              className={styles.share_button}
-              style={{ textDecoration: "none", color: "black" }}
-            >
-              <Image
-                src="/images/picture_icon.png"
-                alt="picture"
-                width={20}
-                height={20}
-                style={{ opacity: 0.5, marginRight: "0.5rem" }}
-              />
-              덕담카드 사진 저장
-            </Link>
-            <div
-              className={styles.share_button}
-              onClick={() => copyLink("덕담 주머니 링크가 복사됐어요!")}
-            >
-              <Image
-                src="/images/link_icon.png"
-                alt="picture"
-                width={20}
-                height={20}
-                style={{ opacity: 0.5, marginRight: "0.5rem" }}
-              />
-              덕담주머니 공유
-            </div>
-          </div>
-          <div className={styles.ment_like_div}>
-            <p className={styles.ment_like}>덕담이 마음에 드셨나요?</p>
-            <div className={styles.ment_like_button_div}>
-              <div
-                className={[styles.ment_like_icon_div, styles.like_button].join(
-                  " "
-                )}
-                onClick={() => {
-                  like("01");
-                }}
-              >
-                🥹 감동이에요
+          <p className={styles.title_sub}>
+            좌우로 스크롤 하여 받은 덕담을 확인하세요!
+          </p>
+          <Slider {...sliderSettings} className={styles.slider_container}>
+            {ments.map((ment: any) => (
+              <div key={ment.ment_uuid} className={styles.ment_slide}>
+                <p className={styles.ment}>{ment.ment}</p>
+                <span>
+                  <div className={styles.ment_like_div}>
+                    <p className={styles.ment_like}>덕담이 마음에 드셨나요?</p>
+                    <div className={styles.ment_like_button_div}>
+                      <div
+                        className={styles.ment_like_icon_div}
+                        onClick={() => {
+                          reactMent(ment.ment_uuid, "1");
+                        }}
+                      >
+                        🥹 감동이에요
+                      </div>
+                      <div
+                        className={styles.ment_like_icon_div}
+                        onClick={() => {
+                          reactMent(ment.ment_uuid, "2");
+                        }}
+                      >
+                        😊 훈훈해요
+                      </div>
+                      <div
+                        className={styles.ment_like_icon_div}
+                        onClick={() => {
+                          reactMent(ment.ment_uuid, "3");
+                        }}
+                      >
+                        😑 별로에요
+                      </div>
+                    </div>
+                  </div>
+                  <p className={styles.rement_notice}>
+                    회답을 작성하여 감사의 말을 전하세요!
+                  </p>
+                  <input
+                    className={styles.rement_input}
+                    placeholder="회답을 입력하세요"
+                    value={replies[ment.ment_uuid] || ""}
+                    onChange={(e) =>
+                      handleReplyChange(ment.ment_uuid, e.target.value)
+                    }
+                  />
+                  <button
+                    className={[styles.rement_btn, myFont.className].join(" ")}
+                    onClick={() => rement(ment.ment_uuid)}
+                  >
+                    전송
+                  </button>
+                </span>
               </div>
-              <div
-                className={[styles.ment_like_icon_div, styles.like_button].join(
-                  " "
-                )}
-                onClick={() => {
-                  like("02");
-                }}
-              >
-                😊 훈훈해요
-              </div>
-              <div
-                className={[styles.ment_like_icon_div, styles.like_button].join(
-                  " "
-                )}
-                onClick={() => {
-                  like("03");
-                }}
-              >
-                😑 별로에요
-              </div>
-            </div>
-          </div>
+            ))}
+          </Slider>
+
           <div className={styles.next_div}>
-            <Link href="/data" className={styles.next_ment}>
-              다음으로&nbsp;&rarr;
+            <Link href="/pocket" className={styles.next_ment}>
+              내 덕담 주머니 보러가기&nbsp;&rarr;
             </Link>
           </div>
         </div>

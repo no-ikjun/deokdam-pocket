@@ -22,6 +22,9 @@ import {
 import localFont from "next/font/local";
 import Script from "next/script";
 import Timer from "@/components/timer/timer";
+import Modal from "@/components/modal/modal";
+import SignUp from "@/components/signUp/signup";
+import SignIn from "@/components/signIn/signin";
 
 const myFont = localFont({
   src: "./fonts/NanumMyeongjo.ttf",
@@ -72,7 +75,7 @@ const mentList = [
 
 const getCount = async (): Promise<number> => {
   try {
-    const res = await axios.get("/api/ment/count", {
+    const res = await axios.get("/api/ment2025/count", {
       headers: {
         "Cache-Control": "no-cache",
         Pragma: "no-cache",
@@ -128,6 +131,9 @@ export default function Home() {
   const [animation, setAnimation] = useState(false);
   const router = useRouter();
 
+  const [showSignUpModal, setSignUpModal] = useState(false);
+  const [showSignInModal, setSignInModal] = useState(false);
+
   const onInputHandler = (e: ChangeEvent<HTMLTextAreaElement>) => {
     if (e.target.value.length > 150) {
       e.target.value = e.target.value.slice(0, 150);
@@ -144,20 +150,24 @@ export default function Home() {
 
   useEffect(() => {
     const now = new Date();
-    const targetDate = new Date("2025-01-01T00:00:00+09:00"); // KST
+    const targetDate = new Date("2024-01-01T00:00:00+09:00"); // KST
     if (now >= targetDate) {
       setShowTimer(false); // 2025년이 지나면 타이머 숨기기
     }
 
+    if (localStorage.getItem("pocket_uuid")) {
+      router.replace("/pocket");
+    }
+
     if (window.adsbygoogle && !window.adsbygoogle.loaded)
       (window.adsbygoogle = (window as any).adsbygoogle || []).push({});
-  }, []);
+  }, [router]);
 
   useEffect(() => {
     const intervalId = setInterval(async () => {
       const newCount = await getCount();
       setTempCount(newCount); // 상태 업데이트
-    }, 5000); // 예: 5초마다 데이터를 요청
+    }, 5000); //5초마다 데이터를 요청
 
     return () => clearInterval(intervalId); // 컴포넌트 언마운트 시 인터벌 정리
   }, []);
@@ -185,6 +195,33 @@ export default function Home() {
 
   return (
     <>
+      <Modal
+        isOpen={showSignUpModal}
+        onClose={() => {
+          setSignUpModal(false);
+        }}
+      >
+        <SignUp
+          ment={ment}
+          onSubmitted={() => {
+            setSignUpModal(false); // 성공 시 모달 닫기
+            setAnimation(true); // 애니메이션 실행
+            loading(); // 로딩 완료
+          }}
+          onCanceled={() => {
+            alert("사용할 수 없는 이름입니다.");
+            setSignUpModal(true);
+          }}
+        />
+      </Modal>
+      <Modal
+        isOpen={showSignInModal}
+        onClose={() => {
+          setSignInModal(false);
+        }}
+      >
+        <SignIn />
+      </Modal>
       <div
         style={{ display: `${animation ? "flex" : "none"}` }}
         className={styles.sending_div}
@@ -275,6 +312,13 @@ export default function Home() {
                 />
                 <button
                   className={[styles.input_btn, myFont.className].join(" ")}
+                  onClick={async () => {
+                    if (ment.length < 1) {
+                      alert("덕담을 입력해주세요");
+                      return;
+                    }
+                    setSignUpModal(true);
+                  }}
                 >
                   입력
                 </button>
@@ -289,9 +333,13 @@ export default function Home() {
                   <br />
                 </p>
               </div>
+
               <div className={styles.button_div}>
                 <button
                   className={[styles.submit_btn, myFont.className].join(" ")}
+                  onClick={() => {
+                    setSignInModal(true);
+                  }}
                 >
                   <p className={styles.submit_btn_ment}>
                     이미 덕담 주머니가 있다면?
@@ -299,6 +347,14 @@ export default function Home() {
                   덕담 주머니 조회
                 </button>
               </div>
+
+              <Link
+                href="https://ikjun.notion.site/148ee261b89580ac9ad5defe33a92f65?pvs=4"
+                className={styles.info_ment}
+                target="_blank"
+              >
+                덕담 주머니란?
+              </Link>
             </div>
           </div>
           <div style={{ marginTop: "1.5rem" }}>
