@@ -53,34 +53,32 @@ export async function GET(req: Request) {
 
     // 2. 내가 받은 덕담 정보
     const receivedMents = await client.sql`
+      WITH reaction_data AS (
+        SELECT
+          r.ment_uuid,
+          ARRAY_AGG(r.type) FILTER (WHERE r.type IS NOT NULL) AS reactions
+        FROM reaction r
+        GROUP BY r.ment_uuid
+      )
       SELECT 
         mip.ment_uuid, 
         m.ment, 
-        r.type AS reaction, 
-        COALESCE(
-          JSON_AGG(
-            JSON_BUILD_OBJECT(
-              'rement', re.ment,
-              'pocket_name', re_p.name
-            )
-          ) FILTER (WHERE re.ment IS NOT NULL),
-          '[]'::json
-        ) AS rements,
+
+        COALESCE(rd.reactions, '{}') AS reactions,
+        re.ment AS rement,
         p.type AS writer_type,
         MIN(mip.created_at) AS created_at
       FROM ment_in_pocket mip
       JOIN ment m 
         ON mip.ment_uuid = m.ment_uuid
-      LEFT JOIN reaction r 
-        ON mip.ment_uuid = r.ment_uuid AND r.pocket_uuid = ${pocket_uuid}
+      LEFT JOIN reaction_data rd
+        ON mip.ment_uuid = rd.ment_uuid
       LEFT JOIN rement re 
         ON mip.ment_uuid = re.ment_uuid AND re.pocket_uuid = ${pocket_uuid}
-      LEFT JOIN pocket re_p
-        ON re.pocket_uuid = re_p.pocket_uuid
       LEFT JOIN pocket p
         ON m.pocket_uuid = p.pocket_uuid
       WHERE mip.pocket_uuid = ${pocket_uuid}
-      GROUP BY mip.ment_uuid, m.ment, r.type, p.type
+      GROUP BY mip.ment_uuid, m.ment, re.ment, p.type, rd.reactions
       ORDER BY MIN(mip.created_at) DESC;
     `;
 

@@ -133,12 +133,37 @@
   overflow-y: auto;
 }
 
+.title_div {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+}
+
 .title {
   font-size: 1.5rem;
   font-weight: 600;
-  margin-bottom: 1rem;
   color: #333;
-  margin-top: 1.5rem;
+}
+
+.title_button {
+  padding: 0.5rem 1rem;
+  border: 1px solid #f86161;
+  border-radius: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #f86161;
+  cursor: pointer;
+  transition: 0.2s;
+  background-color: transparent;
+}
+
+.title_button:hover {
+  background-color: #f86161;
+  color: #fff;
+  transition: 0.2s;
 }
 
 .ment_highlight {
@@ -210,6 +235,74 @@
   font-weight: 500;
   color: #2c2c2c;
   line-height: 1.5rem;
+}
+
+.modal_title {
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.modal_ment {
+  font-size: 1rem;
+  font-weight: 500;
+  text-align: center;
+  line-height: 1.7rem;
+  color: #707070;
+  margin-bottom: 0.5rem;
+}
+
+.input {
+  margin-top: 0.5rem;
+  width: 90%;
+  border: 1px solid #636363;
+  border-radius: 0.5rem;
+  padding: 0.8rem;
+  font-size: 1rem;
+  font-weight: 400;
+  font-family: sans-serif;
+  text-align: center;
+  vertical-align: middle;
+  resize: vertical;
+  box-sizing: border-box;
+  transition: 0.2s;
+  max-height: 6rem;
+  min-height: 2rem;
+}
+
+.input:focus {
+  color: #495057;
+  background-color: #fff;
+  border-color: #f86161;
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgb(232, 152, 152);
+  transition: 0.2s;
+}
+
+.modal_btn {
+  width: 10rem;
+  height: 2.5rem;
+  border: 2px solid #f86161;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  line-height: 1.3rem;
+  font-weight: 700;
+  letter-spacing: 0.04rem;
+  text-align: center;
+  vertical-align: middle;
+  box-sizing: border-box;
+  transition: 0.2s;
+  background-color: #f86161;
+  color: #fff;
+  cursor: pointer;
+}
+
+.modal_btn:hover {
+  background-color: #de4d4d;
+  border-color: #de4d4d;
+  transition: 0.2s;
 }
 
 @media screen and (max-width: 768px) {
