@@ -287,3 +287,7 @@
 //     </Suspense>
 //   );
 // }
+
+export default function Ment() {
+  return <div>ment</div>;
+}
