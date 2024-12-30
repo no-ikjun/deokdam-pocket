@@ -18,15 +18,18 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: "error" }, { status: 400 });
     }
 
-    const mentUuid = uuidv4();
+    console.log(ment, pocket_uuid);
 
-    await client.sql`INSERT INTO ment (ment_uuid, pocket_uuid, ment) VALUES (${mentUuid}, ${pocket_uuid}, ${ment});`;
+    const mentUuid = uuidv4();
+    const safeMent = ment.replace(/'/g, "''");
+
+    await client.sql`INSERT INTO ment (ment_uuid, pocket_uuid, ment) VALUES (${mentUuid}, ${pocket_uuid}, ${safeMent});`;
 
     client.release();
     return NextResponse.json({ message: "success" }, { status: 201 });
   } catch (error) {
     console.log(error);
-    client.release;
+    client.release();
     return NextResponse.json({ message: "error" }, { status: 500 });
   }
 }

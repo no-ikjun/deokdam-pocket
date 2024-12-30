@@ -197,7 +197,18 @@ export default function Home() {
           setSignUpModal(false);
         }}
       >
-        <SignUp ment={ment} />
+        <SignUp
+          ment={ment}
+          onSubmitted={() => {
+            setSignUpModal(false); // 성공 시 모달 닫기
+            setAnimation(true); // 애니메이션 실행
+            loading(); // 로딩 완료
+          }}
+          onCanceled={() => {
+            alert("등록에 실패했습니다."); // 실패 시 사용자에게 알림
+            setSignUpModal(true); // 모달 유지
+          }}
+        />
       </Modal>
       <Modal
         isOpen={showSignInModal}
@@ -298,6 +309,10 @@ export default function Home() {
                 <button
                   className={[styles.input_btn, myFont.className].join(" ")}
                   onClick={async () => {
+                    if (ment.length < 1) {
+                      alert("덕담을 입력해주세요");
+                      return;
+                    }
                     setSignUpModal(true);
                   }}
                 >

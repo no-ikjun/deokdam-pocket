@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import styles from "./signup.module.css";
 import localFont from "next/font/local";
+import axios from "axios";
 
 const myFont = localFont({
   src: "./fonts/NanumMyeongjo.ttf",
@@ -9,9 +10,11 @@ const myFont = localFont({
 
 interface SignUpProps {
   ment: string;
+  onSubmitted: () => void;
+  onCanceled: () => void;
 }
 
-const SignUp: React.FC<SignUpProps> = ({ ment }) => {
+const SignUp: React.FC<SignUpProps> = ({ ment, onSubmitted, onCanceled }) => {
   const [name, setName] = useState<string>("");
   const [pin, setPin] = useState<string[]>(["", "", "", ""]);
   const inputRefs = useRef<Array<HTMLInputElement | null>>(Array(4).fill(null));
@@ -119,8 +122,30 @@ const SignUp: React.FC<SignUpProps> = ({ ment }) => {
       </div>
       <button
         className={[styles.submit_btn, myFont.className].join(" ")}
-        onClick={() => {
-          console.log(ment, name, pin);
+        onClick={async () => {
+          try {
+            const pocketResponse = await axios.post("/api/pocket", {
+              name: name,
+              password: pin.join(""),
+            });
+
+            const pocket_uuid = pocketResponse.data.pocket_uuid;
+            console.log(pocket_uuid);
+
+            const result = await axios.post("/api/ment2025", {
+              ment: ment,
+              pocket_uuid: pocket_uuid,
+            });
+
+            if (result.data.message === "success") {
+              onSubmitted();
+            } else {
+              throw new Error("등록 실패");
+            }
+          } catch (error) {
+            console.error("에러 발생:", error);
+            onCanceled();
+          }
         }}
       >
         만들기
