@@ -1,6 +1,5 @@
 import { db } from "@vercel/postgres";
 import { NextResponse } from "next/server";
-import { v4 as uuidv4 } from "uuid";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -9,19 +8,16 @@ export async function POST(req: Request) {
   const client = await db.connect();
   try {
     const request = await req.json();
-    const { ment, pocket_uuid } = request as {
-      ment: string;
+    const { pocket_uuid, type } = request as {
       pocket_uuid: string;
+      type: string;
     };
 
-    if (!ment || !pocket_uuid) {
+    if (!pocket_uuid || !type) {
       return NextResponse.json({ message: "error" }, { status: 400 });
     }
 
-    const mentUuid = uuidv4();
-    const safeMent = ment.replace(/'/g, "''");
-
-    await client.sql`INSERT INTO ment (ment_uuid, pocket_uuid, ment) VALUES (${mentUuid}, ${pocket_uuid}, ${safeMent});`;
+    await client.sql`UPDATE pocket SET type = ${type} WHERE pocket_uuid = ${pocket_uuid};`;
 
     client.release();
     return NextResponse.json({ message: "success" }, { status: 201 });

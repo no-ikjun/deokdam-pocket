@@ -130,7 +130,7 @@ const SignUp: React.FC<SignUpProps> = ({ ment, onSubmitted, onCanceled }) => {
             });
 
             const pocket_uuid = pocketResponse.data.pocket_uuid;
-            console.log(pocket_uuid);
+            localStorage.setItem("pocket_uuid", pocket_uuid);
 
             const result = await axios.post("/api/ment2025", {
               ment: ment,
