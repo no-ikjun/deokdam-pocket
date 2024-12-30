@@ -78,7 +78,13 @@ const SignUp: React.FC<SignUpProps> = ({ ment, onSubmitted, onCanceled }) => {
         placeholder="예) 을사년 복주머니"
         ref={nameInputRef}
         value={name}
-        onChange={(e) => setName(e.target.value)}
+        maxLength={10} // 최대 글자수 10자
+        onChange={(e) => {
+          const input = e.target.value;
+          if (input.length <= 10) {
+            setName(input);
+          }
+        }}
       />
 
       <p className={styles.modal_ment}>비밀번호 네 자리를 입력해주세요!</p>
@@ -125,6 +131,11 @@ const SignUp: React.FC<SignUpProps> = ({ ment, onSubmitted, onCanceled }) => {
       <button
         className={[styles.submit_btn, myFont.className].join(" ")}
         onClick={async () => {
+          if (name.length > 10) {
+            alert("주머니 이름은 최대 10글자까지 가능합니다!");
+            return;
+          }
+
           try {
             const pocketResponse = await axios.post("/api/pocket", {
               name: name,
