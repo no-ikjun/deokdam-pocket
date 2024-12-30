@@ -22,6 +22,9 @@ import {
 import localFont from "next/font/local";
 import Script from "next/script";
 import Timer from "@/components/timer/timer";
+import Modal from "@/components/modal/modal";
+import SignUp from "@/components/signUp/signup";
+import SignIn from "@/components/signIn/signin";
 
 const myFont = localFont({
   src: "./fonts/NanumMyeongjo.ttf",
@@ -128,6 +131,9 @@ export default function Home() {
   const [animation, setAnimation] = useState(false);
   const router = useRouter();
 
+  const [showSignUpModal, setSignUpModal] = useState(false);
+  const [showSignInModal, setSignInModal] = useState(false);
+
   const onInputHandler = (e: ChangeEvent<HTMLTextAreaElement>) => {
     if (e.target.value.length > 150) {
       e.target.value = e.target.value.slice(0, 150);
@@ -144,7 +150,7 @@ export default function Home() {
 
   useEffect(() => {
     const now = new Date();
-    const targetDate = new Date("2025-01-01T00:00:00+09:00"); // KST
+    const targetDate = new Date("2024-12-01T00:00:00+09:00"); // KST
     if (now >= targetDate) {
       setShowTimer(false); // 2025년이 지나면 타이머 숨기기
     }
@@ -157,7 +163,7 @@ export default function Home() {
     const intervalId = setInterval(async () => {
       const newCount = await getCount();
       setTempCount(newCount); // 상태 업데이트
-    }, 5000); // 예: 5초마다 데이터를 요청
+    }, 5000); //5초마다 데이터를 요청
 
     return () => clearInterval(intervalId); // 컴포넌트 언마운트 시 인터벌 정리
   }, []);
@@ -185,6 +191,22 @@ export default function Home() {
 
   return (
     <>
+      <Modal
+        isOpen={showSignUpModal}
+        onClose={() => {
+          setSignUpModal(false);
+        }}
+      >
+        <SignUp ment={ment} />
+      </Modal>
+      <Modal
+        isOpen={showSignInModal}
+        onClose={() => {
+          setSignInModal(false);
+        }}
+      >
+        <SignIn />
+      </Modal>
       <div
         style={{ display: `${animation ? "flex" : "none"}` }}
         className={styles.sending_div}
@@ -275,6 +297,9 @@ export default function Home() {
                 />
                 <button
                   className={[styles.input_btn, myFont.className].join(" ")}
+                  onClick={async () => {
+                    setSignUpModal(true);
+                  }}
                 >
                   입력
                 </button>
@@ -292,6 +317,9 @@ export default function Home() {
               <div className={styles.button_div}>
                 <button
                   className={[styles.submit_btn, myFont.className].join(" ")}
+                  onClick={() => {
+                    setSignInModal(true);
+                  }}
                 >
                   <p className={styles.submit_btn_ment}>
                     이미 덕담 주머니가 있다면?
