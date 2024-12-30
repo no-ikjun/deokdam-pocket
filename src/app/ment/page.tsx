@@ -217,6 +217,9 @@ export default function Ment() {
               height={35}
             />
           </div>
+          <p className={styles.title_sub}>
+            좌우로 스크롤 하여 받은 덕담을 확인하세요!
+          </p>
           <Slider {...sliderSettings} className={styles.slider_container}>
             {ments.map((ment: any) => (
               <div key={ment.ment_uuid} className={styles.ment_slide}>
