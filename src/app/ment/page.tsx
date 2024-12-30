@@ -16,6 +16,8 @@ import Image from "next/image";
 import Link from "next/link";
 import Notification from "@/components/notification_popup";
 
+export const dynamic = "force-dynamic";
+
 const getCount = async (): Promise<any> => {
   try {
     const res = await axios.get("/api/ment/random", {
