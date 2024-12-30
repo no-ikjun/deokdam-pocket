@@ -15,6 +15,7 @@ import axios from "axios";
 import Image from "next/image";
 import Link from "next/link";
 import Notification from "@/components/notification_popup";
+import { Suspense } from "react";
 
 export const dynamic = "force-dynamic";
 
@@ -159,7 +160,7 @@ export default function Ment() {
   }, [search]);
 
   return (
-    <>
+    <Suspense>
       <Notification show={showNotification} message={notificationMessage} />
       <div
         style={{ display: `${animation ? "flex" : "none"}` }}
@@ -283,6 +284,6 @@ export default function Ment() {
           </div>
         </div>
       </div>
-    </>
+    </Suspense>
   );
 }
