@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = "force-dynamic";
+
 import { useEffect, useRef, useState } from "react";
 import styles from "./page.module.css";
 import {
@@ -16,8 +18,6 @@ import Image from "next/image";
 import Link from "next/link";
 import Notification from "@/components/notification_popup";
 import { Suspense } from "react";
-
-export const dynamic = "force-dynamic";
 
 const getCount = async (): Promise<any> => {
   try {
