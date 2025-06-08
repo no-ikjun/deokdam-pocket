@@ -36,12 +36,13 @@ export async function POST(req: Request) {
     }
 
     const kakaoData = await kakaoRes.json();
-    const kakaoId = kakaoData.id.toString();
+    const provider = "KAKAO";
+    const providerId = kakaoData.id.toString();
     const name = kakaoData.properties?.nickname ?? "사용자";
 
     // 2. 유저 존재 여부 확인
     const existingUserResult = await client.sql`
-      SELECT * FROM "user" WHERE kakao_id = ${kakaoId}
+      SELECT * FROM "user" WHERE provider = ${provider} AND kakao_id = ${providerId}
     `;
     let user;
 
@@ -50,8 +51,8 @@ export async function POST(req: Request) {
     } else {
       // 3. 신규 회원가입
       const insertResult = await client.sql`
-        INSERT INTO "user" (kakao_id, name)
-        VALUES (${kakaoId}, ${name})
+        INSERT INTO "user" (provider, provider_id, name)
+        VALUES (${provider}, ${providerId}, ${name})
         RETURNING *
       `;
       user = insertResult.rows[0];
@@ -61,7 +62,7 @@ export async function POST(req: Request) {
     const token = jwt.sign(
       {
         user_uuid: user.user_uuid,
-        kakao_id: user.kakao_id,
+        provider_id: user.provider_id,
       },
       JWT_SECRET,
       { expiresIn: "70d" }
