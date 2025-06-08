@@ -72,14 +72,13 @@ export async function POST(req: Request) {
       { message: "Login successful" },
       { status: 200 }
     );
-    response.cookies.set("token", token),
-      {
-        httpOnly: true,
-        secure: true,
-        sameSite: "lax",
-        maxAge: 30 * 24 * 60 * 60, // 30 days
-        path: "/",
-      };
+    response.cookies.set("token", token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "lax",
+      maxAge: 30 * 24 * 60 * 60,
+      path: "/",
+    });
 
     return response;
   } catch (err: any) {
