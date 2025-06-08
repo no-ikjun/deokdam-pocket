@@ -14,6 +14,7 @@ export async function POST(req: Request) {
   const client = await db.connect();
   try {
     const { code } = await req.json();
+    console.log("STEP 1: Received code:", code);
 
     if (!code) {
       return NextResponse.json(
@@ -38,6 +39,7 @@ export async function POST(req: Request) {
     });
 
     const tokenData = await tokenRes.json();
+    console.log("STEP 2: Token data:", tokenData);
     const accessToken = tokenData.access_token;
 
     if (!accessToken) {
@@ -63,10 +65,12 @@ export async function POST(req: Request) {
     }
 
     const data = await userInfoRes.json();
+    console.log("STEP 3: User info data:", data);
     const provider = "GOOGLE";
     const providerId = data.id;
     const name = data.name;
     const profileImage = data.picture;
+    console.log("STEP 4: Inserting or finding user...");
 
     // 3. 사용자 확인 또는 등록
     let user =
@@ -92,9 +96,12 @@ export async function POST(req: Request) {
     );
 
     return NextResponse.json({ token });
-  } catch (e) {
-    console.error(e);
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+  } catch (err: any) {
+    console.error("Google OAuth Error:", err);
+    return NextResponse.json(
+      { error: "Internal server error", detail: err?.message },
+      { status: 500 }
+    );
   } finally {
     client.release();
   }
