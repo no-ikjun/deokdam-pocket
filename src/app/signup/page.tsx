@@ -17,7 +17,7 @@ export default function LoginPage() {
   const GOOGLE_REDIRECT_URI = "https://deokdam.app/google/callback";
 
   const handleGoogleLogin = () => {
-    const url = `https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=${GOOGLE_CLIENT_ID}&redirect_uri=${GOOGLE_REDIRECT_URI}&scope=openid%20email%20profile&prompt=consent`;
+    const url = `https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=${GOOGLE_CLIENT_ID}&redirect_uri=${GOOGLE_REDIRECT_URI}&scope=openid%20email%20profile`;
     window.location.href = url;
   };
 
