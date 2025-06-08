@@ -92,6 +92,26 @@ const getCount = async (): Promise<number> => {
   return 0;
 };
 
+const test = async () => {
+  try {
+    const res = await axios.get("/api/auth/test", {
+      headers: {
+        "Cache-Control": "no-cache",
+        Pragma: "no-cache",
+        Expires: "0",
+      },
+    });
+    if (res.status === 200) {
+      console.log(res.data);
+      return res.data;
+    }
+  } catch (err) {
+    console.log(err);
+    return 0;
+  }
+  return 0;
+};
+
 const sendMent = async (ment: string) => {
   try {
     const uuid = `MT${getDateString()}${generateRandomString(10)}`;
@@ -188,6 +208,17 @@ export default function Home() {
       clearTimeout(timer);
     };
   }, []);
+
+  useEffect(() => {
+    test().then((res) => {
+      if (res === 0) {
+        router.push("/signup");
+      } else if (res === "error") {
+        alert("로그인에 실패했습니다. 다시 시도해주세요.");
+        router.push("/select");
+      }
+    });
+  }, [router]);
 
   if (showTimer) {
     return <Timer />;

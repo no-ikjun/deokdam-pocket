@@ -1,53 +1,65 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
+import styles from "./page.module.css";
 
-export default function GoogleCallback() {
+export default function GoogleCallbackPage() {
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const run = async () => {
+    const handleGoogleAuth = async () => {
       const code = new URL(window.location.href).searchParams.get("code");
-      if (!code) return;
 
-      const tokenRes = await fetch("https://oauth2.googleapis.com/token", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: new URLSearchParams({
-          grant_type: "authorization_code",
-          client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!,
-          client_secret: process.env.GOOGLE_CLIENT_SECRET!,
-          redirect_uri: process.env.GOOGLE_REDIRECT_URI!,
-          code,
-        }),
-      });
+      if (!code) {
+        alert("코드를 받아오지 못했습니다.");
+        setIsLoading(false);
+        return;
+      }
 
-      const tokenData = await tokenRes.json();
-      console.log("Token Data:", tokenData);
-      const accessToken = tokenData.access_token;
+      try {
+        const res = await fetch("/api/auth/google", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ code }),
+          credentials: "include",
+        });
 
-      const res = await fetch("/api/auth/google", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ accessToken }),
-      });
+        if (!res.ok) {
+          const result = await res.json();
+          console.error("Google login failed:", result);
+          alert("구글 로그인에 실패했습니다.");
+          setIsLoading(false);
+          return;
+        }
 
-      const result = await res.json();
-      console.log("Backend Result:", result);
-
-      if (result.token) {
-        localStorage.setItem("token", result.token);
         router.push("/");
-      } else {
-        alert("구글 로그인 실패");
+      } catch (err) {
+        console.error("Google login error:", err);
+        alert("로그인 중 오류가 발생했습니다.");
+        setIsLoading(false);
       }
     };
 
-    run();
+    handleGoogleAuth();
   }, [router]);
 
-  return <p>구글 로그인 처리 중입니다...</p>;
+  return (
+    <>
+      {isLoading && (
+        <div className={styles.sending_div}>
+          <Image
+            src="/images/kite_icon.png"
+            alt="kite"
+            width={100}
+            height={100}
+            className={styles.sending_icon}
+          />
+          <p className={styles.sending_ment}>로그인 중입니다...</p>
+        </div>
+      )}
+    </>
+  );
 }

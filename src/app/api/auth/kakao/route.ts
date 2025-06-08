@@ -42,7 +42,7 @@ export async function POST(req: Request) {
 
     // 2. 유저 존재 여부 확인
     const existingUserResult = await client.sql`
-      SELECT * FROM "user" WHERE provider = ${provider} AND kakao_id = ${providerId}
+      SELECT * FROM "user" WHERE provider = ${provider} AND provider_id = ${providerId}
     `;
     let user;
 
@@ -65,13 +65,28 @@ export async function POST(req: Request) {
         provider_id: user.provider_id,
       },
       JWT_SECRET,
-      { expiresIn: "70d" }
+      { expiresIn: "30d" }
     );
 
-    return NextResponse.json({ token }, { status: 200 });
-  } catch (err) {
-    console.error("카카오 로그인 에러:", err);
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+    const response = NextResponse.json(
+      { message: "Login successful" },
+      { status: 200 }
+    );
+    response.cookies.set("token", token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "lax",
+      maxAge: 30 * 24 * 60 * 60,
+      path: "/",
+    });
+
+    return response;
+  } catch (err: any) {
+    console.error("Kakao OAuth Error:", err);
+    return NextResponse.json(
+      { error: "Internal server error", detail: err?.message },
+      { status: 500 }
+    );
   } finally {
     client.release();
   }

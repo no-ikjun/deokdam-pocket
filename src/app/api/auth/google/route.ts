@@ -1,23 +1,55 @@
 import { db } from "@vercel/postgres";
 import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
+import path from "path";
 
+const GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token";
 const GOOGLE_USERINFO_URL = "https://www.googleapis.com/oauth2/v2/userinfo";
-const JWT_SECRET = process.env.JWT_SECRET || "secret";
+
+const JWT_SECRET = process.env.JWT_SECRET!;
+const CLIENT_ID = process.env.GOOGLE_CLIENT_ID!;
+const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET!;
+const REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI!;
 
 export async function POST(req: Request) {
   const client = await db.connect();
   try {
-    const { accessToken } = await req.json();
+    const { code } = await req.json();
 
-    if (!accessToken) {
+    if (!code) {
       return NextResponse.json(
-        { error: "No access token provided" },
+        { error: "No authorization code provided" },
         { status: 400 }
       );
     }
 
-    // 1. 구글 사용자 정보 요청
+    // 1. code → access_token 교환
+    const tokenRes = await fetch(GOOGLE_TOKEN_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: new URLSearchParams({
+        code,
+        client_id: CLIENT_ID,
+        client_secret: CLIENT_SECRET,
+        redirect_uri: REDIRECT_URI,
+        grant_type: "authorization_code",
+      }),
+    });
+
+    const tokenData = await tokenRes.json();
+    const accessToken = tokenData.access_token;
+
+    if (!accessToken) {
+      console.error("token error", tokenData);
+      return NextResponse.json(
+        { error: "Failed to get access token" },
+        { status: 400 }
+      );
+    }
+
+    // 2. access_token → 사용자 정보 요청
     const userInfoRes = await fetch(GOOGLE_USERINFO_URL, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -36,11 +68,11 @@ export async function POST(req: Request) {
     const providerId = data.id;
     const name = data.name;
 
-    // 기존 유저 찾기
+    // 3. 사용자 확인 또는 등록
     let user =
       await client.sql`SELECT * FROM "user" WHERE provider = ${provider} AND provider_id = ${providerId}`;
+
     if (user.rowCount === 0) {
-      // 신규 회원가입
       const insert = await client.sql`
         INSERT INTO "user" (provider, provider_id, name)
         VALUES (${provider}, ${providerId}, ${name})
@@ -49,20 +81,36 @@ export async function POST(req: Request) {
       user = insert;
     }
 
-    // 토큰 발급
+    // 4. 토큰 발급
     const token = jwt.sign(
       {
         user_uuid: user.rows[0].user_uuid,
-        provider_id: user.rows[0].provider_id,
+        provider: user.rows[0].provider,
       },
       JWT_SECRET,
-      { expiresIn: "70d" }
+      { expiresIn: "30d" }
     );
 
-    return NextResponse.json({ token });
-  } catch (e) {
-    console.error(e);
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+    const response = NextResponse.json(
+      { message: "Login successful" },
+      { status: 200 }
+    );
+    response.cookies.set("token", token),
+      {
+        httpOnly: true,
+        secure: true,
+        sameSite: "lax",
+        maxAge: 30 * 24 * 60 * 60, // 30 days
+        path: "/",
+      };
+
+    return response;
+  } catch (err: any) {
+    console.error("Google OAuth Error:", err);
+    return NextResponse.json(
+      { error: "Internal server error", detail: err?.message },
+      { status: 500 }
+    );
   } finally {
     client.release();
   }

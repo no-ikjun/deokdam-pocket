@@ -17,7 +17,7 @@ export default function LoginPage() {
   const GOOGLE_REDIRECT_URI = "https://deokdam.app/google/callback";
 
   const handleGoogleLogin = () => {
-    const url = `https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=${GOOGLE_CLIENT_ID}&redirect_uri=${GOOGLE_REDIRECT_URI}&scope=openid%20email%20profile&prompt=consent`;
+    const url = `https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=${GOOGLE_CLIENT_ID}&redirect_uri=${GOOGLE_REDIRECT_URI}&scope=openid%20email%20profile`;
     window.location.href = url;
   };
 
@@ -51,17 +51,17 @@ export default function LoginPage() {
             width={20}
             height={20}
           />
-          카카오계정으로 계속하기
+          카카오계정으로 로그인
         </button>
 
-        <button className={styles.google} disabled>
+        <button className={styles.google} onClick={handleGoogleLogin}>
           <Image
             src="/images/google_icon.svg"
             alt="google"
             width={20}
             height={20}
           />
-          구글로 계속하기
+          구글로 로그인
         </button>
       </div>
 
