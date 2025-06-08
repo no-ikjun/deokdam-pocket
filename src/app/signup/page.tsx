@@ -54,7 +54,7 @@ export default function LoginPage() {
           카카오계정으로 계속하기
         </button>
 
-        <button className={styles.google} disabled>
+        <button className={styles.google} onClick={handleGoogleLogin}>
           <Image
             src="/images/google_icon.svg"
             alt="google"
