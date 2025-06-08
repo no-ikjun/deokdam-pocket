@@ -69,7 +69,6 @@ export async function POST(req: Request) {
     const provider = "GOOGLE";
     const providerId = data.id;
     const name = data.name;
-    const profileImage = data.picture;
     console.log("STEP 4: Inserting or finding user...");
 
     // 3. 사용자 확인 또는 등록
@@ -78,8 +77,8 @@ export async function POST(req: Request) {
 
     if (user.rowCount === 0) {
       const insert = await client.sql`
-        INSERT INTO "user" (provider, provider_id, name, profile_image)
-        VALUES (${provider}, ${providerId}, ${name}, ${profileImage})
+        INSERT INTO "user" (provider, provider_id, name)
+        VALUES (${provider}, ${providerId}, ${name})
         RETURNING *
       `;
       user = insert;
