@@ -50,7 +50,7 @@ export async function POST(req: Request) {
     } else {
       // 3. 신규 회원가입
       const insertResult = await client.sql`
-        INSERT INTO "user" (kakao_id, name, profile_image)
+        INSERT INTO "user" (kakao_id, name)
         VALUES (${kakaoId}, ${name})
         RETURNING *
       `;
