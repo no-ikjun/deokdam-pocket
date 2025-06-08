@@ -1,6 +1,7 @@
 import { db } from "@vercel/postgres";
 import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
+import path from "path";
 
 const GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token";
 const GOOGLE_USERINFO_URL = "https://www.googleapis.com/oauth2/v2/userinfo";
@@ -87,10 +88,20 @@ export async function POST(req: Request) {
         provider: user.rows[0].provider,
       },
       JWT_SECRET,
-      { expiresIn: "7d" }
+      { expiresIn: "30d" }
     );
 
-    return NextResponse.json({ token });
+    const response = NextResponse.json({ message: "Login successful" });
+    response.cookies.set("token", token),
+      {
+        httpOnly: true,
+        secure: true,
+        sameSite: "lax",
+        maxAge: 30 * 24 * 60 * 60, // 30 days
+        path: "/",
+      };
+
+    return response;
   } catch (err: any) {
     console.error("Google OAuth Error:", err);
     return NextResponse.json(

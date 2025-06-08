@@ -23,6 +23,7 @@ export default function GoogleCallbackPage() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ code }),
+          credentials: "include",
         });
 
         const result = await res.json();
