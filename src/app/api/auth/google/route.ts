@@ -5,6 +5,11 @@ import jwt from "jsonwebtoken";
 const GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token";
 const GOOGLE_USERINFO_URL = "https://www.googleapis.com/oauth2/v2/userinfo";
 
+const JWT_SECRET = process.env.JWT_SECRET!;
+const CLIENT_ID = process.env.GOOGLE_CLIENT_ID!;
+const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET!;
+const REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI!;
+
 export async function POST(req: Request) {
   const client = await db.connect();
   try {
@@ -17,7 +22,7 @@ export async function POST(req: Request) {
       );
     }
 
-    // 1. access_token 요청
+    // 1. code → access_token 교환
     const tokenRes = await fetch(GOOGLE_TOKEN_URL, {
       method: "POST",
       headers: {
@@ -25,41 +30,47 @@ export async function POST(req: Request) {
       },
       body: new URLSearchParams({
         code,
-        client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!,
-        client_secret: process.env.GOOGLE_CLIENT_SECRET!,
-        redirect_uri: process.env.GOOGLE_REDIRECT_URI!,
+        client_id: CLIENT_ID,
+        client_secret: CLIENT_SECRET,
+        redirect_uri: REDIRECT_URI,
         grant_type: "authorization_code",
       }),
     });
 
     const tokenData = await tokenRes.json();
+    const accessToken = tokenData.access_token;
 
-    if (!tokenData.access_token) {
-      console.error("Google token error:", tokenData);
+    if (!accessToken) {
+      console.error("token error", tokenData);
       return NextResponse.json(
         { error: "Failed to get access token" },
         { status: 400 }
       );
     }
 
-    // 2. user info 요청
-    const userRes = await fetch(GOOGLE_USERINFO_URL, {
+    // 2. access_token → 사용자 정보 요청
+    const userInfoRes = await fetch(GOOGLE_USERINFO_URL, {
       headers: {
-        Authorization: `Bearer ${tokenData.access_token}`,
+        Authorization: `Bearer ${accessToken}`,
       },
     });
 
-    const data = await userRes.json();
+    if (!userInfoRes.ok) {
+      return NextResponse.json(
+        { error: "Google user info error" },
+        { status: 400 }
+      );
+    }
 
-    const provider = "google";
+    const data = await userInfoRes.json();
+    const provider = "GOOGLE";
     const providerId = data.id;
     const name = data.name;
     const profileImage = data.picture;
 
-    let user = await client.sql`
-      SELECT * FROM "user" 
-      WHERE provider = ${provider} AND provider_id = ${providerId}
-    `;
+    // 3. 사용자 확인 또는 등록
+    let user =
+      await client.sql`SELECT * FROM "user" WHERE provider = ${provider} AND provider_id = ${providerId}`;
 
     if (user.rowCount === 0) {
       const insert = await client.sql`
@@ -70,22 +81,20 @@ export async function POST(req: Request) {
       user = insert;
     }
 
+    // 4. 토큰 발급
     const token = jwt.sign(
       {
         user_uuid: user.rows[0].user_uuid,
         provider: user.rows[0].provider,
       },
-      process.env.JWT_SECRET!,
+      JWT_SECRET,
       { expiresIn: "7d" }
     );
 
-    return NextResponse.json({ token }, { status: 200 });
-  } catch (err) {
-    console.error("Google OAuth Error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ token });
+  } catch (e) {
+    console.error(e);
+    return NextResponse.json({ error: "Server error" }, { status: 500 });
   } finally {
     client.release();
   }

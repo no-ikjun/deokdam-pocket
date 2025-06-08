@@ -1,92 +1,51 @@
-import { db } from "@vercel/postgres";
-import { NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
+"use client";
 
-const GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token";
-const GOOGLE_USERINFO_URL = "https://www.googleapis.com/oauth2/v2/userinfo";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
-export async function POST(req: Request) {
-  const client = await db.connect();
-  try {
-    const { code } = await req.json(); // ✅ 프론트에서 'code'만 받아옴
+export default function GoogleCallbackPage() {
+  const router = useRouter();
 
-    if (!code) {
-      return NextResponse.json(
-        { error: "No authorization code provided" },
-        { status: 400 }
-      );
-    }
+  useEffect(() => {
+    const handleGoogleAuth = async () => {
+      const code = new URL(window.location.href).searchParams.get("code");
 
-    // 1. access_token 요청
-    const tokenRes = await fetch(GOOGLE_TOKEN_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      body: new URLSearchParams({
-        code,
-        client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!,
-        client_secret: process.env.GOOGLE_CLIENT_SECRET!,
-        redirect_uri: process.env.GOOGLE_REDIRECT_URI!,
-        grant_type: "authorization_code",
-      }),
-    });
+      if (!code) {
+        alert("코드를 받아오지 못했습니다.");
+        return;
+      }
 
-    const tokenData = await tokenRes.json();
+      try {
+        // 1. 백엔드에 code 전송 → access_token + 사용자 정보 + JWT 처리
+        const res = await fetch("/api/auth/google", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ code }),
+        });
 
-    if (!tokenData.access_token) {
-      console.error("Google token error:", tokenData);
-      return NextResponse.json(
-        { error: "Failed to get access token" },
-        { status: 400 }
-      );
-    }
+        const result = await res.json();
 
-    // 2. user info 요청
-    const userRes = await fetch(GOOGLE_USERINFO_URL, {
-      headers: {
-        Authorization: `Bearer ${tokenData.access_token}`,
-      },
-    });
+        if (!res.ok || !result.token) {
+          console.error("Google login failed:", result);
+          alert("구글 로그인에 실패했습니다.");
+          return;
+        }
 
-    const data = await userRes.json();
+        // 2. JWT 저장 (ex: localStorage)
+        localStorage.setItem("token", result.token);
 
-    const provider = "google";
-    const providerId = data.id;
-    const name = data.name;
-    const profileImage = data.picture;
+        // 3. 리디렉션
+        router.push("/");
+      } catch (err) {
+        console.error("Google login error:", err);
+        alert("로그인 중 오류가 발생했습니다.");
+      }
+    };
 
-    let user = await client.sql`
-      SELECT * FROM "user" 
-      WHERE provider = ${provider} AND provider_id = ${providerId}
-    `;
+    handleGoogleAuth();
+  }, [router]);
 
-    if (user.rowCount === 0) {
-      const insert = await client.sql`
-        INSERT INTO "user" (provider, provider_id, name, profile_image)
-        VALUES (${provider}, ${providerId}, ${name}, ${profileImage})
-        RETURNING *
-      `;
-      user = insert;
-    }
-
-    const token = jwt.sign(
-      {
-        user_uuid: user.rows[0].user_uuid,
-        provider: user.rows[0].provider,
-      },
-      process.env.JWT_SECRET!,
-      { expiresIn: "7d" }
-    );
-
-    return NextResponse.json({ token }, { status: 200 });
-  } catch (err) {
-    console.error("Google OAuth Error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
-  } finally {
-    client.release();
-  }
+  return <p>로그인 처리 중입니다...</p>;
 }
