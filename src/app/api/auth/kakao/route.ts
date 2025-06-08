@@ -42,7 +42,7 @@ export async function POST(req: Request) {
 
     // 2. 유저 존재 여부 확인
     const existingUserResult = await client.sql`
-      SELECT * FROM "user" WHERE provider = ${provider} AND kakao_id = ${providerId}
+      SELECT * FROM "user" WHERE provider = ${provider} AND provider_id = ${providerId}
     `;
     let user;
 
