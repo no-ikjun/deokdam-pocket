@@ -51,7 +51,7 @@ export default function LoginPage() {
             width={20}
             height={20}
           />
-          카카오계정으로 계속하기
+          카카오계정으로 로그인
         </button>
 
         <button className={styles.google} onClick={handleGoogleLogin}>
@@ -61,7 +61,7 @@ export default function LoginPage() {
             width={20}
             height={20}
           />
-          구글로 계속하기
+          구글로 로그인
         </button>
       </div>
 
