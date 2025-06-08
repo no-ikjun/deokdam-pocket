@@ -45,16 +45,6 @@ export default function RootLayout({
 }) {
   return (
     <html lang="kr" className={myFont.className}>
-      <Script
-        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2222926756194557"
-        crossOrigin="anonymous"
-        async
-      ></Script>
-      <Script
-        async
-        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2222926756194557"
-        crossOrigin="anonymous"
-      ></Script>
       <body>
         <Image
           className={styles.background_img}
