@@ -27,6 +27,7 @@ export default function KakaoCallbackPage() {
       });
 
       const tokenData = await tokenRes.json();
+      console.log("Token Data:", tokenData);
       const accessToken = tokenData.access_token;
 
       // 2. 우리 백엔드에 로그인 요청
@@ -37,6 +38,7 @@ export default function KakaoCallbackPage() {
       });
 
       const result = await backendRes.json();
+      console.log("Backend Result:", result);
 
       if (result.token) {
         localStorage.setItem("token", result.token);
