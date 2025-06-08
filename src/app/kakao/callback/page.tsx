@@ -21,7 +21,7 @@ export default function KakaoCallbackPage() {
         body: new URLSearchParams({
           grant_type: "authorization_code",
           client_id: process.env.NEXT_PUBLIC_KAKAO_REST_API_KEY!,
-          redirect_uri: "https://yourdomain.com/kakao/callback",
+          redirect_uri: "https://deokdam.app/kakao/callback",
           code: code,
         }),
       });
