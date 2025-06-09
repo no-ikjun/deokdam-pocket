@@ -297,6 +297,13 @@ export default function Home() {
                 alt="pocket"
                 width={35}
                 height={35}
+                onClick={async () => {
+                  await fetch("/api/auth/logout", {
+                    method: "POST",
+                    credentials: "include",
+                  });
+                  window.location.href = "/";
+                }}
               />
               <p className={styles.count}>
                 지금까지 총 {count.toLocaleString()}개의 덕담이 모였어요
