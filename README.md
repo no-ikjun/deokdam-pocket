@@ -1,36 +1,33 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# 🎉 덕담 주머니 (Deokdam Jumeoni)
 
-## Getting Started
+**덕담 주머니**는 새해를 맞아 따뜻한 덕담을 주고받을 수 있는 디지털 복주머니 서비스입니다.  
+친구, 가족, 동료에게 좋은 말을 전하고, 다양한 반응과 리멘트로 소통하며 따뜻한 새해를 시작해보세요!
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 📌 주요 기능
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- 📝 **덕담 작성 및 공유**: 대표 덕담을 작성하여 나만의 주머니를 만들고, 링크를 통해 지인에게 공유할 수 있어요.
+- 💬 **리멘트 기능**: 받은 덕담에 리멘트를 남겨 더 따뜻한 소통이 가능해요.
+- ❤️ **반응(리액션)**: 좋아요, 웃겨요, 감동이에요 등의 리액션을 통해 감정을 표현할 수 있어요.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+## 🛠 기술 스택
 
-## Learn More
+### Frontend
 
-To learn more about Next.js, take a look at the following resources:
+- Next.js (App Router)
+- TypeScript
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Backend
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+- Vercel Serverless Functions
+- PostgreSQL (@vercel/postgres)
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 피드백 및 기여
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+이슈나 기능 제안은 언제든지 GitHub Issues로 남겨주세요.
+기여를 원하신다면 Pull Request를 통해 참여해주시면 감사하겠습니다!
