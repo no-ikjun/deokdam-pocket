@@ -288,9 +288,9 @@ export default function Home() {
                   />
                 </div>
                 <div className={styles.action_texts}>
-                  <h3 className={styles.action_title}>나를 위해 덕담 남기기</h3>
+                  <h3 className={styles.action_title}>새해를 맞이하는 나</h3>
                   <p className={styles.action_desc}>
-                    올해 목표/되돌아보기/1년만 산다면
+                    새해 목표 · 올해 회고 · 1년 후 나
                   </p>
                 </div>
               </Link>
@@ -306,10 +306,10 @@ export default function Home() {
                 </div>
                 <div className={styles.action_texts}>
                   <h3 className={styles.action_title}>
-                    주변 사람들과 함께 쓰기
+                    주변 사람과 덕담 나누기
                   </h3>
                   <p className={styles.action_desc}>
-                    링크 공유로 지인과 주고받기
+                    가족·친구·동료과 덕담 주고받기
                   </p>
                 </div>
               </Link>
@@ -392,11 +392,15 @@ export default function Home() {
                 >
                   덕담 주머니란?
                 </Link>
-                <Link href="#" className={styles.info_ment} target="_blank">
+                <Link
+                  href="/policy"
+                  className={styles.info_ment}
+                  target="_blank"
+                >
                   개인정보 처리방침
                 </Link>
                 <Link href="#" className={styles.info_ment} target="_blank">
-                  서비스 이용약관
+                  로그아웃
                 </Link>
               </div>
 

@@ -41,6 +41,7 @@
     transform 0.6s ease-in-out;
   visibility: hidden;
   gap: 1rem;
+  width: 100%;
 }
 
 .show {
@@ -258,6 +259,7 @@
 .action_texts {
   display: flex;
   flex-direction: column;
+  gap: 0.2rem;
 }
 
 .action_title {
@@ -272,7 +274,7 @@
 
 .action_desc {
   margin: 0.2rem 0 0;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   color: #475569;
 }
 
@@ -490,6 +492,8 @@
 @media (max-width: 480px) {
   .actions_row {
     flex-direction: column;
+    gap: 0.8rem;
+    min-width: 100%;
   }
   .action_card {
     font-size: 0.9rem;
@@ -505,7 +509,8 @@
     padding: 2rem 1.5rem 1rem;
   }
   .title {
-    font-size: 1.5rem;
+    margin-top: 1rem;
+    font-size: 1.4rem;
     line-height: 2.5rem;
   }
   .example_div {
