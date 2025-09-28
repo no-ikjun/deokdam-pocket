@@ -8,6 +8,12 @@ import Head from "next/head";
 import localFont from "next/font/local";
 import Script from "next/script";
 import { Analytics } from "@vercel/analytics/react";
+import dynamic from "next/dynamic";
+
+// Render client-side bootstrap without SSR
+const AuthBootstrap = dynamic(() => import("@/components/auth/AuthBootstrap"), {
+  ssr: false,
+});
 
 export const metadata: Metadata = {
   title: "덕담 주머니",
@@ -51,6 +57,8 @@ export default function RootLayout({
           src={backgroundImg}
           alt="img"
         />
+        {/* Initialize auth state on the client */}
+        <AuthBootstrap />
         {children}
         <Analytics />
       </body>
