@@ -151,7 +151,7 @@ export default function Home() {
 
   useEffect(() => {
     const now = new Date();
-    const targetDate = new Date("2026-01-01T00:00:00+09:00"); // KST
+    const targetDate = new Date("2025-01-01T00:00:00+09:00"); // KST
     if (now >= targetDate) {
       setShowTimer(false); // 2026년이 지나면 타이머 숨기기
     }
@@ -279,9 +279,16 @@ export default function Home() {
             </div>
             <section className={styles.actions_row}>
               <Link href="/self" className={styles.action_card}>
-                <div className={styles.action_icon}>🎁</div>
+                <div className={styles.action_icon}>
+                  <Image
+                    src="/images/for_me.png"
+                    alt="pocket"
+                    width={40}
+                    height={40}
+                  />
+                </div>
                 <div className={styles.action_texts}>
-                  <h3 className={styles.action_title}>나에게 덕담 남기기</h3>
+                  <h3 className={styles.action_title}>나를 위해 덕담 남기기</h3>
                   <p className={styles.action_desc}>
                     올해 목표/되돌아보기/1년만 산다면
                   </p>
@@ -289,9 +296,18 @@ export default function Home() {
               </Link>
 
               <Link href="/community" className={styles.action_card}>
-                <div className={styles.action_icon}>🤝</div>
+                <div className={styles.action_icon}>
+                  <Image
+                    src="/images/for_others.png"
+                    alt="pocket"
+                    width={40}
+                    height={40}
+                  />
+                </div>
                 <div className={styles.action_texts}>
-                  <h3 className={styles.action_title}>주변과 덕담 나누기</h3>
+                  <h3 className={styles.action_title}>
+                    주변 사람들과 함께 쓰기
+                  </h3>
                   <p className={styles.action_desc}>
                     링크 공유로 지인과 주고받기
                   </p>
