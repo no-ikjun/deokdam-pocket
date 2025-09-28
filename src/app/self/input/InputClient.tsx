@@ -146,9 +146,19 @@ export default function InputPage() {
     <main className={styles.wrap}>
       {/* 헤더 */}
       <header className={styles.header}>
-        <Link href="/self" className={styles.back_link} aria-label="뒤로">
+        <span
+          className={styles.back_link}
+          onClick={() => {
+            if (typeof window !== "undefined" && window.history.length > 1) {
+              router.back();
+            } else {
+              router.replace("/self");
+            }
+          }}
+          aria-label="뒤로"
+        >
           ←
-        </Link>
+        </span>
         <div className={styles.header_texts}>
           <div className={styles.badge}>{schema.badge}</div>
           <h1 className={styles.title}>{schema.title}</h1>
