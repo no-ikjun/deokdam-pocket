@@ -8,6 +8,7 @@ import useCountNum from "@/hooks/countUp";
 import Link from "next/link";
 import MentExample from "@/components/ment_example";
 import axios from "axios";
+import { useAuthStore } from "@/stores/auth";
 import { generateRandomString } from "@/utils/getRandomString";
 import { getDateString } from "@/utils/getDateString";
 import {
@@ -92,26 +93,6 @@ const getCount = async (): Promise<number> => {
   return 0;
 };
 
-const test = async () => {
-  try {
-    const res = await axios.get("/api/auth/test", {
-      headers: {
-        "Cache-Control": "no-cache",
-        Pragma: "no-cache",
-        Expires: "0",
-      },
-    });
-    if (res.status === 200) {
-      console.log(res.data);
-      return res.data;
-    }
-  } catch (err) {
-    console.log(err);
-    return 0;
-  }
-  return 0;
-};
-
 const sendMent = async (ment: string) => {
   try {
     const uuid = `MT${getDateString()}${generateRandomString(10)}`;
@@ -172,7 +153,7 @@ export default function Home() {
     const now = new Date();
     const targetDate = new Date("2025-01-01T00:00:00+09:00"); // KST
     if (now >= targetDate) {
-      setShowTimer(false); // 2025년이 지나면 타이머 숨기기
+      setShowTimer(false); // 2026년이 지나면 타이머 숨기기
     }
 
     if (localStorage.getItem("pocket_uuid")) {
@@ -193,13 +174,6 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    async function fetchCount() {
-      const count = await getCount();
-      console.log(count);
-      setTempCount(count);
-    }
-    fetchCount();
-
     const timer = setTimeout(() => {
       setShowDiv(true);
     }, 500);
@@ -209,16 +183,13 @@ export default function Home() {
     };
   }, []);
 
+  // Use centralized auth status instead of per-page check
+  const authStatus = useAuthStore((s) => s.status);
   useEffect(() => {
-    test().then((res) => {
-      if (res === 0) {
-        router.push("/signup");
-      } else if (res === "error") {
-        alert("로그인에 실패했습니다. 다시 시도해주세요.");
-        router.push("/select");
-      }
-    });
-  }, [router]);
+    // if (authStatus === "unauthenticated") {
+    //   router.push("/signup");
+    // }
+  }, [authStatus, router]);
 
   if (showTimer) {
     return <Timer />;
@@ -279,11 +250,7 @@ export default function Home() {
       </div>
       <div className={animation ? styles.blur_background : ""}>
         <div className={styles.main}>
-          <h1 className={styles.title}>
-            2025년은 새해 덕담과 함께
-            <br />
-            빛나는 한 해가 되기를 기원합니다
-          </h1>
+          <h1 className={styles.title}>최익준님, 새해 복 많이 받으세요!</h1>
           <div
             className={
               showDiv
@@ -291,125 +258,151 @@ export default function Home() {
                 : styles.fade_div
             }
           >
-            <div className={styles.count_div}>
+            <div className={styles.sub_title_div}>
               <Image
                 src="/images/pocket.png"
                 alt="pocket"
-                width={35}
-                height={35}
+                width={30}
+                height={30}
                 onClick={async () => {
-                  await fetch("/api/auth/logout", {
-                    method: "POST",
-                    credentials: "include",
-                  });
+                  await useAuthStore.getState().logout();
                   window.location.href = "/";
                 }}
               />
-              <p className={styles.count}>
-                지금까지 총 {count.toLocaleString()}개의 덕담이 모였어요
-              </p>
+              <p className={styles.sub_title}>덕담주머니 for 2026 병오년</p>
               <Image
                 src="/images/pocket.png"
                 alt="pocket"
-                width={35}
-                height={35}
+                width={30}
+                height={30}
               />
             </div>
-            <div className={styles.example_div}>
-              <div className={styles.ment_wrapper}>
-                {mentList.map((ment, index) => (
-                  <MentExample
-                    key={index}
-                    profile={ment.profile}
-                    ment={ment.ment}
-                  />
-                ))}
-              </div>
-            </div>
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "center",
-                alignItems: "center",
-                marginTop: "0.5rem",
-              }}
-            >
-              <p className={styles.mention}>
-                대표 덕담을 적어주시면 다른 유저들에게 덕담이 전달되고 회답을
-                받을 수 있어요.
-              </p>
-              <div className={styles.input_div}>
-                <textarea
-                  className={[styles.text_field, myFont.className].join(" ")}
-                  placeholder="내 덕담 주머니의 대표 덕담을 적어주세요"
-                  onChange={(e) => {
-                    onInputHandler(e);
-                    setMent(e.target.value);
-                  }}
-                />
+            <section className={styles.actions_row}>
+              <Link href="/self" className={styles.action_card}>
+                <div className={styles.action_icon}>🎁</div>
+                <div className={styles.action_texts}>
+                  <h3 className={styles.action_title}>나에게 덕담 남기기</h3>
+                  <p className={styles.action_desc}>
+                    올해 목표/되돌아보기/1년만 산다면
+                  </p>
+                </div>
+              </Link>
+
+              <Link href="/community" className={styles.action_card}>
+                <div className={styles.action_icon}>🤝</div>
+                <div className={styles.action_texts}>
+                  <h3 className={styles.action_title}>주변과 덕담 나누기</h3>
+                  <p className={styles.action_desc}>
+                    링크 공유로 지인과 주고받기
+                  </p>
+                </div>
+              </Link>
+            </section>
+
+            {/* ============ 오늘의 덕담 카드 ============ */}
+            <section className={styles.glass_card}>
+              <div className={styles.section_header}>
+                <h3 className={styles.section_title}>나의 덕담 기록 ✨</h3>
                 <button
-                  className={[styles.input_btn, myFont.className].join(" ")}
-                  onClick={async () => {
-                    if (ment.length < 1) {
-                      alert("덕담을 입력해주세요");
-                      return;
-                    }
-                    setSignUpModal(true);
+                  type="button"
+                  className={styles.section_action_btn}
+                  onClick={() => {
+                    // 필요시 랜덤 재생/리프레시 핸들러 연결
+                    const container = document.querySelector(
+                      `.${styles.ment_wrapper}`
+                    );
+                    if (container)
+                      ((container as HTMLElement).style.animation = "none"),
+                        setTimeout(
+                          () =>
+                            ((container as HTMLElement).style.animation = ""),
+                          0
+                        );
                   }}
                 >
-                  입력
+                  새로고침
                 </button>
               </div>
 
-              <div className={styles.input_length}>
-                <p
-                  className={styles.word_length}
-                  style={{ color: inputCount == 150 ? "red" : "#949494" }}
+              {/* 기존 MentExample 리스트 재활용 */}
+              <div className={styles.example_div}>
+                <div className={styles.ment_wrapper}>
+                  {/* {mentList.map((m, i) => (
+                    <MentExample key={i} profile={m.profile} ment={m.ment} />
+                  ))} */}
+                </div>
+              </div>
+            </section>
+
+            {/* ============ 리마인드 프리뷰 스트립 ============ */}
+            <section className={styles.strip}>
+              <div className={styles.section_header}>
+                <h3 className={styles.section_title}>다가오는 리마인드</h3>
+                <Link href="/reminders" className={styles.section_link}>
+                  모두 보기
+                </Link>
+              </div>
+
+              {/* 실제 데이터 연결 전, 플레이스홀더 아이템 */}
+              <ul className={styles.reminder_list}>
+                <li className={styles.reminder_item}>
+                  <span className={styles.reminder_dot} />
+                  <div className={styles.reminder_texts}>
+                    <p className={styles.reminder_title}>목표 체크인</p>
+                    <p className={styles.reminder_meta}>
+                      1월 5일 오전 9:00 · 인앱
+                    </p>
+                  </div>
+                </li>
+                <li className={styles.reminder_item}>
+                  <span className={styles.reminder_dot} />
+                  <div className={styles.reminder_texts}>
+                    <p className={styles.reminder_title}>‘1년만 산다면’ 회고</p>
+                    <p className={styles.reminder_meta}>
+                      1월 12일 오후 7:00 · 푸시
+                    </p>
+                  </div>
+                </li>
+              </ul>
+            </section>
+
+            {/* ============ 정책 링크 ============ */}
+            <footer className={styles.footer}>
+              <div className={styles.info_div}>
+                <Link
+                  href="https://ikjun.notion.site/148ee261b89580ac9ad5defe33a92f65?pvs=4"
+                  className={styles.info_ment}
+                  target="_blank"
                 >
-                  {inputCount} / 150자
-                  <br />
+                  덕담 주머니란?
+                </Link>
+                <Link href="#" className={styles.info_ment} target="_blank">
+                  개인정보 처리방침
+                </Link>
+                <Link href="#" className={styles.info_ment} target="_blank">
+                  서비스 이용약관
+                </Link>
+              </div>
+
+              <div className={styles.footerContent}>
+                <p className={styles.copyright}>
+                  ⓒ 2024 덕담 주머니. All rights reserved.
+                </p>
+                <p className={styles.contact}>
+                  문의 :{" "}
+                  <a
+                    href="mailto:deokdam@ikjun.com"
+                    style={{
+                      textDecoration: "none",
+                      color: "inherit",
+                      margin: 0,
+                    }}
+                  >
+                    deokdam@ikjun.com
+                  </a>
                 </p>
               </div>
-
-              <div className={styles.button_div}>
-                <button
-                  className={[styles.submit_btn, myFont.className].join(" ")}
-                  onClick={() => {
-                    setSignInModal(true);
-                  }}
-                >
-                  <p className={styles.submit_btn_ment}>
-                    이미 덕담 주머니가 있다면?
-                  </p>
-                  덕담 주머니 조회
-                </button>
-              </div>
-
-              <Link
-                href="https://ikjun.notion.site/148ee261b89580ac9ad5defe33a92f65?pvs=4"
-                className={styles.info_ment}
-                target="_blank"
-              >
-                덕담 주머니란?
-              </Link>
-            </div>
-          </div>
-          <div style={{ marginTop: "1.5rem" }}>
-            {/* <p className={styles.ad_ment}>
-              발생한 광고수익은 독거노인종합지원센터를 통해 기부됩니다
-            </p> */}
-            <Script
-              async
-              src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2222926756194557"
-              crossOrigin="anonymous"
-            ></Script>
-            <ins
-              className={["adsbygoogle", styles.footer].join(" ")}
-              style={{ display: "block" }}
-              data-ad-client="ca-pub-2222926756194557"
-              data-ad-slot="4808765086"
-            ></ins>
+            </footer>
           </div>
         </div>
       </div>
