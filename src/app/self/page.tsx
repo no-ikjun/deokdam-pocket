@@ -62,7 +62,7 @@ export default function SelfPage() {
       <section className={styles.actions_row}>
         {/* 새해 목표 */}
         <Link
-          href="/self/goals"
+          href="/self/input?type=goals"
           className={`${styles.action_card} ${styles.compact_card} ${
             used.goals ? styles.card_disabled : ""
           }`}
@@ -149,7 +149,7 @@ export default function SelfPage() {
 
         {/* 1년만 남는다면? */}
         <Link
-          href="/self/oneyear"
+          href="/self/input?type=oneyear"
           className={`${styles.action_card} ${styles.compact_card} ${
             used.oneyear ? styles.card_disabled : ""
           }`}
@@ -230,7 +230,7 @@ export default function SelfPage() {
 
         {/* 올해 되돌아보기 */}
         <Link
-          href="/self/retrospect"
+          href="/self/input?type=retrospect"
           className={`${styles.action_card} ${styles.compact_card} ${
             used.retrospect ? styles.card_disabled : ""
           }`}
@@ -326,7 +326,7 @@ export default function SelfPage() {
 
         <div className={styles.future_actions}>
           <Link
-            href="/self/future"
+            href="/self/input?type=future"
             className={styles.glass_primary_btn}
             style={
               used.retrospect || used.goals || used.oneyear
