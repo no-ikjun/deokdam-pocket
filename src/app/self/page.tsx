@@ -318,14 +318,25 @@ export default function SelfPage() {
             </span>
             <h3 className={styles.future_title}>1년 뒤의 나와 대화하기</h3>
             <p className={styles.future_desc}>
-              오늘의 기록을 바탕으로 1년 뒤 모습을 시뮬레이션하고,{" "}
-              <strong>순한맛/매운맛</strong> 말투를 선택해 AI와 대화해요.
+              위 기능 중 한개 이상을 사용하면, <strong>순한맛/매운맛</strong>{" "}
+              말투를 선택해 AI와 대화할 수 있어요.
             </p>
           </div>
         </div>
 
         <div className={styles.future_actions}>
-          <Link href="/self/future" className={styles.glass_primary_btn}>
+          <Link
+            href="/self/future"
+            className={styles.glass_primary_btn}
+            style={
+              used.retrospect || used.goals || used.oneyear
+                ? {}
+                : { pointerEvents: "none", opacity: 0.5, cursor: "not-allowed" }
+            }
+            aria-disabled={
+              used.retrospect || used.goals || used.oneyear ? false : true
+            }
+          >
             <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden>
               <path
                 d="M21 12a4 4 0 0 1-4 4H10l-4 3v-3H7a4 4 0 0 1-4-4V8a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v4Z"
