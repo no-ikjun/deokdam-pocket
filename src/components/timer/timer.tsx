@@ -57,7 +57,7 @@ const Timer = () => {
     };
 
     fetchSubscribers();
-    
+
     const timer = setTimeout(() => {
       setShowDiv(true);
     }, 500);
@@ -75,7 +75,7 @@ const Timer = () => {
   } | null>(null);
 
   const calculateTimeLeft = () => {
-    const targetDate = new Date("2025-01-01T00:00:00+09:00"); // KST
+    const targetDate = new Date("2026-01-01T00:00:00+09:00"); // KST
     const currentDate = new Date();
     const difference = targetDate.getTime() - currentDate.getTime();
 
@@ -171,7 +171,7 @@ const Timer = () => {
           확인
         </button>
       </Modal>
-      <p className={_.title}>2024년이 얼마 남지 않았어요!</p>
+      <p className={_.title}>2026년까지 얼마 남지 않았어요!</p>
       <div className={showDiv ? [_.show, _.fade_div].join(" ") : _.fade_div}>
         <div className={_.timer_div}>
           <div className={_.timer}>
@@ -183,7 +183,7 @@ const Timer = () => {
                 height={35}
               />
               <p className={_.ment}>
-                2025년 1월 1일이 되면
+                2026년 1월 1일이 되면
                 <br />
                 덕담 주머니를 만들어 덕담을 주고받을 수 있어요
               </p>
