@@ -1,118 +1,12 @@
 "use client";
 
-import Head from "next/head";
 import styles from "./page.module.css";
-import { ChangeEvent, ChangeEventHandler, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
-import useCountNum from "@/hooks/countUp";
 import Link from "next/link";
-import MentExample from "@/components/ment_example";
-import axios from "axios";
 import { useAuthStore } from "@/stores/auth";
-import { generateRandomString } from "@/utils/getRandomString";
-import { getDateString } from "@/utils/getDateString";
-import {
-  useRouter,
-  usePathname,
-  useSearchParams,
-  useSelectedLayoutSegment,
-  useSelectedLayoutSegments,
-  redirect,
-  notFound,
-} from "next/navigation";
-import localFont from "next/font/local";
-import Script from "next/script";
+import { useRouter } from "next/navigation";
 import Timer from "@/components/timer/timer";
-import Modal from "@/components/modal/modal";
-import SignUp from "@/components/signUp/signup";
-import SignIn from "@/components/signIn/signin";
-
-const myFont = localFont({
-  src: "./fonts/NanumMyeongjo.ttf",
-});
-
-const mentList = [
-  {
-    profile: "1",
-    ment: "새해에도 함께 웃고, 함께 성장할 수 있길 바랄게요.🙏 새해 복 많이 받으세요.",
-  },
-  {
-    profile: "2",
-    ment: "2025년 무거운 짐들은 모두 벗어버리시고 새로운 마음으로 힘차게 출발하시길 기원합니다.",
-  },
-  {
-    profile: "3",
-    ment: "😄 웃을수록 행복이 찾아온다고 합니다. 2025년에는 웃음을 잃지 않고 좋은 일만 가득하시길 바랍니다.",
-  },
-  {
-    profile: "4",
-    ment: "을사년 새해에는 승승장구하시길 진심으로 기원합니다.",
-  },
-  {
-    profile: "5",
-    ment: "새해에는 사랑 속에서 늘 빛나고 행복하시길 희망합니다.",
-  },
-  {
-    profile: "6",
-    ment: "을사년 새해 복 많이 받으세요. 건강과 뜻하는 일이 모두 이루어지는 을사년이 되시길 바랍니다.",
-  },
-  {
-    profile: "7",
-    ment: "올 한 해도 정말 수고 많으셨습니다😊 2025 을사년에도 행복하고 좋인 일만 가득하길 바랄게요.",
-  },
-  {
-    profile: "1",
-    ment: "다사다난했던 한 해가 저물어 갑니다. 다가오는 새해에는 더욱 큰 행복과 희망이 함께 하시길 바랍니다.",
-  },
-  {
-    profile: "4",
-    ment: "새해 복 많이 받으세요! 항상 건강하시고 행복하세요🤩",
-  },
-  {
-    profile: "7",
-    ment: "2025년 새해 좋은 일, 행복한 일 가득하기를 바라며 늘 건강하시길 기원하겠습니다.",
-  },
-];
-
-const getCount = async (): Promise<number> => {
-  try {
-    const res = await axios.get("/api/ment2025/count", {
-      headers: {
-        "Cache-Control": "no-cache",
-        Pragma: "no-cache",
-        Expires: "0",
-      },
-    });
-    if (res.status === 200) {
-      return res.data.count;
-    }
-  } catch (err) {
-    console.log(err);
-    return 0;
-  }
-  return 0;
-};
-
-const sendMent = async (ment: string) => {
-  try {
-    const uuid = `MT${getDateString()}${generateRandomString(10)}`;
-    const res = await axios.post("/api/ment", {
-      uuid: uuid,
-      ment: ment,
-      cache: "no-store",
-      dynamic: "force-dynamic",
-    });
-
-    if (res.status === 201) {
-      return uuid;
-    } else {
-      return "error";
-    }
-  } catch (err) {
-    console.log(err);
-    return "error";
-  }
-};
 
 declare global {
   interface Window {
@@ -124,23 +18,9 @@ export default function Home() {
   const [showTimer, setShowTimer] = useState(true);
 
   const [showDiv, setShowDiv] = useState(false);
-  const [tempCount, setTempCount] = useState(0);
-  const count = useCountNum(tempCount);
-  const [inputCount, setInputCount] = useState(0);
 
-  const [ment, setMent] = useState("");
   const [animation, setAnimation] = useState(false);
   const router = useRouter();
-
-  const [showSignUpModal, setSignUpModal] = useState(false);
-  const [showSignInModal, setSignInModal] = useState(false);
-
-  const onInputHandler = (e: ChangeEvent<HTMLTextAreaElement>) => {
-    if (e.target.value.length > 150) {
-      e.target.value = e.target.value.slice(0, 150);
-    }
-    setInputCount(e.target.value.length);
-  };
 
   const loading = async () => {
     setTimeout(() => {
@@ -156,22 +36,9 @@ export default function Home() {
       setShowTimer(false); // 2026년이 지나면 타이머 숨기기
     }
 
-    if (localStorage.getItem("pocket_uuid")) {
-      router.replace("/pocket");
-    }
-
     if (window.adsbygoogle && !window.adsbygoogle.loaded)
       (window.adsbygoogle = (window as any).adsbygoogle || []).push({});
   }, [router]);
-
-  useEffect(() => {
-    const intervalId = setInterval(async () => {
-      const newCount = await getCount();
-      setTempCount(newCount); // 상태 업데이트
-    }, 5000); //5초마다 데이터를 요청
-
-    return () => clearInterval(intervalId); // 컴포넌트 언마운트 시 인터벌 정리
-  }, []);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -197,33 +64,6 @@ export default function Home() {
 
   return (
     <>
-      <Modal
-        isOpen={showSignUpModal}
-        onClose={() => {
-          setSignUpModal(false);
-        }}
-      >
-        <SignUp
-          ment={ment}
-          onSubmitted={() => {
-            setSignUpModal(false); // 성공 시 모달 닫기
-            setAnimation(true); // 애니메이션 실행
-            loading(); // 로딩 완료
-          }}
-          onCanceled={() => {
-            alert("사용할 수 없는 이름입니다.");
-            setSignUpModal(true);
-          }}
-        />
-      </Modal>
-      <Modal
-        isOpen={showSignInModal}
-        onClose={() => {
-          setSignInModal(false);
-        }}
-      >
-        <SignIn />
-      </Modal>
       <div
         style={{ display: `${animation ? "flex" : "none"}` }}
         className={styles.sending_div}
