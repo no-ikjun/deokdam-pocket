@@ -25,7 +25,8 @@
     "react-dom": "^18",
     "react-slick": "^0.30.3",
     "slick-carousel": "^1.8.1",
-    "uuid": "^11.0.3"
+    "uuid": "^11.0.3",
+    "zustand": "^4.5.7"
   },
   "devDependencies": {
     "@types/node": "^20",
