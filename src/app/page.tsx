@@ -59,7 +59,7 @@ export default function Home() {
   }, [authStatus, router]);
 
   if (showTimer) {
-    return <Timer />;
+    return <Timer hideTimer={() => setShowTimer(false)} />;
   }
 
   return (
