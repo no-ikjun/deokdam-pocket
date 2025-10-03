@@ -13,7 +13,7 @@ const myFont = localFont({
 });
 
 type TimerProps = {
-  hideTimer?: () => void;
+  hideTimer: () => void;
 };
 
 const Timer = ({ hideTimer }: TimerProps) => {
