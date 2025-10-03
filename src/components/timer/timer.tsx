@@ -12,7 +12,11 @@ const myFont = localFont({
   src: "fonts/NanumMyeongjo.ttf",
 });
 
-const Timer = () => {
+type TimerProps = {
+  hideTimer?: () => void;
+};
+
+const Timer = ({ hideTimer }: TimerProps) => {
   const [showDiv, setShowDiv] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [email, setEmail] = useState("");
@@ -181,6 +185,9 @@ const Timer = () => {
                 alt="pocket"
                 width={35}
                 height={35}
+                onClick={() => {
+                  hideTimer();
+                }}
               />
               <p className={_.ment}>
                 2026년 1월 1일이 되면
