@@ -9,6 +9,7 @@ import localFont from "next/font/local";
 import Script from "next/script";
 import { Analytics } from "@vercel/analytics/react";
 import dynamic from "next/dynamic";
+import Script from "next/script";
 
 // Render client-side bootstrap without SSR
 const AuthBootstrap = dynamic(() => import("@/components/auth/AuthBootstrap"), {
@@ -50,9 +51,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="kr" className={myFont.className}>
+    <html lang="ko" className={myFont.className}>
       <head>
-        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2222926756194557" crossorigin="anonymous"></script>  
+        <Script
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2222926756194557"
+          strategy="afterInteractive"
+          crossOrigin="anonymous"
+        />
       </head>
       <body>
         <Image
