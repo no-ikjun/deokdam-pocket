@@ -50,7 +50,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="kr" className={myFont.className}>
+    <html lang="ko" className={myFont.className}>
+      <head>
+        <Script
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2222926756194557"
+          strategy="afterInteractive"
+          crossOrigin="anonymous"
+        />
+      </head>
       <body>
         <Image
           className={styles.background_img}
