@@ -9,7 +9,6 @@ import localFont from "next/font/local";
 import Script from "next/script";
 import { Analytics } from "@vercel/analytics/react";
 import dynamic from "next/dynamic";
-import Script from "next/script";
 
 // Render client-side bootstrap without SSR
 const AuthBootstrap = dynamic(() => import("@/components/auth/AuthBootstrap"), {
