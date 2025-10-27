@@ -4,10 +4,12 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import styles from "./page.module.css";
 import Image from "next/image";
+import { useAuthStore } from "@/stores/auth";
 
 export default function KakaoCallbackPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
+  const checkAuth = useAuthStore((s) => s.checkAuth);
 
   useEffect(() => {
     let canceled = false;
@@ -74,7 +76,10 @@ export default function KakaoCallbackPage() {
         }
 
         // 3) 성공 → 홈으로
-        if (!canceled) router.replace("/");
+        if (!canceled) {
+          await checkAuth();
+          if (!canceled) router.replace("/");
+        }
       } catch (err) {
         console.error("Login error:", err);
         alert("로그인에 실패했습니다. 다시 시도해주세요.");
@@ -89,7 +94,7 @@ export default function KakaoCallbackPage() {
     return () => {
       canceled = true;
     };
-  }, [router]);
+  }, [router, checkAuth]);
 
   return (
     <>
