@@ -6,7 +6,7 @@ import Link from "next/link";
 
 export default function LoginPage() {
   const REST_API_KEY = process.env.NEXT_PUBLIC_KAKAO_REST_API_KEY!;
-  const REDIRECT_URI = "https://deokdam.app/kakao/callback";
+  const REDIRECT_URI = `${process.env.NEXT_PUBLIC_SERVICE_URL}/kakao/callback`;
 
   const handleKakaoLogin = () => {
     const kakaoAuthUrl = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${REST_API_KEY}&redirect_uri=${REDIRECT_URI}`;
@@ -14,7 +14,7 @@ export default function LoginPage() {
   };
 
   const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!;
-  const GOOGLE_REDIRECT_URI = "https://deokdam.app/google/callback";
+  const GOOGLE_REDIRECT_URI = `${process.env.NEXT_PUBLIC_SERVICE_URL}/google/callback`;
 
   const handleGoogleLogin = () => {
     const url = `https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=${GOOGLE_CLIENT_ID}&redirect_uri=${GOOGLE_REDIRECT_URI}&scope=openid%20email%20profile`;
