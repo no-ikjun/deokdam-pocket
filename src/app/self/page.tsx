@@ -18,25 +18,37 @@ export default function SelfPage() {
     oneyear: false,
     retrospect: false,
   });
+  const [loading, setLoading] = useState(true);
 
   // 최초 진입 시 답변 완료 여부 불러오기
   useEffect(() => {
+    let mounted = true;
     const getUsedStatus = async () => {
-      const response = await axios.get("/api/self/check");
-      const data: UsedState = {
-        goals: response.data.some(
-          (item: { self_type: string }) => item.self_type === "GOALS"
-        ),
-        oneyear: response.data.some(
-          (item: { self_type: string }) => item.self_type === "ONEYEAR"
-        ),
-        retrospect: response.data.some(
-          (item: { self_type: string }) => item.self_type === "RETROSPECT"
-        ),
-      };
-      setUsed(data);
+      try {
+        const response = await axios.get("/api/self/check");
+        if (!mounted) return;
+        const data: UsedState = {
+          goals: response.data.some(
+            (item: { self_type: string }) => item.self_type === "GOALS"
+          ),
+          oneyear: response.data.some(
+            (item: { self_type: string }) => item.self_type === "ONEYEAR"
+          ),
+          retrospect: response.data.some(
+            (item: { self_type: string }) => item.self_type === "RETROSPECT"
+          ),
+        };
+        setUsed(data);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        if (mounted) setLoading(false);
+      }
     };
     getUsedStatus();
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   // 비활성 카드 클릭 방지
@@ -46,6 +58,11 @@ export default function SelfPage() {
       e.stopPropagation();
     }
   };
+
+  const goalsDisabled = loading || used.goals;
+  const oneyearDisabled = loading || used.oneyear;
+  const retrospectDisabled = loading || used.retrospect;
+  const skeletons = new Array(3).fill(null);
 
   return (
     <main className={styles.self_wrap} aria-label="나에게 덕담 남기기">
@@ -58,250 +75,275 @@ export default function SelfPage() {
         아래 세 가지 서비스 중 원하는 기능을 선택해보세요.
       </p>
       <section className={styles.actions_row}>
-        {/* 새해 목표 */}
-        <Link
-          href="/self/input?type=goals"
-          className={`${styles.action_card} ${styles.compact_card} ${
-            used.goals ? styles.card_disabled : ""
-          }`}
-          aria-label="새해 목표 설정하기"
-          aria-disabled={used.goals}
-          onClick={(e) => {
-            preventIfDisabled(e, used.goals);
-          }}
-        >
-          <div className={styles.card_icon}>
-            <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden>
-              <circle
-                cx="12"
-                cy="12"
-                r="9"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.6"
-                opacity=".6"
-              />
-              <circle
-                cx="12"
-                cy="12"
-                r="5"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.6"
-              />
-              <path
-                d="M12 7v10M7 12h10"
-                stroke="currentColor"
-                strokeWidth="1.6"
-                strokeLinecap="round"
-              />
-            </svg>
-          </div>
-          <div className={styles.card_body}>
-            <span className={styles.overline}>새해 목표 세우기</span>
-            <h3 className={styles.card_title}>올해 이루고 싶은 것</h3>
-            <p className={styles.card_desc}>5문항으로 나만의 목표 구체화하기</p>
-            <div className={styles.card_meta}>
-              <span className={styles.chip}>질문 5개</span>
-              <span className={styles.chip}>소요 2~3분</span>
-              <span className={styles.chip}>리마인드</span>
+        {loading ? (
+          skeletons.map((_, idx) => (
+            <div
+              key={`skeleton-${idx}`}
+              className={`${styles.action_card} ${styles.compact_card} ${styles.skeleton_card}`}
+              aria-hidden
+            >
+              <div className={`${styles.card_icon} ${styles.skeleton_block}`} />
+              <div className={styles.card_body}>
+                <span className={`${styles.skeleton_line} ${styles.skeleton_badge}`} />
+                <span className={`${styles.skeleton_line} ${styles.skeleton_title}`} />
+                <span className={`${styles.skeleton_line} ${styles.skeleton_desc}`} />
+                <div className={styles.card_meta}>
+                  <span className={styles.skeleton_chip} />
+                  <span className={styles.skeleton_chip} />
+                  <span className={styles.skeleton_chip} />
+                </div>
+              </div>
+              <div className={`${styles.chevron} ${styles.skeleton_chevron}`} />
             </div>
-          </div>
-          <svg
-            className={styles.chevron}
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            aria-hidden
-          >
-            <path
-              d="M9 6l6 6-6 6"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-
-          {used.goals && (
-            <div className={styles.lock_badge} aria-hidden>
-              <span className={styles.lock_dot} />
-              완료됨
-              <button
-                type="button"
-                className={styles.reset_btn}
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  localStorage.removeItem("self_goals_done");
-                  setUsed((p) => ({ ...p, goals: false }));
-                }}
-              >
-                다시 작성
-              </button>
-            </div>
-          )}
-        </Link>
-
-        {/* 1년만 남는다면? */}
-        <Link
-          href="/self/input?type=oneyear"
-          className={`${styles.action_card} ${styles.compact_card} ${
-            used.oneyear ? styles.card_disabled : ""
-          }`}
-          aria-label="1년만 남는다면 작성하기"
-          aria-disabled={used.oneyear}
-          onClick={(e) => {
-            preventIfDisabled(e, used.oneyear);
-          }}
-        >
-          <div className={styles.card_icon}>
-            <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden>
-              <path
-                d="M6 3h12M6 21h12M8 3c0 4 8 4 8 8s-8 4-8 8"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.6"
-                strokeLinecap="round"
-              />
-              <path
-                d="M16 3c0 4-8 4-8 8s8 4 8 8"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.6"
-                strokeLinecap="round"
-                opacity=".6"
-              />
-            </svg>
-          </div>
-          <div className={styles.card_body}>
-            <span className={styles.overline}>나에게 1년만 주어진다면?</span>
-            <h3 className={styles.card_title}>가장 중요한 것</h3>
-            <p className={styles.card_desc}>
-              우선순위를 드러내는 4문항 시나리오
-            </p>
-            <div className={styles.card_meta}>
-              <span className={styles.chip}>질문 4개</span>
-              <span className={styles.chip}>소요 2분</span>
-              <span className={styles.chip}>AI 대화 예약</span>
-            </div>
-          </div>
-          <svg
-            className={styles.chevron}
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            aria-hidden
-          >
-            <path
-              d="M9 6l6 6-6 6"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-
-          {used.oneyear && (
-            <div className={styles.lock_badge} aria-hidden>
-              <span className={styles.lock_dot} />
-              완료됨
-              <button
-                type="button"
-                className={styles.reset_btn}
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  localStorage.removeItem("self_oneyear_done");
-                  setUsed((p) => ({ ...p, oneyear: false }));
-                }}
-              >
-                다시 작성
-              </button>
-            </div>
-          )}
-        </Link>
-
-        {/* 올해 되돌아보기 */}
-        <Link
-          href="/self/input?type=retrospect"
-          className={`${styles.action_card} ${styles.compact_card} ${
-            used.retrospect ? styles.card_disabled : ""
-          }`}
-          aria-label="올해 되돌아보기 작성하기"
-          aria-disabled={used.retrospect}
-          onClick={(e) => {
-            preventIfDisabled(e, used.retrospect);
-          }}
-        >
-          <div className={styles.card_icon}>
-            <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden>
-              <rect
-                x="3"
-                y="5"
+          ))
+        ) : (
+          <>
+            {/* 새해 목표 */}
+            <Link
+              href="/self/input?type=goals"
+              className={`${styles.action_card} ${styles.compact_card} ${
+                goalsDisabled ? styles.card_disabled : ""
+              }`}
+              aria-label="새해 목표 설정하기"
+              aria-disabled={goalsDisabled}
+              onClick={(e) => {
+                preventIfDisabled(e, goalsDisabled);
+              }}
+            >
+              <div className={styles.card_icon}>
+                <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden>
+                  <circle
+                    cx="12"
+                    cy="12"
+                    r="9"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                    opacity=".6"
+                  />
+                  <circle
+                    cx="12"
+                    cy="12"
+                    r="5"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                  />
+                  <path
+                    d="M12 7v10M7 12h10"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </div>
+              <div className={styles.card_body}>
+                <span className={styles.overline}>새해 목표 세우기</span>
+                <h3 className={styles.card_title}>올해 이루고 싶은 것</h3>
+                <p className={styles.card_desc}>5문항으로 나만의 목표 구체화하기</p>
+                <div className={styles.card_meta}>
+                  <span className={styles.chip}>질문 5개</span>
+                  <span className={styles.chip}>소요 2~3분</span>
+                  <span className={styles.chip}>리마인드</span>
+                </div>
+              </div>
+              <svg
+                className={styles.chevron}
                 width="18"
-                height="16"
-                rx="3"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.6"
-              />
-              <path
-                d="M8 3v4M16 3v4M3 10h18"
-                stroke="currentColor"
-                strokeWidth="1.6"
-                strokeLinecap="round"
-              />
-            </svg>
-          </div>
-          <div className={styles.card_body}>
-            <span className={styles.overline}>올해 되돌아보기</span>
-            <h3 className={styles.card_title}>기록과 통찰</h3>
-            <p className={styles.card_desc}>감사·배움·아쉬움 3섹션 요약</p>
-            <div className={styles.card_meta}>
-              <span className={styles.chip}>섹션 3개</span>
-              <span className={styles.chip}>소요 3~4분</span>
-              <span className={styles.chip}>PDF 내보내기</span>
-            </div>
-          </div>
-          <svg
-            className={styles.chevron}
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            aria-hidden
-          >
-            <path
-              d="M9 6l6 6-6 6"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-
-          {used.retrospect && (
-            <div className={styles.lock_badge} aria-hidden>
-              <span className={styles.lock_dot} />
-              완료됨
-              <button
-                type="button"
-                className={styles.reset_btn}
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  localStorage.removeItem("self_retrospect_done");
-                  setUsed((p) => ({ ...p, retrospect: false }));
-                }}
+                height="18"
+                viewBox="0 0 24 24"
+                aria-hidden
               >
-                다시 작성
-              </button>
-            </div>
-          )}
-        </Link>
+                <path
+                  d="M9 6l6 6-6 6"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+
+              {used.goals && (
+                <div className={styles.lock_badge} aria-hidden>
+                  <span className={styles.lock_dot} />
+                  완료됨
+                  <button
+                    type="button"
+                    className={styles.reset_btn}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      localStorage.removeItem("self_goals_done");
+                      setUsed((p) => ({ ...p, goals: false }));
+                    }}
+                  >
+                    다시 작성
+                  </button>
+                </div>
+              )}
+            </Link>
+
+            {/* 1년만 남는다면? */}
+            <Link
+              href="/self/input?type=oneyear"
+              className={`${styles.action_card} ${styles.compact_card} ${
+                oneyearDisabled ? styles.card_disabled : ""
+              }`}
+              aria-label="1년만 남는다면 작성하기"
+              aria-disabled={oneyearDisabled}
+              onClick={(e) => {
+                preventIfDisabled(e, oneyearDisabled);
+              }}
+            >
+              <div className={styles.card_icon}>
+                <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden>
+                  <path
+                    d="M6 3h12M6 21h12M8 3c0 4 8 4 8 8s-8 4-8 8"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                    strokeLinecap="round"
+                  />
+                  <path
+                    d="M16 3c0 4-8 4-8 8s8 4 8 8"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                    strokeLinecap="round"
+                    opacity=".6"
+                  />
+                </svg>
+              </div>
+              <div className={styles.card_body}>
+                <span className={styles.overline}>나에게 1년만 주어진다면?</span>
+                <h3 className={styles.card_title}>가장 중요한 것</h3>
+                <p className={styles.card_desc}>
+                  우선순위를 드러내는 4문항 시나리오
+                </p>
+                <div className={styles.card_meta}>
+                  <span className={styles.chip}>질문 4개</span>
+                  <span className={styles.chip}>소요 2분</span>
+                  <span className={styles.chip}>AI 대화 예약</span>
+                </div>
+              </div>
+              <svg
+                className={styles.chevron}
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                aria-hidden
+              >
+                <path
+                  d="M9 6l6 6-6 6"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+
+              {used.oneyear && (
+                <div className={styles.lock_badge} aria-hidden>
+                  <span className={styles.lock_dot} />
+                  완료됨
+                  <button
+                    type="button"
+                    className={styles.reset_btn}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      localStorage.removeItem("self_oneyear_done");
+                      setUsed((p) => ({ ...p, oneyear: false }));
+                    }}
+                  >
+                    다시 작성
+                  </button>
+                </div>
+              )}
+            </Link>
+
+            {/* 회고 */}
+            <Link
+              href="/self/input?type=retrospect"
+              className={`${styles.action_card} ${styles.compact_card} ${
+                retrospectDisabled ? styles.card_disabled : ""
+              }`}
+              aria-label="올해 되돌아보기 작성하기"
+              aria-disabled={retrospectDisabled}
+              onClick={(e) => {
+                preventIfDisabled(e, retrospectDisabled);
+              }}
+            >
+              <div className={styles.card_icon}>
+                <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden>
+                  <path
+                    d="M12 5v14M5 12h14"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                    strokeLinecap="round"
+                  />
+                  <circle
+                    cx="12"
+                    cy="12"
+                    r="9"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                    opacity=".45"
+                  />
+                </svg>
+              </div>
+              <div className={styles.card_body}>
+                <span className={styles.overline}>올해 되돌아보기</span>
+                <h3 className={styles.card_title}>감사 · 성장 · 다짐</h3>
+                <p className={styles.card_desc}>
+                  3섹션으로 올해를 정리해보아요
+                </p>
+                <div className={styles.card_meta}>
+                  <span className={styles.chip}>섹션 3개</span>
+                  <span className={styles.chip}>소요 3~4분</span>
+                </div>
+              </div>
+              <svg
+                className={styles.chevron}
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                aria-hidden
+              >
+                <path
+                  d="M9 6l6 6-6 6"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+
+              {used.retrospect && (
+                <div className={styles.lock_badge} aria-hidden>
+                  <span className={styles.lock_dot} />
+                  완료됨
+                  <button
+                    type="button"
+                    className={styles.reset_btn}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      localStorage.removeItem("self_retrospect_done");
+                      setUsed((p) => ({ ...p, retrospect: false }));
+                    }}
+                  >
+                    다시 작성
+                  </button>
+                </div>
+              )}
+            </Link>
+          </>
+        )}
       </section>
 
       {/* 하단 CTA: 1년 뒤 나와 대화하기 */}

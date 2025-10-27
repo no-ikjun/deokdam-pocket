@@ -199,6 +199,83 @@
   box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.35);
 }
 
+/* 스켈레톤 */
+.skeleton_card {
+  position: relative;
+  pointer-events: none;
+  overflow: hidden;
+  cursor: default;
+}
+
+.skeleton_card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0),
+    rgba(255, 255, 255, 0.55),
+    rgba(255, 255, 255, 0)
+  );
+  transform: translateX(-120%);
+  animation: skeletonShimmer 1.4s ease-in-out infinite;
+}
+
+.skeleton_block,
+.skeleton_line,
+.skeleton_chip,
+.skeleton_chevron {
+  background: rgba(148, 163, 184, 0.22);
+  position: relative;
+}
+
+.skeleton_block {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+}
+
+.skeleton_line {
+  display: block;
+  height: 12px;
+  border-radius: 10px;
+}
+
+.skeleton_badge {
+  width: 96px;
+}
+.skeleton_title {
+  width: 68%;
+  height: 16px;
+  margin-top: 6px;
+}
+.skeleton_desc {
+  width: 85%;
+  margin-top: 10px;
+}
+
+.skeleton_chip {
+  width: 68px;
+  height: 20px;
+  border-radius: 999px;
+}
+
+.skeleton_chevron {
+  width: 18px;
+  height: 18px;
+  border-radius: 6px;
+  margin-left: auto;
+}
+
+@keyframes skeletonShimmer {
+  0% {
+    transform: translateX(-120%);
+  }
+  100% {
+    transform: translateX(120%);
+  }
+}
+
 /* 우측 화살표 */
 .chevron {
   opacity: 0.6;
