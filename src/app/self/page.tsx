@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import styles from "./page.module.css";
+import axios from "axios";
 
 type UsedState = {
   goals: boolean;
@@ -18,28 +19,25 @@ export default function SelfPage() {
     retrospect: false,
   });
 
-  // 최초 진입 시 localStorage에서 완료 여부 로드
+  // 최초 진입 시 답변 완료 여부 불러오기
   useEffect(() => {
-    const next = {
-      goals: localStorage.getItem("self_goals_done") === "1",
-      oneyear: localStorage.getItem("self_oneyear_done") === "1",
-      retrospect: localStorage.getItem("self_retrospect_done") === "1",
+    const getUsedStatus = async () => {
+      const response = await axios.get("/api/self/check");
+      const data: UsedState = {
+        goals: response.data.some(
+          (item: { self_type: string }) => item.self_type === "GOALS"
+        ),
+        oneyear: response.data.some(
+          (item: { self_type: string }) => item.self_type === "ONEYEAR"
+        ),
+        retrospect: response.data.some(
+          (item: { self_type: string }) => item.self_type === "RETROSPECT"
+        ),
+      };
+      setUsed(data);
     };
-    setUsed(next);
+    getUsedStatus();
   }, []);
-
-  // (임시) 카드 클릭 시 완료로 간주하고 저장 후 이동
-  const handleMarkDone = (key: keyof UsedState) => {
-    localStorage.setItem(
-      key === "goals"
-        ? "self_goals_done"
-        : key === "oneyear"
-        ? "self_oneyear_done"
-        : "self_retrospect_done",
-      "1"
-    );
-    setUsed((prev) => ({ ...prev, [key]: true }));
-  };
 
   // 비활성 카드 클릭 방지
   const preventIfDisabled = (e: React.MouseEvent, disabled?: boolean) => {
@@ -70,7 +68,6 @@ export default function SelfPage() {
           aria-disabled={used.goals}
           onClick={(e) => {
             preventIfDisabled(e, used.goals);
-            if (!used.goals) handleMarkDone("goals");
           }}
         >
           <div className={styles.card_icon}>
@@ -157,7 +154,6 @@ export default function SelfPage() {
           aria-disabled={used.oneyear}
           onClick={(e) => {
             preventIfDisabled(e, used.oneyear);
-            if (!used.oneyear) handleMarkDone("oneyear");
           }}
         >
           <div className={styles.card_icon}>
@@ -238,7 +234,6 @@ export default function SelfPage() {
           aria-disabled={used.retrospect}
           onClick={(e) => {
             preventIfDisabled(e, used.retrospect);
-            if (!used.retrospect) handleMarkDone("retrospect");
           }}
         >
           <div className={styles.card_icon}>
