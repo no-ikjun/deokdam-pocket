@@ -4,18 +4,22 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import styles from "./page.module.css";
+import { useAuthStore } from "@/stores/auth";
 
 export default function GoogleCallbackPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
+  const checkAuth = useAuthStore((s) => s.checkAuth);
 
   useEffect(() => {
+    let canceled = false;
+
     const handleGoogleAuth = async () => {
       const code = new URL(window.location.href).searchParams.get("code");
 
       if (!code) {
         alert("코드를 받아오지 못했습니다.");
-        setIsLoading(false);
+        if (!canceled) setIsLoading(false);
         return;
       }
 
@@ -31,20 +35,26 @@ export default function GoogleCallbackPage() {
           const result = await res.json();
           console.error("Google login failed:", result);
           alert("구글 로그인에 실패했습니다.");
-          setIsLoading(false);
+          if (!canceled) setIsLoading(false);
           return;
         }
 
-        router.push("/");
+        if (!canceled) {
+          await checkAuth();
+          if (!canceled) router.push("/");
+        }
       } catch (err) {
         console.error("Google login error:", err);
         alert("로그인 중 오류가 발생했습니다.");
-        setIsLoading(false);
+        if (!canceled) setIsLoading(false);
       }
     };
 
     handleGoogleAuth();
-  }, [router]);
+    return () => {
+      canceled = true;
+    };
+  }, [router, checkAuth]);
 
   return (
     <>
