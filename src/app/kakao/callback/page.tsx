@@ -42,9 +42,7 @@ export default function KakaoCallbackPage() {
             grant_type: "authorization_code",
             client_id: process.env.NEXT_PUBLIC_KAKAO_REST_API_KEY!,
             // 반드시 인코딩된 값과 콘솔 등록값이 "문자 그대로" 동일
-            redirect_uri: encodeURIComponent(
-              `${process.env.NEXT_PUBLIC_SERVICE_URL}/kakao/callback`
-            ),
+            redirect_uri: `${process.env.NEXT_PUBLIC_SERVICE_URL}/kakao/callback`,
             code,
             // client_secret: process.env.NEXT_PUBLIC_KAKAO_CLIENT_SECRET ?? "", // 보안 강화 쓴다면 필수
           }),
