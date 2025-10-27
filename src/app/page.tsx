@@ -16,10 +16,11 @@ declare global {
 
 export default function Home() {
   const [showTimer, setShowTimer] = useState(true);
-
   const [showDiv, setShowDiv] = useState(false);
 
   const [animation, setAnimation] = useState(false);
+
+  const [username, setUsername] = useState("");
   const router = useRouter();
 
   const loading = async () => {
@@ -31,7 +32,7 @@ export default function Home() {
 
   useEffect(() => {
     const now = new Date();
-    const targetDate = new Date("2026-01-01T00:00:00+09:00"); // KST
+    const targetDate = new Date("2025-01-01T00:00:00+09:00"); // KST
     if (now >= targetDate) {
       setShowTimer(false); // 2026년이 지나면 타이머 숨기기
     }
@@ -53,9 +54,9 @@ export default function Home() {
   // Use centralized auth status instead of per-page check
   const authStatus = useAuthStore((s) => s.status);
   useEffect(() => {
-    // if (authStatus === "unauthenticated") {
-    //   router.push("/signup");
-    // }
+    if (authStatus === "unauthenticated") {
+      router.push("/signup");
+    }
   }, [authStatus, router]);
 
   if (showTimer) {
@@ -90,7 +91,7 @@ export default function Home() {
       </div>
       <div className={animation ? styles.blur_background : ""}>
         <div className={styles.main}>
-          <h1 className={styles.title}>최익준님, 새해 복 많이 받으세요!</h1>
+          <h1 className={styles.title}>{username}님, 새해 복 많이 받으세요!</h1>
           <div
             className={
               showDiv

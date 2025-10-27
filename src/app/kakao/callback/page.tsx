@@ -10,31 +10,56 @@ export default function KakaoCallbackPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchTokenAndLogin = async () => {
-      const code = new URL(window.location.href).searchParams.get("code");
-      if (!code) return;
+    let canceled = false;
+
+    const run = async () => {
+      const url = new URL(window.location.href);
+      const code = url.searchParams.get("code");
+
+      // code가 없으면 세션 확인 후 홈으로 / 로딩 해제
+      if (!code) {
+        try {
+          const me = await fetch("/api/auth/me", {
+            credentials: "include",
+            cache: "no-store",
+          });
+          if (me.ok && !canceled) router.replace("/");
+        } catch {}
+        if (!canceled) setIsLoading(false);
+        return;
+      }
 
       try {
-        // 1. access token 요청
+        // 1) access token
         const tokenRes = await fetch("https://kauth.kakao.com/oauth/token", {
           method: "POST",
           headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
+            "Content-Type": "application/x-www-form-urlencoded;charset=utf-8",
           },
           body: new URLSearchParams({
             grant_type: "authorization_code",
             client_id: process.env.NEXT_PUBLIC_KAKAO_REST_API_KEY!,
-            redirect_uri: "https://deokdam.app/kakao/callback",
-            code: code,
+            // 반드시 인코딩된 값과 콘솔 등록값이 "문자 그대로" 동일
+            redirect_uri: encodeURIComponent(
+              `${process.env.NEXT_PUBLIC_SERVICE_URL}/kakao/callback`
+            ),
+            code,
+            // client_secret: process.env.NEXT_PUBLIC_KAKAO_CLIENT_SECRET ?? "", // 보안 강화 쓴다면 필수
           }),
         });
 
         const tokenData = await tokenRes.json();
-        const accessToken = tokenData.access_token;
+        if (!tokenRes.ok) {
+          console.error("Kakao token error:", tokenData);
+          throw new Error(
+            tokenData?.error_description || "Token request failed"
+          );
+        }
 
+        const accessToken = tokenData.access_token as string | undefined;
         if (!accessToken) throw new Error("No access token");
 
-        // 2. 백엔드에 로그인 요청
+        // 2) 서버에 세션 생성 요청(쿠키 세팅)
         const backendRes = await fetch("/api/auth/kakao", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -42,18 +67,28 @@ export default function KakaoCallbackPage() {
           credentials: "include",
         });
 
-        if (!backendRes.ok) throw new Error("Login failed");
+        if (!backendRes.ok) {
+          const body = await backendRes.text().catch(() => "");
+          console.error("Backend login failed:", backendRes.status, body);
+          throw new Error("Backend login failed");
+        }
 
-        // 성공 → 홈으로 이동
-        router.push("/");
+        // 3) 성공 → 홈으로
+        if (!canceled) router.replace("/");
       } catch (err) {
         console.error("Login error:", err);
-        alert("로그인에 실패했습니다.");
-        setIsLoading(false); // 실패하면 애니메이션 종료
+        alert("로그인에 실패했습니다. 다시 시도해주세요.");
+        if (!canceled) setIsLoading(false);
+      } finally {
+        // push/replace로 이동되면 언마운트되지만, 실패 케이스 대비
+        if (!canceled) setIsLoading(false);
       }
     };
 
-    fetchTokenAndLogin();
+    run();
+    return () => {
+      canceled = true;
+    };
   }, [router]);
 
   return (
