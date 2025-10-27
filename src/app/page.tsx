@@ -59,6 +59,13 @@ export default function Home() {
     }
   }, [authStatus, router]);
 
+  const user = useAuthStore((s) => s.user);
+  useEffect(() => {
+    if (user) {
+      setUsername(user.name);
+    }
+  }, [user]);
+
   if (showTimer) {
     return <Timer hideTimer={() => setShowTimer(false)} />;
   }
