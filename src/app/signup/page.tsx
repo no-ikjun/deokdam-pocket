@@ -3,22 +3,41 @@
 import Image from "next/image";
 import styles from "./page.module.css";
 import Link from "next/link";
+import { useAuthStore } from "@/stores/auth";
 
 export default function LoginPage() {
   const REST_API_KEY = process.env.NEXT_PUBLIC_KAKAO_REST_API_KEY!;
   const REDIRECT_URI = `${process.env.NEXT_PUBLIC_SERVICE_URL}/kakao/callback`;
 
+  const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!;
+  const GOOGLE_REDIRECT_URI = `${process.env.NEXT_PUBLIC_SERVICE_URL}/google/callback`;
+
+  const { setAuthenticated } = useAuthStore();
+
+  /** ✅ 실제 카카오 로그인 */
   const handleKakaoLogin = () => {
     const kakaoAuthUrl = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${REST_API_KEY}&redirect_uri=${REDIRECT_URI}`;
     window.location.href = kakaoAuthUrl;
   };
 
-  const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!;
-  const GOOGLE_REDIRECT_URI = `${process.env.NEXT_PUBLIC_SERVICE_URL}/google/callback`;
-
+  /** ✅ 실제 구글 로그인 */
   const handleGoogleLogin = () => {
     const url = `https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=${GOOGLE_CLIENT_ID}&redirect_uri=${GOOGLE_REDIRECT_URI}&scope=openid%20email%20profile`;
     window.location.href = url;
+  };
+
+  // 개발용 로그인 버튼 핸들러
+  const handleDevLogin = async () => {
+    const res = await fetch("/api/auth/dev-login", { method: "POST" });
+    if (!res.ok) {
+      alert("dev 로그인 실패");
+      return;
+    }
+
+    // 서버가 HttpOnly 쿠키를 심었고, 응답으로 유저를 돌려줌
+    const user = await res.json(); // { user_uuid, name }
+    useAuthStore.getState().setAuthenticated(user);
+    window.location.href = "/";
   };
 
   return (
@@ -63,6 +82,23 @@ export default function LoginPage() {
           />
           구글로 로그인
         </button>
+
+        {/* ✅ 로컬 개발용 로그인 버튼 */}
+        {process.env.NODE_ENV === "development" && (
+          <button
+            className={styles.devLogin}
+            style={{
+              backgroundColor: "#444",
+              color: "#fff",
+              borderRadius: "8px",
+              padding: "10px 14px",
+              fontSize: "14px",
+            }}
+            onClick={handleDevLogin}
+          >
+            🚀 로컬 개발용 간이 로그인
+          </button>
+        )}
       </div>
 
       <footer className={styles.footer}>

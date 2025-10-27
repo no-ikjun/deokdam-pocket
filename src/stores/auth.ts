@@ -146,6 +146,7 @@ export const useAuthStore = create<AuthState>()(
           if (!res.ok) return null;
 
           const data = (await res.json()) as Partial<AuthUser>;
+          console.log(data);
           if (data?.user_uuid && data?.name) {
             const user: AuthUser = {
               user_uuid: data.user_uuid,
