@@ -451,14 +451,6 @@
   display: none;
 }
 
-.suggest_track.dragging {
-  cursor: grabbing;
-}
-
-.suggest_track.dragging * {
-  user-select: none;
-}
-
 .suggest_chip {
   flex: 0 0 auto;
   border: 1px solid rgba(148, 163, 184, 0.35);

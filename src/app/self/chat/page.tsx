@@ -23,16 +23,17 @@ type ChatMessage = {
 const introMessage: ChatMessage = {
   id: "intro",
   role: "assistant",
-  content: "새해 목표와 고민을 들려주세요.",
+  content:
+    "안녕! 나는 1년 후의 너야. 새해 목표와 고민에 대해 이야기해보자. 무엇이든 물어봐!",
   status: "done",
 };
 
 const SUGGESTIONS = [
-  "올해 꼭 이루고 싶은 목표 3가지만 골라줘",
-  "지금 가장 고민되는 일 하나를 정리하고 해결 순서를 알려줘",
-  "내 강점 3개 기반으로 새해 루틴 추천해줘",
-  "이번 달에 실천 가능한 작은 습관 5가지",
-  "지금 상황에서 현실적인 다음 걸음 1가지",
+  "그곳의 나는 어떤 모습이야?",
+  "지금의 나에게 충고해줘",
+  "내가 지금 뭘 해야할까?",
+  "내가 세운 목표를 달성하려면 어떻게 해야 할까?",
+  "올해 내가 주의해야 할 점이 있을까?",
 ];
 
 const createId = () => {
@@ -259,7 +260,7 @@ export default function SelfChatPage() {
             >
               <div className={styles.bubble_meta}>
                 <span className={styles.bubble_role}>
-                  {message.role === "user" ? "나" : "AI 코치"}
+                  {message.role === "user" ? "나" : "1년 후의 나"}
                 </span>
               </div>
               <p className={styles.bubble_text}>{message.content}</p>
