@@ -1,80 +1,99 @@
-/* Modal 배경 */
-.modal_overlay {
+/* === Overlay (글래스 + 은은한 핑크 하이라이트) === */
+.overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0); /* 초기 상태: 투명 */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 99;
-  transition: background-color 0.4s ease-in-out; /* 배경 흐려짐 애니메이션 */
+  inset: 0;
+  display: grid;
+  place-items: center;
+  z-index: 1000;
+  background: rgba(15, 23, 42, 0); /* 초기 투명 */
+  backdrop-filter: blur(4px); /* 배경 살짝 흐림 */
+  -webkit-backdrop-filter: blur(4px);
+  transition: background-color 0.2s ease;
 }
 
-.modal_content {
+.overlay_show {
+  background: rgba(15, 23, 42, 0.28);
+}
+.overlay_hide {
+  background: rgba(15, 23, 42, 0);
+}
+
+/* === Content (서비스 카드 스타일과 통일) === */
+.content {
+  position: relative;
+  width: min(720px, 92vw);
+  border-radius: 20px;
+  padding: 1.25rem;
   background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.65),
-    rgba(255, 255, 255, 0.45)
-  );
-  backdrop-filter: blur(14px) saturate(160%);
-  -webkit-backdrop-filter: blur(10px) saturate(160%);
-  padding: 2rem;
-  border: 1px solid rgba(255, 255, 255, 0.7);
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  width: 90%;
-  max-width: 500px;
-  text-align: center;
-  position: relative; /* 닫기 버튼 위치를 위해 추가 */
-  transform: translateY(100px); /* 초기 상태: 아래에 위치 */
-  opacity: 0; /* 초기 상태: 투명 */
-  transition: transform 0.4s ease-in-out, opacity 0.4s ease-in-out; /* 모달 박스 애니메이션 */
+      180deg,
+      rgba(255, 255, 255, 0.86),
+      rgba(255, 255, 255, 0.62)
+    ),
+    rgba(255, 255, 255, 0.42);
+  backdrop-filter: blur(14px) saturate(150%);
+  -webkit-backdrop-filter: blur(14px) saturate(150%);
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  outline: 1px solid rgba(248, 113, 113, 0.18); /* 로즈톤 아웃라인 */
+  box-shadow: 0 18px 40px rgba(248, 113, 113, 0.14),
+    /* 외곽 그림자 */ inset 0 1px 0 rgba(255, 255, 255, 0.65); /* 상단 하이라이트 */
+
+  transform: translateY(12px) scale(0.98);
+  opacity: 0;
+  transition: transform 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease;
 }
 
-/* 열릴 때 */
-.show_overlay {
-  background-color: rgba(0, 0, 0, 0.5); /* 배경 흐려짐 */
+.content_show {
+  transform: translateY(0) scale(1);
+  opacity: 1;
 }
 
-.show_content {
-  transform: translateY(0); /* 중앙으로 이동 */
-  opacity: 1; /* 완전 표시 */
+.content_hide {
+  transform: translateY(12px) scale(0.98);
+  opacity: 0;
 }
 
-/* 닫힐 때 */
-.hide_overlay {
-  background-color: rgba(0, 0, 0, 0); /* 배경 투명 */
-}
-
-.hide_content {
-  transform: translateY(100px); /* 아래로 내려가며 사라짐 */
-  opacity: 0; /* 투명 */
-}
-
-.close_button {
+/* 닫기 버튼 (고스트 알약형) */
+.close {
   position: absolute;
-  top: 1rem;
-  right: 1rem;
-  font-size: 1.3rem;
-}
-
-.close_button:hover {
-  color: #f86161;
+  top: 0.6rem;
+  right: 0.6rem;
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: rgba(255, 255, 255, 0.92);
+  color: #334155;
+  font-size: 1.25rem;
+  line-height: 1;
   cursor: pointer;
+  transition: transform 0.12s ease, background 0.18s ease, color 0.18s ease,
+    box-shadow 0.18s ease;
 }
 
-@media screen and (max-width: 768px) {
-  .modal_content {
+.close:hover {
+  background: #ef4444;
+  color: #fff;
+  box-shadow: 0 10px 18px rgba(239, 68, 68, 0.22);
+}
+.close:active {
+  transform: scale(0.98);
+}
+
+/* 내용 여백이 많은 모달이 필요하면 다음 유틸 클래스를 추가로 사용
+.spacious { padding: 1.75rem; }
+*/
+
+@media (max-width: 640px) {
+  .content {
     padding: 1rem;
+    border-radius: 16px;
   }
-  .modal_content {
-    padding: 2rem;
-  }
-  .close_button {
-    top: 0.5rem;
-    right: 0.5rem;
+  .close {
+    top: 0.4rem;
+    right: 0.4rem;
+    width: 32px;
+    height: 32px;
   }
 }
