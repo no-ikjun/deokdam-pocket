@@ -143,7 +143,7 @@ export default function Home() {
                 </div>
               </Link>
 
-              <Link href="/community" className={styles.action_card}>
+              <Link href="/social" className={styles.action_card}>
                 <div className={styles.action_icon}>
                   <Image
                     src="/images/for_others.png"
