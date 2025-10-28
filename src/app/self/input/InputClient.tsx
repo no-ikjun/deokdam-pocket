@@ -8,6 +8,20 @@ import styles from "./page.module.css";
 type InputType = "goals" | "oneyear" | "retrospect";
 
 type Q = { id: string; label: string; placeholder?: string; max?: number };
+type RemindOption = "1개월 후" | "6개월 후" | "1년 후";
+
+const REMIND_MONTH_MAP: Record<RemindOption, number> = {
+  "1개월 후": 1,
+  "6개월 후": 6,
+  "1년 후": 12,
+};
+
+const computeReminderTimestamp = (option: RemindOption) => {
+  const monthsToAdd = REMIND_MONTH_MAP[option];
+  const target = new Date();
+  target.setMonth(target.getMonth() + monthsToAdd);
+  return target.toISOString();
+};
 
 const FORM_SCHEMAS: Record<
   InputType,
@@ -39,14 +53,14 @@ const FORM_SCHEMAS: Record<
       {
         id: "g4",
         label: "목표 진행을 방해하는 요소는?",
-        placeholder: "시간 부족, 체력, 환경 등",
+        placeholder: "예) 시간 부족, 체력, 환경 등",
         max: 180,
       },
       {
         id: "g5",
-        label: "리마인드 받고 싶은 빈도/시간은?",
-        placeholder: "예) 매주 월요일 9시",
-        max: 80,
+        label: "방해 요소 극복을 위한 나만의 다짐은?",
+        placeholder: "예) 아침에 일어나자마자 운동복 입기",
+        max: 180,
       },
     ],
   },
@@ -88,8 +102,9 @@ export default function InputPage() {
   // 폼 상태
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [index, setIndex] = useState(0); // 현재 질문 인덱스
-  const [remindOpen, setRemindOpen] = useState(false);
-  const [remindValue, setRemindValue] = useState("매주 월 9시");
+  const [remindEnabled, setRemindEnabled] = useState(true);
+  const [remindValue, setRemindValue] = useState<RemindOption>("6개월 후");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const q = schema.qs[index];
 
   // draft 키
@@ -103,7 +118,8 @@ export default function InputPage() {
         const parsed = JSON.parse(raw);
         setAnswers(parsed.answers || {});
         setIndex(parsed.index || 0);
-        setRemindValue(parsed.remindValue || "매주 월 9시");
+        setRemindEnabled(parsed.remindEnabled ?? true);
+        setRemindValue(parsed.remindValue || "6개월 후");
       }
     } catch {}
   }, [draftKey]);
@@ -113,11 +129,12 @@ export default function InputPage() {
     const payload = JSON.stringify({
       answers,
       index,
+      remindEnabled,
       remindValue,
       ts: Date.now(),
     });
     localStorage.setItem(draftKey, payload);
-  }, [answers, index, remindValue, draftKey]);
+  }, [answers, index, remindEnabled, remindValue, draftKey]);
 
   // 진행률
   const progress = Math.round(((index + 1) / schema.qs.length) * 100);
@@ -134,12 +151,50 @@ export default function InputPage() {
   const goPrev = () => setIndex((i) => Math.max(0, i - 1));
   const goNext = () => setIndex((i) => Math.min(schema.qs.length - 1, i + 1));
 
-  const finish = () => {
-    // TODO: 서버 전송 로직 연결
-    alert(
-      "임시 저장 완료! (서버 연동 전) \n— 1년 뒤 대화 예약 페이지로 이동합니다."
-    );
-    router.push("/self/future");
+  const finish = async () => {
+    if (isSubmitting) return;
+
+    try {
+      setIsSubmitting(true);
+
+      const payload = {
+        self_type: {
+          goals: "GOALS",
+          oneyear: "ONEYEAR",
+          retrospect: "RETROSPECT",
+        }[typeParam],
+        content: JSON.stringify(
+          schema.qs.map((question) => ({
+            id: question.id,
+            label: question.label,
+            answer: (answers[question.id] || "").trim(),
+          }))
+        ),
+        remind: remindEnabled,
+        remind_at: remindEnabled ? computeReminderTimestamp(remindValue) : null,
+      };
+
+      const response = await fetch("/api/self/input", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save self input");
+      }
+
+      localStorage.removeItem(draftKey);
+      sessionStorage.setItem("self:lastSubmit", "ok");
+      router.replace("/self/done");
+    } catch (error) {
+      console.error(error);
+      alert("저장에 실패했습니다. 잠시 후 다시 시도해주세요.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -204,23 +259,24 @@ export default function InputPage() {
           <button
             type="button"
             className={styles.remind_btn}
-            onClick={() => setRemindOpen((o) => !o)}
+            onClick={() => setRemindEnabled((prev) => !prev)}
           >
-            🔔 리마인드 설정: <strong>{remindValue}</strong>
+            {remindEnabled ? "🔔 리마인드 켜짐" : "🔕 리마인드 꺼짐"}
           </button>
-          {remindOpen && (
+          {remindEnabled && (
             <div className={styles.remind_panel}>
               <label className={styles.remind_label}>
-                빈도
+                날짜
                 <select
                   className={styles.select}
-                  onChange={(e) => setRemindValue(e.target.value)}
+                  onChange={(e) =>
+                    setRemindValue(e.target.value as RemindOption)
+                  }
                   value={remindValue}
                 >
-                  <option>매일 아침 9시</option>
-                  <option>매주 월 9시</option>
-                  <option>매월 1일 9시</option>
-                  <option>리마인드 끄기</option>
+                  <option value="1개월 후">1개월 후</option>
+                  <option value="6개월 후">6개월 후</option>
+                  <option value="1년 후">1년 후</option>
                 </select>
               </label>
             </div>
@@ -236,7 +292,8 @@ export default function InputPage() {
               localStorage.removeItem(draftKey);
               setAnswers({});
               setIndex(0);
-              setRemindValue("매주 월 9시");
+              setRemindEnabled(true);
+              setRemindValue("6개월 후");
             }}
           >
             초기화
@@ -267,23 +324,13 @@ export default function InputPage() {
               type="button"
               className={styles.primary_btn}
               onClick={finish}
-              disabled={!val.trim()}
+              disabled={!val.trim() || isSubmitting}
             >
               완료
             </button>
           )}
         </div>
       </section>
-
-      {/* 하단 네비 */}
-      <footer className={styles.footer}>
-        <Link href="/self" className={styles.link}>
-          ← 선택 화면으로
-        </Link>
-        <Link href="/self/future" className={styles.link}>
-          1년 뒤 나와 대화하기
-        </Link>
-      </footer>
     </main>
   );
 }
