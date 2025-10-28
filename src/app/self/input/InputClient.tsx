@@ -187,8 +187,8 @@ export default function InputPage() {
       }
 
       localStorage.removeItem(draftKey);
-      alert("저장이 완료되었습니다!");
-      router.replace("/self");
+      sessionStorage.setItem("self:lastSubmit", "ok");
+      router.replace("/self/done");
     } catch (error) {
       console.error(error);
       alert("저장에 실패했습니다. 잠시 후 다시 시도해주세요.");
@@ -331,16 +331,6 @@ export default function InputPage() {
           )}
         </div>
       </section>
-
-      {/* 하단 네비 */}
-      <footer className={styles.footer}>
-        <Link href="/self" className={styles.link}>
-          ← 선택 화면으로
-        </Link>
-        <Link href="/self/future" className={styles.link}>
-          1년 뒤 나와 대화하기
-        </Link>
-      </footer>
     </main>
   );
 }
