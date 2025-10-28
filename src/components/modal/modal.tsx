@@ -24,7 +24,7 @@ const Modal = ({
   useEffect(() => {
     if (isOpen) {
       setIsVisible(true);
-      // next tick 에니메이션 시작
+      // next tick 애니메이션 시작
       const t = setTimeout(() => setAnimate(true), 10);
       // 스크롤 락
       const original = document.body.style.overflow;
