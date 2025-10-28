@@ -84,9 +84,15 @@ export default function SelfPage() {
             >
               <div className={`${styles.card_icon} ${styles.skeleton_block}`} />
               <div className={styles.card_body}>
-                <span className={`${styles.skeleton_line} ${styles.skeleton_badge}`} />
-                <span className={`${styles.skeleton_line} ${styles.skeleton_title}`} />
-                <span className={`${styles.skeleton_line} ${styles.skeleton_desc}`} />
+                <span
+                  className={`${styles.skeleton_line} ${styles.skeleton_badge}`}
+                />
+                <span
+                  className={`${styles.skeleton_line} ${styles.skeleton_title}`}
+                />
+                <span
+                  className={`${styles.skeleton_line} ${styles.skeleton_desc}`}
+                />
                 <div className={styles.card_meta}>
                   <span className={styles.skeleton_chip} />
                   <span className={styles.skeleton_chip} />
@@ -140,7 +146,9 @@ export default function SelfPage() {
               <div className={styles.card_body}>
                 <span className={styles.overline}>새해 목표 세우기</span>
                 <h3 className={styles.card_title}>올해 이루고 싶은 것</h3>
-                <p className={styles.card_desc}>5문항으로 나만의 목표 구체화하기</p>
+                <p className={styles.card_desc}>
+                  5문항으로 나만의 목표 구체화하기
+                </p>
                 <div className={styles.card_meta}>
                   <span className={styles.chip}>질문 5개</span>
                   <span className={styles.chip}>소요 2~3분</span>
@@ -216,7 +224,9 @@ export default function SelfPage() {
                 </svg>
               </div>
               <div className={styles.card_body}>
-                <span className={styles.overline}>나에게 1년만 주어진다면?</span>
+                <span className={styles.overline}>
+                  나에게 1년만 주어진다면?
+                </span>
                 <h3 className={styles.card_title}>가장 중요한 것</h3>
                 <p className={styles.card_desc}>
                   우선순위를 드러내는 4문항 시나리오
@@ -363,7 +373,7 @@ export default function SelfPage() {
 
         <div className={styles.future_actions}>
           <Link
-            href="/self/input?type=future"
+            href="/self/chat"
             className={styles.glass_primary_btn}
             style={
               used.retrospect || used.goals || used.oneyear
