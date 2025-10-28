@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import styles from "./page.module.css";
 import axios from "axios";
+import Modal from "@/components/modal/modal";
 
 type UsedState = {
   goals: boolean;
@@ -63,6 +64,10 @@ export default function SelfPage() {
   const oneyearDisabled = loading || used.oneyear;
   const retrospectDisabled = loading || used.retrospect;
   const skeletons = new Array(3).fill(null);
+
+  const [openSettings, setOpenSettings] = useState(false);
+  const [tone, setTone] = useState<"mild" | "spicy">("mild");
+  const [isTraining, setIsTraining] = useState(false);
 
   return (
     <main className={styles.self_wrap} aria-label="나에게 덕담 남기기">
@@ -404,11 +409,94 @@ export default function SelfPage() {
             </svg>
             대화 시작하기
           </Link>
-          <Link href="/settings" className={styles.glass_secondary_btn}>
+          <div
+            className={styles.glass_secondary_btn}
+            onClick={(e) => {
+              e.preventDefault();
+              setOpenSettings(true);
+            }}
+          >
             환경설정
-          </Link>
+          </div>
         </div>
       </section>
+
+      <Modal
+        isOpen={openSettings}
+        onClose={() => setOpenSettings(false)}
+        ariaTitle="환경설정"
+      >
+        <div className={styles.settings_modal}>
+          <h3 className={styles.settings_title}>환경설정</h3>
+          <p className={styles.settings_desc}>
+            미래의 나의 말투와 대화 스타일을 설정할 수 있어요.
+          </p>
+
+          {/* 1. 대화 스타일 (순한맛/매운맛) */}
+          <div className={styles.settings_section}>
+            <h4>대화 스타일</h4>
+            <div className={styles.tone_toggle}>
+              <button
+                className={`${styles.tone_button} ${
+                  tone === "mild" ? styles.active_tone : ""
+                }`}
+                onClick={() => setTone("mild")}
+              >
+                🩵 순한맛
+              </button>
+              <button
+                className={`${styles.tone_button} ${
+                  tone === "spicy" ? styles.active_tone : ""
+                }`}
+                onClick={() => setTone("spicy")}
+              >
+                🔥 매운맛
+              </button>
+            </div>
+            <p className={styles.tone_hint}>
+              * 순한맛은 부드럽고 공감형 톤, 매운맛은 직설적이고 솔직한 피드백
+              스타일이에요.
+            </p>
+          </div>
+
+          {/* 2. AI 학습시키기 */}
+          <div className={styles.settings_section}>
+            <h4>AI 학습</h4>
+            <p>내가 입력한 정보를 바탕으로 AI가 미래의 나를 학습해요.</p>
+            <button
+              type="button"
+              className={styles.train_button}
+              onClick={() => {
+                setIsTraining(true);
+                setTimeout(() => {
+                  setIsTraining(false);
+                  alert("최신 데이터가 반영되었어요 ✨");
+                }, 1500);
+              }}
+              disabled={isTraining}
+            >
+              {isTraining ? "학습 중..." : "AI 학습시키기"}
+            </button>
+          </div>
+
+          <div className={styles.settings_footer}>
+            <button
+              type="button"
+              className={styles.modal_close_button}
+              onClick={() => setOpenSettings(false)}
+            >
+              닫기
+            </button>
+            <button
+              type="button"
+              className={styles.modal_send_button}
+              onClick={() => setOpenSettings(false)}
+            >
+              저장
+            </button>
+          </div>
+        </div>
+      </Modal>
 
       <footer className={styles.footer}>
         <div className={styles.footerContent}>

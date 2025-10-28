@@ -556,3 +556,115 @@
     padding: 1.5rem;
   }
 }
+
+.settings_modal {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  text-align: left;
+}
+
+.settings_title {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 800;
+}
+
+.settings_desc {
+  margin: 0;
+  color: #64748b;
+  font-size: 0.92rem;
+}
+
+.settings_section {
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 14px;
+  padding: 1rem 1.2rem;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  display: grid;
+  gap: 0.6rem;
+}
+
+.tone_toggle {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.tone_button {
+  flex: 1;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 12px;
+  padding: 0.6rem 1rem;
+  background: rgba(255, 255, 255, 0.9);
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #334155;
+}
+
+.active_tone {
+  background: linear-gradient(145deg, #f56d6d, #e25757);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 8px 20px rgba(239, 68, 68, 0.25);
+}
+
+.tone_hint {
+  margin: 0;
+  color: #94a3b8;
+  font-size: 0.85rem;
+}
+
+.train_button {
+  padding: 0.8rem 1.2rem;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.6);
+  color: #ff4552;
+  font-weight: 700;
+  border: 1.5px solid rgba(255, 69, 82, 0.25);
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  transition: transform 0.12s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.train_button:hover {
+  background: linear-gradient(145deg, #f56d6d, #e25757);
+  color: #fff;
+  box-shadow: 0 8px 22px rgba(255, 69, 82, 0.25);
+}
+
+.train_button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: rgba(255, 255, 255, 0.4);
+  color: #b0b0b0;
+}
+
+.settings_footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+}
+
+.modal_close_button,
+.modal_send_button {
+  border: none;
+  border-radius: 12px;
+  padding: 0.75rem 1.2rem;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+}
+
+.modal_send_button {
+  background: linear-gradient(145deg, #f56d6d, #e25757);
+  color: #fff;
+}
+.modal_send_button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
