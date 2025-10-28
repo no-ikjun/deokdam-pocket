@@ -33,9 +33,14 @@ export async function POST(req: Request) {
 
     if (!self_type || !content) {
       client.release();
-      return NextResponse.json({ message: "No Data" }, { status: 400 });
+      return NextResponse.json({ message: "No Input Data" }, { status: 400 });
     }
 
+    const existingSelf =
+      await client.sql`SELECT * FROM self WHERE user_uuid = ${resolvedUserUuid} AND self_type = ${self_type};`;
+    if (existingSelf.rows.length > 0) {
+      await client.sql`DELETE FROM self WHERE user_uuid = ${resolvedUserUuid} AND self_type = ${self_type};`;
+    }
     const selfUuid = uuid4();
     const safeContent = content.replace(/'/g, "''");
 
