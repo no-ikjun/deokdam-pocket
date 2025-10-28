@@ -157,7 +157,6 @@ export default function SelfPage() {
                 <div className={styles.card_meta}>
                   <span className={styles.chip}>질문 5개</span>
                   <span className={styles.chip}>소요 2~3분</span>
-                  <span className={styles.chip}>리마인드</span>
                 </div>
               </div>
               <svg
@@ -239,7 +238,6 @@ export default function SelfPage() {
                 <div className={styles.card_meta}>
                   <span className={styles.chip}>질문 4개</span>
                   <span className={styles.chip}>소요 2분</span>
-                  <span className={styles.chip}>AI 대화 예약</span>
                 </div>
               </div>
               <svg
@@ -415,6 +413,7 @@ export default function SelfPage() {
               e.preventDefault();
               setOpenSettings(true);
             }}
+            style={{ cursor: "pointer" }}
           >
             환경설정
           </div>
