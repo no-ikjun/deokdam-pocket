@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import styles from "./page.module.css";
 import Image from "next/image";
+import axios from "axios";
 
 type OpenMode = "seollal" | "custom";
 
@@ -18,7 +19,7 @@ export default function NewPouchPage() {
   const formRef = useRef<HTMLFormElement>(null);
 
   const [name, setName] = useState("");
-  const [icon, setIcon] = useState("🧧");
+  const [icon, setIcon] = useState("");
   const [maxMembers, setMaxMembers] = useState<number | "">("");
   const [goalCount, setGoalCount] = useState<number | "">("");
 
@@ -47,10 +48,10 @@ export default function NewPouchPage() {
     return d >= today && d >= min && d <= max;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!name || !maxMembers || !goalCount) {
+    if (!name || !icon || !maxMembers || !goalCount) {
       alert("모든 항목을 입력해주세요.");
       return;
     }
@@ -68,9 +69,20 @@ export default function NewPouchPage() {
       goalCount,
       openDate: finalOpenDate,
     });
+    const response = await axios.post("/api/pocket", {
+      name,
+      icon,
+      maxMembers,
+      goalCount,
+      openDate: finalOpenDate,
+    });
 
+    if (response.status !== 201) {
+      alert("주머니 생성에 실패했어요. 다시 시도해주세요.");
+      return;
+    }
     // 완료 페이지로 이동
-    router.push("/pocket/new/done?code=HAPPY25");
+    router.push(`/pocket/new/done?code=${response.data.code}`);
   };
 
   return (
