@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import styles from "./page.module.css";
@@ -21,20 +21,20 @@ const mockMyPouches: Pouch[] = [
     members: 18,
     createdAt: "2024-12-10T03:00:00Z",
   },
-  {
-    id: "2",
-    title: "가족 덕담 2025",
-    code: "HAPPY25",
-    members: 7,
-    createdAt: "2024-12-27T09:00:00Z",
-  },
-  {
-    id: "3",
-    title: "지글 스터디 모임",
-    code: "ZGL2025",
-    members: 12,
-    createdAt: "2024-12-29T09:00:00Z",
-  },
+  // {
+  //   id: "2",
+  //   title: "가족 덕담 2025",
+  //   code: "HAPPY25",
+  //   members: 7,
+  //   createdAt: "2024-12-27T09:00:00Z",
+  // },
+  // {
+  //   id: "3",
+  //   title: "지글 스터디 모임",
+  //   code: "ZGL2025",
+  //   members: 12,
+  //   createdAt: "2024-12-29T09:00:00Z",
+  // },
 ];
 
 const formatDate = (iso: string) =>
@@ -46,26 +46,6 @@ const formatDate = (iso: string) =>
 export default function SocialPage() {
   const [code, setCode] = useState("");
   const [query, setQuery] = useState("");
-
-  const totalMembers = useMemo(
-    () => mockMyPouches.reduce((acc, pouch) => acc + pouch.members, 0),
-    []
-  );
-
-  const latestCreated = useMemo(() => {
-    if (mockMyPouches.length === 0) return null;
-    return mockMyPouches
-      .map((pouch) => new Date(pouch.createdAt))
-      .sort((a, b) => b.getTime() - a.getTime())[0];
-  }, []);
-
-  const formattedLatest = useMemo(() => {
-    if (!latestCreated) return "—";
-    return new Intl.DateTimeFormat("ko", {
-      month: "long",
-      day: "numeric",
-    }).format(latestCreated);
-  }, [latestCreated]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -100,55 +80,70 @@ export default function SocialPage() {
     }
   };
 
+  const [message, setMessage] = useState("");
+
+  useEffect(() => {
+    const phrases: string[] = [
+      "소중한 사람에게 전하는 작은 행복, 덕담",
+      "함께 웃고, 함께 응원하는 새해의 공간",
+      "새해의 마음을 나누는 가장 따뜻한 방법, 덕담 주머니",
+      "함께 만드는 덕담의 기쁨",
+      "새해의 인사를 따뜻하게, 덕담 주머니와 함께",
+      "행복한 새해를 위한 첫걸음, 덕담 주머니",
+      "덕담이 모여 사랑이 되는 공간",
+      "따뜻한 마음을 전하는 덕담 주머니",
+      "새해의 기쁨을 함께하는 공간, 덕담 주머니",
+    ];
+
+    const randomIndex = Math.floor(Math.random() * phrases.length);
+    setMessage(phrases[randomIndex]);
+  }, []);
+
   return (
     <main className={styles.page} aria-label="덕담 주머니 소셜 허브">
       <div className={styles.page_inner}>
-        <section className={styles.hero_section}>
+        <section className={styles.hero_wrap}>
           {/* 좌측: 타이틀 */}
-          <div className={styles.hero_left}>
-            <span className={styles.hero_badge}>덕담 나누기</span>
-            <h1 className={styles.hero_title_sm}>
-              덕담 주머니를 만들고, 덕담을 주고받아보세요!
-            </h1>
-            <p className={styles.hero_text}>
-              주변 사람들을 덕담 주머니로 초대하고, 덕담을 전해보세요.
+          <div className={styles.hero_head}>
+            <span className={styles.hero_badge}>2026 덕담 주머니</span>
+            <h1 className={styles.hero_title}>서로의 새해를 응원하는 공간</h1>
+            <p className={styles.hero_desc}>
+              가족, 친구, 동료와 덕담 주머니를 만들고 새해 메시지를 나눠보세요.
+              <br />
+              참여 코드를 공유하면 누구나 초대 없이 합류할 수 있어요.
             </p>
+            <div className={styles.ambient_ribbon}>
+              <span className={styles.ribbon_dot} />
+              <p className={styles.ribbon_text}>{message}</p>
+            </div>
+          </div>
+
+          {/* 우측: CTA 패널 */}
+          <aside className={styles.cta_panel}>
             <Link
-              href="/pouch/new"
-              className={styles.cta_primary_sm}
+              href="/pocket/new"
+              className={styles.cta_primary_lg}
               aria-label="새 덕담 주머니 만들기"
             >
-              주머니 만들기
+              새 덕담 주머니 만들기
             </Link>
-
-            <form className={styles.join_inline_compact} onSubmit={joinByCode}>
+            <p className={styles.cta_desc}>또는 주머니 코드로 참여하기</p>
+            <form className={styles.join_row} onSubmit={joinByCode}>
               <label htmlFor="join-code" className={styles.sr_only}>
                 참여 코드 입력
               </label>
               <input
                 id="join-code"
-                className={styles.join_input_sm}
+                className={styles.join_input}
                 value={code}
                 onChange={(e) => setCode(e.target.value.toUpperCase())}
                 placeholder="예: HAPPY25"
                 aria-label="덕담 주머니 코드 입력"
                 maxLength={16}
               />
-              <button type="submit" className={styles.join_btn_sm}>
-                참여
-              </button>
+              <div className={styles.join_btn}>참여</div>
             </form>
-          </div>
-
-          <div className={styles.hero_right}>
-            <div className={styles.hero_statbar}>
-              <span className={styles.statpill}>
-                참여 중 {mockMyPouches.length}
-              </span>
-              <span className={styles.statpill}>함께 {totalMembers}명</span>
-              <span className={styles.statpill}>최근 {formattedLatest}</span>
-            </div>
-          </div>
+          </aside>
         </section>
 
         <section id="my-pouches" className={styles.collection_section}>
@@ -179,16 +174,12 @@ export default function SocialPage() {
                 먼저 주머니를 만들거나, 받은 초대 코드로 참여를 시작해보세요.
               </p>
               <div className={styles.empty_actions}>
-                <Link className={styles.hero_primary} href="/pouch/new">
+                <Link className={styles.hero_primary} href="/pocket/new">
                   새 주머니 만들기
                 </Link>
-                <button
-                  type="button"
-                  className={styles.ghost_btn}
-                  onClick={() => setQuery("")}
-                >
+                <div className={styles.ghost_btn} onClick={() => setQuery("")}>
                   검색 초기화
-                </button>
+                </div>
               </div>
             </div>
           ) : (
@@ -213,7 +204,7 @@ export default function SocialPage() {
                         </span>
                       </div>
                     </div>
-                    <button
+                    {/* <button
                       type="button"
                       className={styles.copy_button}
                       onClick={() =>
@@ -221,7 +212,7 @@ export default function SocialPage() {
                       }
                     >
                       코드 복사
-                    </button>
+                    </button> */}
                   </header>
 
                   <p className={styles.pouch_summary}>
@@ -230,14 +221,7 @@ export default function SocialPage() {
                   </p>
 
                   <footer className={styles.pouch_footer}>
-                    <Link
-                      href={`/pouch/${pouch.id}`}
-                      className={styles.primary_link}
-                    >
-                      주머니 열기
-                    </Link>
-                    <button
-                      type="button"
+                    <div
                       className={styles.ghost_btn}
                       onClick={() => {
                         const origin =
@@ -257,7 +241,13 @@ export default function SocialPage() {
                       }}
                     >
                       링크 복사
-                    </button>
+                    </div>
+                    <Link
+                      href={`/pouch/${pouch.id}`}
+                      className={styles.primary_link}
+                    >
+                      주머니 열기
+                    </Link>
                   </footer>
                 </li>
               ))}
