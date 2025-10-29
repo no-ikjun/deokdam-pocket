@@ -146,6 +146,8 @@
   gap: 6px;
 }
 .remind_btn {
+  display: flex;
+  align-items: center;
   justify-self: start;
   font-size: 0.9rem;
   font-weight: 800;
@@ -213,8 +215,15 @@
   cursor: pointer;
   color: #fff;
   font-weight: 900;
+  outline: none;
+  border: none;
   background: linear-gradient(145deg, #f56d6d, #e25757);
   box-shadow: 0 6px 18px rgba(229, 87, 87, 0.22);
+}
+.primary_btn:disabled {
+  background: rgba(229, 87, 87, 0.5);
+  cursor: not-allowed;
+  box-shadow: none;
 }
 
 /* 반응형 */

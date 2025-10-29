@@ -254,6 +254,7 @@ export default function InputPage() {
             placeholder={q.placeholder || "여기에 입력하세요"}
             value={val}
             onChange={(e) => setVal(e.target.value)}
+            autoFocus
           />
           <div className={styles.counter}>
             {val.length} / {max}자
@@ -262,13 +263,14 @@ export default function InputPage() {
 
         {/* 리마인드 (goals 타입에서 강조, 공통 사용 가능) */}
         <div className={styles.remind_row}>
-          <button
-            type="button"
+          <div
+            role="button"
+            tabIndex={0}
             className={styles.remind_btn}
             onClick={() => setRemindEnabled((prev) => !prev)}
           >
             {remindEnabled ? "🔔 리마인드 켜짐" : "🔕 리마인드 꺼짐"}
-          </button>
+          </div>
           {remindEnabled && (
             <div className={styles.remind_panel}>
               <label className={styles.remind_label}>
