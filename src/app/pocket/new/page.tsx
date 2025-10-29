@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import styles from "./page.module.css";
 import Image from "next/image";
 import axios from "axios";
+import LoadingIndicator from "@/components/loadingIndicator/loadingIndicator";
 
 type OpenMode = "seollal" | "custom";
 
@@ -16,7 +17,7 @@ const MAX_DATE = "2026-03-31";
 
 export default function NewPouchPage() {
   const router = useRouter();
-  const formRef = useRef<HTMLFormElement>(null);
+  const [loading, setLoading] = useState(false);
 
   const [name, setName] = useState("");
   const [icon, setIcon] = useState("");
@@ -61,32 +62,32 @@ export default function NewPouchPage() {
       alert("개봉일은 2026년 1월 1일부터 3월 31일 사이여야 해요.");
       return;
     }
+    setLoading(true);
+    try {
+      const response = await axios.post("/api/pocket", {
+        name,
+        icon,
+        maxMembers,
+        goalCount,
+        openDate: finalOpenDate,
+      });
 
-    console.log({
-      name,
-      icon,
-      maxMembers,
-      goalCount,
-      openDate: finalOpenDate,
-    });
-    const response = await axios.post("/api/pocket", {
-      name,
-      icon,
-      maxMembers,
-      goalCount,
-      openDate: finalOpenDate,
-    });
-
-    if (response.status !== 201) {
+      if (response.status !== 201) {
+        alert("주머니 생성에 실패했어요. 다시 시도해주세요.");
+        return;
+      }
+      router.push(`/pocket/new/done?code=${response.data.code}`);
+    } catch (error) {
       alert("주머니 생성에 실패했어요. 다시 시도해주세요.");
       return;
+    } finally {
+      setLoading(false);
     }
-    // 완료 페이지로 이동
-    router.push(`/pocket/new/done?code=${response.data.code}`);
   };
 
   return (
     <main className={styles.new_wrap}>
+      {loading && <LoadingIndicator />}
       <header className={styles.header}>
         <h1 className={styles.title}>새 덕담 주머니 만들기</h1>
         <p className={styles.subtitle}>
@@ -175,8 +176,8 @@ export default function NewPouchPage() {
 
           {/* 세그먼트 탭: 설날 / 직접 선택 */}
           <div className={styles.segment}>
-            <div
-              role="button"
+            <button
+              type="button"
               tabIndex={0}
               className={`${styles.seg_btn} ${
                 openMode === "seollal" ? styles.seg_active : ""
@@ -188,10 +189,10 @@ export default function NewPouchPage() {
             >
               설날(권장)
               <span className={styles.seg_hint}>{DEFAULT_SEOLLAL}</span>
-            </div>
+            </button>
 
-            <div
-              role="button"
+            <button
+              type="button"
               tabIndex={0}
               className={`${styles.seg_btn} ${
                 openMode === "custom" ? styles.seg_active : ""
@@ -199,7 +200,7 @@ export default function NewPouchPage() {
               onClick={() => setOpenMode("custom")}
             >
               직접 선택
-            </div>
+            </button>
           </div>
 
           {/* 날짜 입력 (직접 선택일 때만 활성) */}

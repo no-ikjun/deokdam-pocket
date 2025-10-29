@@ -4,58 +4,65 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import styles from "./page.module.css";
+import axios from "axios";
+import LoadingIndicator from "@/components/loadingIndicator/loadingIndicator";
 
-type Pouch = {
-  id: string;
-  title: string;
+type Pocket = {
+  pocket_uuid: string;
+  made_by: string;
+  name: string;
+  icon: string;
+  limit: number;
+  goal: number;
+  members: string[];
   code: string;
-  members: number;
-  createdAt: string;
+  open_at: string;
+  created_at: string;
 };
 
-const mockMyPouches: Pouch[] = [
-  {
-    id: "1",
-    title: "GIST 동기 새해 덕담",
-    code: "GIST24",
-    members: 18,
-    createdAt: "2024-12-10T03:00:00Z",
-  },
-  // {
-  //   id: "2",
-  //   title: "가족 덕담 2025",
-  //   code: "HAPPY25",
-  //   members: 7,
-  //   createdAt: "2024-12-27T09:00:00Z",
-  // },
-  // {
-  //   id: "3",
-  //   title: "지글 스터디 모임",
-  //   code: "ZGL2025",
-  //   members: 12,
-  //   createdAt: "2024-12-29T09:00:00Z",
-  // },
-];
-
-const formatDate = (iso: string) =>
-  new Intl.DateTimeFormat("ko", {
-    month: "numeric",
-    day: "numeric",
-  }).format(new Date(iso));
+const formatDate = (iso: string) => {
+  const date = new Date(iso);
+  const month = date.getMonth() + 1;
+  const day = date.getDate();
+  if (month === 2 && day === 17) {
+    return "설날";
+  }
+  return `${month}월 ${day}일`;
+};
 
 export default function SocialPage() {
   const [code, setCode] = useState("");
   const [query, setQuery] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [myPockets, setMyPockets] = useState<Pocket[]>([]);
+
+  const fetchMyPockets = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get("/api/pocket/my");
+      if (response.status === 200) {
+        // 성공적으로 데이터를 가져온 경우
+        setMyPockets(response.data);
+      }
+    } catch (error) {
+      console.error("Error fetching my pockets:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    void fetchMyPockets();
+  }, []);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return mockMyPouches;
-    return mockMyPouches.filter(
-      (pouch) =>
-        pouch.title.toLowerCase().includes(q) ||
-        pouch.code.toLowerCase().includes(q)
+    if (!q) return myPockets;
+    return myPockets.filter(
+      (pocket) =>
+        pocket.name.toLowerCase().includes(q) ||
+        pocket.pocket_uuid.toLowerCase().includes(q)
     );
-  }, [query]);
+  }, [myPockets, query]);
 
   const joinByCode = (event?: React.FormEvent) => {
     event?.preventDefault();
@@ -101,6 +108,7 @@ export default function SocialPage() {
 
   return (
     <main className={styles.page} aria-label="덕담 주머니 소셜 허브">
+      {loading && <LoadingIndicator />}
       <div className={styles.page_inner}>
         <section className={styles.hero_wrap}>
           {/* 좌측: 타이틀 */}
@@ -146,12 +154,12 @@ export default function SocialPage() {
           </aside>
         </section>
 
-        <section id="my-pouches" className={styles.collection_section}>
+        <section id="my-pocketes" className={styles.collection_section}>
           <header className={styles.section_header}>
             <div>
               <h2 className={styles.section_title}>내 덕담 주머니</h2>
               <p className={styles.section_desc}>
-                함께하는 모임을 살펴보고, 덕담을 전할 준비를 해보세요.
+                내가 만든 또는 참여한 덕담 주머니 목록입니다.
               </p>
             </div>
             <div className={styles.section_tools}>
@@ -183,44 +191,59 @@ export default function SocialPage() {
               </div>
             </div>
           ) : (
-            <ul className={styles.pouch_grid} role="list">
-              {filtered.map((pouch) => (
-                <li key={pouch.id} className={styles.pouch_card}>
-                  <header className={styles.pouch_header}>
-                    <span className={styles.pouch_icon} aria-hidden>
-                      🧧
+            <ul className={styles.pocket_grid} role="list">
+              {filtered.map((pocket) => (
+                <li
+                  key={pocket.pocket_uuid}
+                  className={styles.pocket_card}
+                  onClick={() => {
+                    console.log("clicked");
+                  }}
+                >
+                  <header className={styles.pocket_header}>
+                    <span className={styles.pocket_icon} aria-hidden>
+                      <Image
+                        src={`/images/${pocket.icon}`}
+                        alt={pocket.icon}
+                        width={48}
+                        height={48}
+                      />
                     </span>
-                    <div className={styles.pouch_heading}>
-                      <h3 className={styles.pouch_title}>{pouch.title}</h3>
-                      <div className={styles.pouch_meta}>
-                        <span className={styles.meta_chip}>
-                          코드 {pouch.code}
-                        </span>
-                        <span className={styles.meta_chip}>
-                          👥 {pouch.members}명
-                        </span>
-                        <span className={styles.meta_chip}>
-                          개설 {formatDate(pouch.createdAt)}
-                        </span>
+                    <div className={styles.pocket_heading}>
+                      <h3 className={styles.pocket_title}>{pocket.name}</h3>
+                      <div className={styles.pocket_meta}>
+                        <div className={styles.meta_chip}>
+                          {pocket.members.length}명 참여 중
+                        </div>
+                        <div className={styles.meta_chip}>
+                          {formatDate(pocket.open_at)}에 공개
+                        </div>
                       </div>
                     </div>
-                    {/* <button
-                      type="button"
-                      className={styles.copy_button}
-                      onClick={() =>
-                        copyToClipboard(pouch.code, "코드를 복사했어요!")
-                      }
-                    >
-                      코드 복사
-                    </button> */}
                   </header>
 
-                  <p className={styles.pouch_summary}>
-                    덕담을 주고받을 준비가 완료됐어요. 주머니를 열어 메시지를
-                    확인하거나 추가해보세요.
-                  </p>
+                  <div className={styles.pocket_progress_wrap}>
+                    <div className={styles.pocket_progress_bar}>
+                      <div
+                        className={styles.pocket_progress_fill}
+                        style={{
+                          width: `${Math.min(
+                            (pocket.name.length / pocket.goal) * 100,
+                            100
+                          )}%`,
+                        }}
+                      />
+                    </div>
+                    <p className={styles.pocket_progress_text}>
+                      덕담 0 / {pocket.goal}개
+                    </p>
+                  </div>
 
-                  <footer className={styles.pouch_footer}>
+                  {/* <p className={styles.pocket_summary}>
+                    주머니 코드: <strong>{pocket.code}</strong>
+                  </p> */}
+
+                  <footer className={styles.pocket_footer}>
                     <div
                       className={styles.ghost_btn}
                       onClick={() => {
@@ -235,19 +258,13 @@ export default function SocialPage() {
                           return;
                         }
                         void copyToClipboard(
-                          `${origin}/pouch/${pouch.id}`,
+                          `${origin}/pocket/${pocket.pocket_uuid}`,
                           "주머니 링크가 복사되었어요!"
                         );
                       }}
                     >
-                      링크 복사
+                      초대하기
                     </div>
-                    <Link
-                      href={`/pouch/${pouch.id}`}
-                      className={styles.primary_link}
-                    >
-                      주머니 열기
-                    </Link>
                   </footer>
                 </li>
               ))}
@@ -257,7 +274,7 @@ export default function SocialPage() {
 
         <footer className={styles.footer}>
           <p className={styles.footer_note}>
-            ⓒ 2024 덕담 주머니 · 마음을 전하는 모든 순간을 함께합니다.
+            ⓒ 2024 덕담 주머니 · 아이콘: flaticon.com
           </p>
         </footer>
       </div>

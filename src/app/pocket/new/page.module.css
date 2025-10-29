@@ -133,9 +133,10 @@
   padding: 0.7rem 0.9rem;
   border-radius: 12px;
   cursor: pointer;
-  font-weight: 900;
+  font-weight: 500;
   color: #0b1b3a;
-
+  outline: none;
+  border: none;
   background: linear-gradient(
     180deg,
     rgba(255, 255, 255, 0.85),
@@ -190,7 +191,7 @@
 
 .date_hint {
   margin: 0;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   color: #6b7280;
 }
 
