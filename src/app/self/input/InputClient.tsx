@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import styles from "./page.module.css";
+import LoadingIndicator from "@/components/loadingIndicator/loadingIndicator";
 
 type InputType = "goals" | "oneyear" | "retrospect";
 
@@ -99,6 +100,8 @@ export default function InputPage() {
   const typeParam = (params.get("type") || "goals") as InputType;
   const schema = FORM_SCHEMAS[typeParam] ?? FORM_SCHEMAS.goals;
 
+  const [loading, setLoading] = useState(false);
+
   // 폼 상태
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [index, setIndex] = useState(0); // 현재 질문 인덱스
@@ -153,6 +156,7 @@ export default function InputPage() {
 
   const finish = async () => {
     if (isSubmitting) return;
+    setLoading(true);
 
     try {
       setIsSubmitting(true);
@@ -194,11 +198,13 @@ export default function InputPage() {
       alert("저장에 실패했습니다. 잠시 후 다시 시도해주세요.");
     } finally {
       setIsSubmitting(false);
+      setLoading(false);
     }
   };
 
   return (
     <main className={styles.wrap}>
+      {loading && <LoadingIndicator />}
       {/* 헤더 */}
       <header className={styles.header}>
         <span
