@@ -91,3 +91,41 @@ export async function GET(req: Request) {
     return NextResponse.json({ message: "error" }, { status: 500 });
   }
 }
+
+export async function DELETE(req: Request) {
+  const client = await db.connect();
+  const token = cookies().get("token")?.value;
+  if (!token) {
+    client.release();
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  }
+  try {
+    const payload = jwt.verify(token, process.env.JWT_SECRET!);
+    const { user_uuid } = payload as {
+      user_uuid: string;
+    };
+    if (!user_uuid) {
+      client.release();
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+    const request = await req.json();
+    const { pocket_uuid } = request as { pocket_uuid: string };
+
+    if (!pocket_uuid) {
+      client.release();
+      return NextResponse.json(
+        { message: "pocket_uuid is required" },
+        { status: 400 }
+      );
+    }
+
+    await client.sql`DELETE FROM pocket WHERE pocket_uuid = ${pocket_uuid} AND made_by = ${user_uuid};`;
+
+    client.release();
+    return NextResponse.json({ message: "success" }, { status: 200 });
+  } catch (error) {
+    console.log(error);
+    client.release();
+    return NextResponse.json({ message: "error" }, { status: 500 });
+  }
+}
