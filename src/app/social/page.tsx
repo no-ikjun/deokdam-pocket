@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import styles from "./page.module.css";
@@ -226,12 +226,14 @@ export default function SocialPage() {
                     <div className={styles.pocket_progress_bar}>
                       <div
                         className={styles.pocket_progress_fill}
-                        style={{
-                          width: `${Math.min(
-                            (pocket.name.length / pocket.goal) * 100,
-                            100
-                          )}%`,
-                        }}
+                        style={
+                          {
+                            ["--progress-width" as any]: `${Math.min(
+                              (pocket.name.length / pocket.goal) * 100,
+                              100
+                            )}%`,
+                          } as CSSProperties
+                        }
                       />
                     </div>
                     <p className={styles.pocket_progress_text}>
