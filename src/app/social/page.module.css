@@ -506,6 +506,8 @@
   border-radius: 999px;
   transition: width 0.35s ease;
   box-shadow: 0 2px 8px rgba(249, 80, 80, 0.25);
+  width: var(--progress-width);
+  animation: progress_anim 1.5s ease forwards;
 }
 .pocket_progress_text {
   margin: 0;
@@ -513,6 +515,15 @@
   font-weight: 700;
   color: #a0a0a0;
   text-align: right;
+}
+
+@keyframes progress_anim {
+  0% {
+    width: 0%;
+  }
+  100% {
+    width: var(--progress-width);
+  }
 }
 
 .copy_button {
@@ -553,8 +564,10 @@
 } */
 .pocket_footer {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: auto auto;
   align-items: center;
+  gap: 0.6rem;
+  justify-content: flex-end;
 }
 
 .primary_link,

@@ -197,7 +197,7 @@ export default function SocialPage() {
                   key={pocket.pocket_uuid}
                   className={styles.pocket_card}
                   onClick={() => {
-                    console.log("clicked");
+                    window.location.href = `/pocket/${pocket.pocket_uuid}`;
                   }}
                 >
                   <header className={styles.pocket_header}>
@@ -264,6 +264,17 @@ export default function SocialPage() {
                       }}
                     >
                       초대하기
+                    </div>
+                    <div
+                      className={styles.primary_link}
+                      onClick={() =>
+                        void copyToClipboard(
+                          pocket.code,
+                          "주머니 코드를 복사했어요!"
+                        )
+                      }
+                    >
+                      자세히 보기
                     </div>
                   </footer>
                 </li>
