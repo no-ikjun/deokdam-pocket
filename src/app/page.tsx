@@ -32,8 +32,11 @@ export default function Home() {
 
   useEffect(() => {
     const now = new Date();
-    const targetDate = new Date("2025-01-01T00:00:00+09:00"); // KST
-    if (now >= targetDate) {
+    const targetDate = new Date("2026-01-01T00:00:00+09:00"); // KST
+    if (
+      now >= targetDate &&
+      (process.env.NODE_ENV as string) === "production"
+    ) {
       setShowTimer(false); // 2026년이 지나면 타이머 숨기기
     }
 

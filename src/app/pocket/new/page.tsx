@@ -87,7 +87,7 @@ export default function NewPouchPage() {
 
   return (
     <main className={styles.new_wrap}>
-      {loading && <LoadingIndicator />}
+      {loading && <LoadingIndicator text="생성 중..." />}
       <header className={styles.header}>
         <h1 className={styles.title}>새 덕담 주머니 만들기</h1>
         <p className={styles.subtitle}>

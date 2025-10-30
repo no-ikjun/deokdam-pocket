@@ -36,7 +36,7 @@ export default function CompletePage() {
   }, []);
 
   const goHome = () => {
-    router.replace("/social"); // ✅ 히스토리 지우고 이동
+    router.replace("/social");
   };
 
   const onKey =
