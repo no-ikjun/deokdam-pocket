@@ -6,6 +6,9 @@ import Image from "next/image";
 import styles from "./page.module.css";
 import axios from "axios";
 import LoadingIndicator from "@/components/loadingIndicator/loadingIndicator";
+import PocketCard from "./component/pocket_card";
+import Modal from "@/components/modal/modal";
+import InviteModal from "./component/invite_modal";
 
 type Pocket = {
   pocket_uuid: string;
@@ -18,16 +21,6 @@ type Pocket = {
   code: string;
   open_at: string;
   created_at: string;
-};
-
-const formatDate = (iso: string) => {
-  const date = new Date(iso);
-  const month = date.getMonth() + 1;
-  const day = date.getDate();
-  if (month === 2 && day === 17) {
-    return "설날";
-  }
-  return `${month}월 ${day}일`;
 };
 
 export default function SocialPage() {
@@ -70,21 +63,6 @@ export default function SocialPage() {
     if (!trimmed) return;
     alert(`코드 ${trimmed} 로 덕담 주머니에 참여 시도!`);
     setCode("");
-  };
-
-  const copyToClipboard = async (
-    value: string,
-    successMessage = "코드를 복사했습니다!"
-  ) => {
-    try {
-      if (typeof navigator === "undefined" || !navigator.clipboard) {
-        throw new Error("clipboard");
-      }
-      await navigator.clipboard.writeText(value);
-      alert(successMessage);
-    } catch {
-      alert("코드를 복사하지 못했어요. 직접 복사해주세요.");
-    }
   };
 
   const [message, setMessage] = useState("");
@@ -193,93 +171,19 @@ export default function SocialPage() {
           ) : (
             <ul className={styles.pocket_grid} role="list">
               {filtered.map((pocket) => (
-                <li
+                <PocketCard
                   key={pocket.pocket_uuid}
-                  className={styles.pocket_card}
-                  onClick={() => {
-                    window.location.href = `/pocket/${pocket.pocket_uuid}`;
-                  }}
-                >
-                  <header className={styles.pocket_header}>
-                    <span className={styles.pocket_icon} aria-hidden>
-                      <Image
-                        src={`/images/${pocket.icon}`}
-                        alt={pocket.icon}
-                        width={48}
-                        height={48}
-                      />
-                    </span>
-                    <div className={styles.pocket_heading}>
-                      <h3 className={styles.pocket_title}>{pocket.name}</h3>
-                      <div className={styles.pocket_meta}>
-                        <div className={styles.meta_chip}>
-                          {pocket.members.length}명 참여 중
-                        </div>
-                        <div className={styles.meta_chip}>
-                          {formatDate(pocket.open_at)}에 공개
-                        </div>
-                      </div>
-                    </div>
-                  </header>
-
-                  <div className={styles.pocket_progress_wrap}>
-                    <div className={styles.pocket_progress_bar}>
-                      <div
-                        className={styles.pocket_progress_fill}
-                        style={
-                          {
-                            ["--progress-width" as any]: `${Math.min(
-                              (pocket.name.length / pocket.goal) * 100,
-                              100
-                            )}%`,
-                          } as CSSProperties
-                        }
-                      />
-                    </div>
-                    <p className={styles.pocket_progress_text}>
-                      덕담 0 / {pocket.goal}개
-                    </p>
-                  </div>
-
-                  {/* <p className={styles.pocket_summary}>
-                    주머니 코드: <strong>{pocket.code}</strong>
-                  </p> */}
-
-                  <footer className={styles.pocket_footer}>
-                    <div
-                      className={styles.ghost_btn}
-                      onClick={() => {
-                        const origin =
-                          typeof window !== "undefined"
-                            ? window.location.origin
-                            : "";
-                        if (!origin) {
-                          alert(
-                            "브라우저에서 열었을 때 링크를 복사할 수 있어요."
-                          );
-                          return;
-                        }
-                        void copyToClipboard(
-                          `${origin}/pocket/${pocket.pocket_uuid}`,
-                          "주머니 링크가 복사되었어요!"
-                        );
-                      }}
-                    >
-                      초대하기
-                    </div>
-                    <div
-                      className={styles.primary_link}
-                      onClick={() =>
-                        void copyToClipboard(
-                          pocket.code,
-                          "주머니 코드를 복사했어요!"
-                        )
-                      }
-                    >
-                      자세히 보기
-                    </div>
-                  </footer>
-                </li>
+                  pocket_uuid={pocket.pocket_uuid}
+                  name={pocket.name}
+                  icon={pocket.icon}
+                  made_by={pocket.made_by}
+                  limit={pocket.limit}
+                  goal={pocket.goal}
+                  members={pocket.members}
+                  code={pocket.code}
+                  open_at={pocket.open_at}
+                  created_at={pocket.created_at}
+                />
               ))}
             </ul>
           )}

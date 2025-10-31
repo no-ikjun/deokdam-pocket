@@ -406,7 +406,6 @@
   gap: 1rem;
   padding: 1rem;
   border-radius: 18px;
-  cursor: pointer;
   background: linear-gradient(
     180deg,
     rgba(255, 255, 255, 0.72),
@@ -423,7 +422,6 @@
     background-color 0.2s ease;
 }
 .pocket_card:hover {
-  transform: translateY(-2px);
   box-shadow: 0 14px 28px rgba(249, 80, 80, 0.15);
   background-color: rgba(255, 255, 255, 0.85);
   transition: transform 0.15s ease, box-shadow 0.2s ease,
@@ -467,12 +465,20 @@
   color: #0b1b3a;
 }
 
+.pocket_subtitle {
+  margin: 0;
+  margin-top: -5px;
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
 .pocket_meta {
   display: flex;
   flex-wrap: wrap;
   gap: 0.25rem;
 }
 
+.primary_meta_chip,
 .meta_chip {
   display: flex;
   align-items: center;
@@ -483,6 +489,11 @@
   color: #334155;
   background: rgba(255, 255, 255, 0.75);
   box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.35);
+}
+
+.primary_meta_chip {
+  color: #b42323;
+  background: rgba(254, 226, 226, 0.95);
 }
 
 .pocket_progress_wrap {
@@ -593,7 +604,7 @@
   font-weight: 900;
   text-decoration: none;
   color: #fff;
-
+  cursor: pointer;
   background: linear-gradient(145deg, #f56d6d, #e25757);
   box-shadow: 0 6px 18px rgba(229, 87, 87, 0.25);
   filter: saturate(0.95);
@@ -686,5 +697,311 @@
 
   .pocket_footer {
     justify-content: flex-start;
+  }
+}
+
+/* ===== Skeleton Base ===== */
+@keyframes skelShimmer {
+  0% {
+    transform: translateX(-120%);
+  }
+  100% {
+    transform: translateX(120%);
+  }
+}
+
+.skel_card {
+  pointer-events: none;
+}
+
+.skel_block,
+.skel_line,
+.skel_chip,
+.skel_btn,
+.skel_bar,
+.skel_fill {
+  position: relative;
+  overflow: hidden;
+  background: rgba(148, 163, 184, 0.22);
+  border-radius: 10px;
+}
+
+.skel_block::after,
+.skel_line::after,
+.skel_chip::after,
+.skel_btn::after,
+.skel_bar::after,
+.skel_fill::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0),
+    rgba(255, 255, 255, 0.55),
+    rgba(255, 255, 255, 0)
+  );
+  transform: translateX(-120%);
+  animation: skelShimmer 1.4s ease-in-out infinite;
+}
+
+/* 헤더 아이콘 영역 */
+.skel_block {
+  width: 70px;
+  height: 70px;
+  border-radius: 12px;
+  box-shadow: none; /* 기존 pocket_icon의 inset 보정 */
+}
+
+/* 타이틀/서브타이틀 라인 */
+.skel_line {
+  display: block;
+  height: 12px;
+  border-radius: 8px;
+}
+.skel_title {
+  width: 68%;
+  height: 16px;
+  margin-top: 2px;
+}
+.skel_sub {
+  width: 120px;
+  height: 12px;
+  margin-top: 2px;
+}
+.skel_small {
+  width: 90px;
+  height: 12px;
+}
+.skel_mid {
+  width: 60%;
+  height: 12px;
+}
+
+/* 칩 자리 */
+.skel_chip {
+  width: 90px;
+  height: 22px;
+  border-radius: 999px;
+}
+
+/* 진행률 바 */
+.skel_bar {
+  background: rgba(218, 222, 224, 0.6);
+}
+.skel_bar::after {
+  display: none;
+} /* 바 전체에 샤인 생략 */
+
+.skel_fill {
+  height: 100%;
+  width: 38%; /* 임의 진행률 느낌 */
+  border-radius: 999px;
+}
+.skel_fill::after {
+  animation-duration: 1.1s;
+}
+
+/* 버튼 자리 */
+.skel_btn {
+  min-width: 96px;
+  height: 38px;
+  box-shadow: none;
+  border-radius: 12px;
+  background: rgba(148, 163, 184, 0.18);
+}
+
+/* ====== Modal Content Shell ====== */
+.invite_modal {
+  width: min(560px, 92vw);
+  border-radius: 18px;
+  padding: 1.2rem 1.1rem;
+  background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.86),
+      rgba(255, 255, 255, 0.62)
+    ),
+    rgba(255, 255, 255, 0.42);
+  backdrop-filter: blur(14px) saturate(150%);
+  -webkit-backdrop-filter: blur(14px) saturate(150%);
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  outline: 1px solid rgba(255, 69, 82, 0.18);
+  box-shadow: 0 18px 40px rgba(255, 69, 82, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.65);
+  color: #0f172a;
+}
+
+/* ====== Header ====== */
+.modal_title {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 900;
+  color: #0b1b3a;
+  letter-spacing: -0.01em;
+  margin-bottom: 0.5rem;
+}
+
+.modal_close {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.86),
+    rgba(255, 255, 255, 0.56)
+  );
+  box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.35);
+  cursor: pointer;
+  position: relative;
+}
+
+.modal_body {
+  display: grid;
+  gap: 0.9rem;
+}
+
+/* QR 영역 */
+.qr_wrap {
+  display: grid;
+  place-items: center;
+  padding: 0.8rem;
+  border-radius: 16px;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.85),
+    rgba(255, 255, 255, 0.55)
+  );
+  box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.35);
+}
+
+.qr_text {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #475569;
+  text-align: center;
+  margin-bottom: 0.6rem;
+}
+
+.qr_placeholder,
+.qr_img,
+.qr_canvas {
+  width: 200px;
+  height: 200px;
+  border-radius: 12px;
+  background: linear-gradient(
+    120deg,
+    rgba(254, 226, 226, 0.75),
+    rgba(255, 226, 226, 0.5)
+  );
+  box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.28);
+}
+
+.qr_btn {
+  margin-top: 0.6rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #0b1b3a;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.9),
+    rgba(255, 255, 255, 0.7)
+  );
+  box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.35);
+  padding: 0.5rem 0.8rem;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.2s ease, color 0.2s ease;
+}
+
+/* 코드 박스 */
+.code_box {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.7rem 0.9rem;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  margin: 0 auto;
+}
+
+.code_label {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: #b42323;
+  background: rgba(254, 226, 226, 0.95);
+  box-shadow: inset 0 0 0 1px rgba(248, 113, 113, 0.45);
+  padding: 0.28rem 0.5rem;
+  border-radius: 999px;
+}
+
+.code_value {
+  font-size: 1rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  color: #0b1b3a;
+}
+
+/* 버튼 영역 */
+.actions {
+  display: flex;
+  justify-content: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin-top: 0.2rem;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.8rem 1.1rem;
+  border-radius: 12px;
+  font-weight: 900;
+  font-size: 0.95rem;
+  user-select: none;
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.2s ease, color 0.2s ease,
+    background 0.2s ease;
+}
+
+/* 메인 버튼: 링크 복사 */
+.primary_btn {
+  color: #fff;
+  background: linear-gradient(135deg, #ff5a6a, #ff4552);
+  box-shadow: 0 10px 22px rgba(231, 102, 102, 0.28);
+  filter: saturate(0.95);
+}
+.primary_btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 30px rgba(231, 102, 102, 0.34);
+}
+
+/* 보조 버튼: 코드 복사 */
+.secondary_btn {
+  color: #0b1b3a;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.86),
+    rgba(255, 255, 255, 0.56)
+  );
+  box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.35);
+}
+.secondary_btn:hover {
+  transform: translateY(-1px);
+  color: #f95050;
+  box-shadow: inset 0 0 0 1px rgba(249, 80, 80, 0.6);
+}
+
+/* 반응형 */
+@media (max-width: 420px) {
+  .qr_placeholder,
+  .qr_img,
+  .qr_canvas {
+    width: 168px;
+    height: 168px;
+  }
+  .invite_modal {
+    padding: 1rem 0.9rem;
   }
 }

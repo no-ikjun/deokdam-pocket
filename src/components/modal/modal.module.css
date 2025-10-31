@@ -1,6 +1,10 @@
 /* === Overlay (글래스 + 은은한 핑크 하이라이트) === */
 .overlay {
   position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   inset: 0;
   display: grid;
   place-items: center;
