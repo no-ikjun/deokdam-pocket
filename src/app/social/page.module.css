@@ -496,6 +496,13 @@
   background: rgba(254, 226, 226, 0.95);
 }
 
+.pocket_description {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #4b5563;
+}
+
 .pocket_progress_wrap {
   display: flex;
   flex-direction: column;

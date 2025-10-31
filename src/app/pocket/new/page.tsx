@@ -6,6 +6,7 @@ import styles from "./page.module.css";
 import Image from "next/image";
 import axios from "axios";
 import LoadingIndicator from "@/components/loadingIndicator/loadingIndicator";
+import ToastPopup from "@/components/toastPopup/toastPopup";
 
 type OpenMode = "seollal" | "custom";
 
@@ -20,12 +21,16 @@ export default function NewPouchPage() {
   const [loading, setLoading] = useState(false);
 
   const [name, setName] = useState("");
+  const [desc, setDesc] = useState("");
   const [icon, setIcon] = useState("");
   const [maxMembers, setMaxMembers] = useState<number | "">("");
   const [goalCount, setGoalCount] = useState<number | "">("");
 
   const [openMode, setOpenMode] = useState<OpenMode>("seollal");
   const [openDate, setOpenDate] = useState<string>(DEFAULT_SEOLLAL);
+
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastOpen, setToastOpen] = useState(false);
 
   const icons = [
     "pocket_icon.svg",
@@ -49,6 +54,20 @@ export default function NewPouchPage() {
     return d >= today && d >= min && d <= max;
   };
 
+  const handleNumberLimit = (value: number, min: number, max: number) => {
+    if (value < min) {
+      setToastMessage(`최솟값은 ${min}입니다!`);
+      setToastOpen(true);
+      return min;
+    }
+    if (value > max) {
+      setToastMessage(`최댓값은 ${max}입니다!`);
+      setToastOpen(true);
+      return max;
+    }
+    return value;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -66,6 +85,7 @@ export default function NewPouchPage() {
     try {
       const response = await axios.post("/api/pocket", {
         name,
+        desc,
         icon,
         maxMembers,
         goalCount,
@@ -87,6 +107,14 @@ export default function NewPouchPage() {
 
   return (
     <main className={styles.new_wrap}>
+      <ToastPopup
+        open={toastOpen}
+        type="warning"
+        message={toastMessage}
+        duration={2000}
+        onClose={() => setToastOpen(false)}
+        actionLabel=""
+      />
       {loading && <LoadingIndicator text="생성 중..." />}
       <header className={styles.header}>
         <h1 className={styles.title}>새 덕담 주머니 만들기</h1>
@@ -109,6 +137,22 @@ export default function NewPouchPage() {
             placeholder="예: 새해 가족 덕담 주머니"
             maxLength={30}
             autoFocus
+          />
+        </div>
+
+        {/* 설명 입력 */}
+        <div className={styles.field}>
+          <label htmlFor="desc" className={styles.label}>
+            주머니 설명
+          </label>
+          <textarea
+            id="desc"
+            className={styles.input}
+            value={desc}
+            onChange={(e) => setDesc(e.target.value)}
+            placeholder="예: 가족과 함께하는 새해 덕담"
+            maxLength={100}
+            rows={2}
           />
         </div>
 
@@ -146,10 +190,12 @@ export default function NewPouchPage() {
               type="number"
               className={styles.input}
               value={maxMembers}
-              onChange={(e) => setMaxMembers(Number(e.target.value))}
+              onChange={(e) =>
+                setMaxMembers(handleNumberLimit(Number(e.target.value), 1, 100))
+              }
               placeholder="예: 10"
               min={1}
-              max={50}
+              max={100}
             />
           </div>
 
@@ -162,10 +208,12 @@ export default function NewPouchPage() {
               type="number"
               className={styles.input}
               value={goalCount}
-              onChange={(e) => setGoalCount(Number(e.target.value))}
+              onChange={(e) =>
+                setGoalCount(handleNumberLimit(Number(e.target.value), 1, 300))
+              }
               placeholder="예: 30"
               min={1}
-              max={200}
+              max={300}
             />
           </div>
         </div>
@@ -173,7 +221,6 @@ export default function NewPouchPage() {
         {/* 개봉 시기 */}
         <div className={styles.field}>
           <span className={styles.label}>주머니 개봉 시기</span>
-
           {/* 세그먼트 탭: 설날 / 직접 선택 */}
           <div className={styles.segment}>
             <button
@@ -202,22 +249,23 @@ export default function NewPouchPage() {
               직접 선택
             </button>
           </div>
-
           {/* 날짜 입력 (직접 선택일 때만 활성) */}
-          <div className={styles.date_row}>
-            <input
-              type="date"
-              className={styles.date_input}
-              value={openDate}
-              min={MIN_DATE}
-              max={MAX_DATE}
-              onChange={(e) => setOpenDate(e.target.value)}
-              disabled={openMode !== "custom"}
-            />
-            <p className={styles.date_hint}>
-              선택 가능 기간: {todayISO} ~ 2026-03-31
-            </p>
-          </div>
+          {openMode === "custom" && (
+            <div className={styles.date_row}>
+              <input
+                type="date"
+                className={styles.date_input}
+                value={openDate}
+                min={MIN_DATE}
+                max={MAX_DATE}
+                onChange={(e) => setOpenDate(e.target.value)}
+                // disabled={openMode !== "custom"}
+              />
+              <p className={styles.date_hint}>
+                선택 가능 기간: {todayISO} ~ 2026-03-31
+              </p>
+            </div>
+          )}
         </div>
 
         <div className={styles.button_div}>

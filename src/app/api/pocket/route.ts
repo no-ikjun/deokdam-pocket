@@ -29,15 +29,16 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
     const request = await req.json();
-    const { name, icon, maxMembers, goalCount, openDate } = request as {
+    const { name, desc, icon, maxMembers, goalCount, openDate } = request as {
       name: string;
+      desc: string;
       icon: string;
       maxMembers: number;
       goalCount: number;
       openDate: string;
     };
 
-    if (!name || !icon || !maxMembers || !goalCount || !openDate) {
+    if (!name || !desc || !icon || !maxMembers || !goalCount || !openDate) {
       return NextResponse.json(
         { message: "All fields are required" },
         { status: 400 }
@@ -49,7 +50,7 @@ export async function POST(req: Request) {
     const openAt = new Date(openDate);
     const openAtIso = openAt.toISOString();
 
-    await client.sql`INSERT INTO pocket (pocket_uuid, made_by, name, icon, "limit", goal, members, open_at, code) VALUES (${pocketUuid}, ${user_uuid}, ${name}, ${icon}, ${maxMembers}, ${goalCount}, ARRAY[${user_uuid}], ${openAtIso}, ${pocketCode});`;
+    await client.sql`INSERT INTO pocket (pocket_uuid, made_by, name, icon, "limit", goal, members, open_at, code, "desc") VALUES (${pocketUuid}, ${user_uuid}, ${name}, ${icon}, ${maxMembers}, ${goalCount}, ARRAY[${user_uuid}], ${openAtIso}, ${pocketCode}, ${desc});`;
 
     client.release();
     return NextResponse.json(
@@ -80,8 +81,8 @@ export async function GET(req: Request) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const pockets =
-      await client.sql`SELECT pocket_uuid, name, icon, "limit", goal, members, open_at, code FROM pocket WHERE ${user_uuid} = ANY(members);`;
+    const pockets = await client.sql`
+      SELECT pocket_uuid, name, icon, "limit", goal, members, open_at, code, "desc" FROM pocket WHERE ${user_uuid} = ANY(members);`;
 
     client.release();
     return NextResponse.json({ pockets: pockets.rows }, { status: 200 });
@@ -109,10 +110,11 @@ export async function PATCH(req: Request) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
     const request = await req.json();
-    const { pocket_uuid, name, icon, maxMembers, goalCount, openDate } =
+    const { pocket_uuid, name, desc, icon, maxMembers, goalCount, openDate } =
       request as {
         pocket_uuid: string;
         name: string;
+        desc: string;
         icon: string;
         maxMembers: number;
         goalCount: number;
@@ -122,6 +124,7 @@ export async function PATCH(req: Request) {
     if (
       !pocket_uuid ||
       !name ||
+      !desc ||
       !icon ||
       !maxMembers ||
       !goalCount ||
@@ -154,7 +157,7 @@ export async function PATCH(req: Request) {
     const openAt = new Date(openDate);
     const openAtIso = openAt.toISOString();
 
-    await client.sql`UPDATE pocket SET name = ${name}, icon = ${icon}, "limit" = ${maxMembers}, goal = ${goalCount}, open_at = ${openAtIso} WHERE pocket_uuid = ${pocket_uuid};`;
+    await client.sql`UPDATE pocket SET name = ${name}, "desc" = ${desc}, icon = ${icon}, "limit" = ${maxMembers}, goal = ${goalCount}, open_at = ${openAtIso} WHERE pocket_uuid = ${pocket_uuid};`;
 
     client.release();
     return NextResponse.json({ message: "success" }, { status: 200 });

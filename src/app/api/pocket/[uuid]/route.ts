@@ -30,6 +30,7 @@ export async function GET(_req: Request, { params }: RouteParams) {
         pocket_uuid,
         made_by,
         name,
+        "desc",
         icon,
         "limit",
         goal,

@@ -36,6 +36,7 @@ const copyToClipboard = async (
 type PocketCardProps = {
   pocket_uuid: string;
   name: string;
+  desc: string;
   icon: string;
   made_by: string;
   limit: number;
@@ -49,6 +50,7 @@ type PocketCardProps = {
 export default function PocketCard({
   pocket_uuid,
   name,
+  desc,
   icon,
   made_by,
   limit,
@@ -133,6 +135,8 @@ export default function PocketCard({
           </div>
         </header>
 
+        <p className={styles.pocket_description}>{desc}</p>
+
         <div className={styles.pocket_progress_wrap}>
           <div className={styles.pocket_progress_bar}>
             <div
@@ -149,10 +153,6 @@ export default function PocketCard({
           </div>
           <p className={styles.pocket_progress_text}>덕담 0 / {goal}개</p>
         </div>
-
-        <p className={styles.pocket_summary}>
-          주머니 코드: <strong>{code}</strong>
-        </p>
 
         <footer className={styles.pocket_footer}>
           <div

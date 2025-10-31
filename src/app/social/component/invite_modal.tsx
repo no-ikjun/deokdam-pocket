@@ -154,7 +154,6 @@ export default function InviteModal({
         duration={2000}
         onClose={() => setToastOpen(false)}
         actionLabel=""
-        onAction={() => console.log("undo")}
       />
 
       <header className={styles.modal_head}>

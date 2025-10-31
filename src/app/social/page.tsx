@@ -14,6 +14,7 @@ type Pocket = {
   pocket_uuid: string;
   made_by: string;
   name: string;
+  desc: string;
   icon: string;
   limit: number;
   goal: number;
@@ -175,6 +176,7 @@ export default function SocialPage() {
                   key={pocket.pocket_uuid}
                   pocket_uuid={pocket.pocket_uuid}
                   name={pocket.name}
+                  desc={pocket.desc}
                   icon={pocket.icon}
                   made_by={pocket.made_by}
                   limit={pocket.limit}
