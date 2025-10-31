@@ -1,28 +1,38 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import styles from "./page.module.css";
 import Image from "next/image";
+import InviteModal from "@/app/social/component/invite_modal";
+import Modal from "@/components/modal/modal";
+import ToastPopup from "@/components/toastPopup/toastPopup";
 
 const EMOJIS = ["🎉", "✨", "🎊", "🌟", "💫", "🎈", "🪽", "🪄"];
 
 export default function CompletePage() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const pouchCode = searchParams.get("code") || "HAPPY25";
+  const pocketCode = searchParams.get("code") || "HAPPY25";
+  const pocketUuid = searchParams.get("uuid") || "";
+  const pocketName = searchParams.get("name") || "덕담 주머니";
 
-  const inviteLink =
-    typeof window !== "undefined"
-      ? `${window.location.origin}/pouch/${pouchCode}`
-      : "";
+  const [modalOpen, setModalOpen] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastOpen, setToastOpen] = useState(false);
+
+  useEffect(() => {
+    if (!pocketCode || !pocketUuid) {
+      router.replace("/social");
+    }
+  }, [pocketCode, pocketUuid, router]);
 
   const copyText = (text: string, message: string) => {
+    setToastMessage(message);
+    setToastOpen(true);
     navigator.clipboard.writeText(text);
-    alert(message);
   };
 
-  // 🎊 컨페티 애니메이션
   const particles = useMemo(() => {
     return Array.from({ length: 32 }).map((_, i) => {
       const left = Math.random() * 100;
@@ -49,7 +59,17 @@ export default function CompletePage() {
 
   return (
     <main className={styles.page} aria-label="덕담 주머니 생성 완료 페이지">
-      {/* 배경 및 컨페티 */}
+      <ToastPopup
+        open={toastOpen}
+        type="success"
+        message={toastMessage}
+        duration={2000}
+        onClose={() => setToastOpen(false)}
+        actionLabel=""
+      />
+      <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)}>
+        <InviteModal name={pocketName} uuid={pocketUuid} code={pocketCode} />
+      </Modal>
       <div className={styles.bg} aria-hidden />
       <div className={styles.confetti} aria-hidden>
         {particles.map((p, idx) => (
@@ -88,11 +108,11 @@ export default function CompletePage() {
         <div className={styles.info_box}>
           <span className={styles.code_label}>참여 코드</span>
           <div className={styles.code_row}>
-            <code className={styles.code}>{pouchCode}</code>
+            <code className={styles.code}>{pocketCode}</code>
             <div
               role="button"
               className={styles.copy_btn}
-              onClick={() => copyText(pouchCode, "코드를 복사했어요!")}
+              onClick={() => copyText(pocketCode, "코드를 복사했어요!")}
             >
               복사
             </div>
@@ -102,21 +122,11 @@ export default function CompletePage() {
           <div
             role="button"
             tabIndex={0}
-            className={`${styles.btn} ${styles.secondary_btn}`}
-            onClick={() => copyText(inviteLink, "링크를 복사했어요!")}
-            onKeyDown={onKey(() => copyText(inviteLink, "링크를 복사했어요!"))}
+            className={`${styles.btn} ${styles.primary_btn}`}
+            onClick={() => setModalOpen(true)}
+            onKeyDown={onKey(() => setModalOpen(true))}
           >
-            링크 공유하기
-          </div>
-
-          <div
-            role="button"
-            tabIndex={0}
-            className={`${styles.btn} ${styles.secondary_btn}`}
-            onClick={() => alert("QR 코드 보기 기능은 준비 중이에요!")}
-            onKeyDown={onKey(() => alert("QR 코드 보기 기능은 준비 중이에요!"))}
-          >
-            QR 코드 보기
+            초대하기
           </div>
 
           <div

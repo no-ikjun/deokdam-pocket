@@ -96,7 +96,11 @@ export default function NewPouchPage() {
         alert("주머니 생성에 실패했어요. 다시 시도해주세요.");
         return;
       }
-      router.push(`/pocket/new/done?code=${response.data.code}`);
+      router.replace(
+        `/pocket/new/done?code=${response.data.code}&name=${encodeURIComponent(
+          name
+        )}&uuid=${response.data.pocket_uuid}`
+      );
     } catch (error) {
       alert("주머니 생성에 실패했어요. 다시 시도해주세요.");
       return;
