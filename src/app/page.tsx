@@ -7,12 +7,7 @@ import Link from "next/link";
 import { useAuthStore } from "@/stores/auth";
 import { useRouter } from "next/navigation";
 import Timer from "@/components/timer/timer";
-
-declare global {
-  interface Window {
-    adsbygoogle: any;
-  }
-}
+import AdBanner728x90 from "@/components/AdBanner/728x90";
 
 export default function Home() {
   const [showTimer, setShowTimer] = useState(true);
@@ -36,9 +31,6 @@ export default function Home() {
     if (now >= targetDate) {
       setShowTimer(false); // 2026년이 지나면 타이머 숨기기
     }
-
-    if (window.adsbygoogle && !window.adsbygoogle.loaded)
-      (window.adsbygoogle = (window as any).adsbygoogle || []).push({});
   }, [router]);
 
   useEffect(() => {
@@ -229,6 +221,8 @@ export default function Home() {
                 </li>
               </ul>
             </section>
+
+            <AdBanner728x90 />
 
             {/* ============ 정책 링크 ============ */}
             <footer className={styles.footer}>
