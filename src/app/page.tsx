@@ -7,12 +7,7 @@ import Link from "next/link";
 import { useAuthStore } from "@/stores/auth";
 import { useRouter } from "next/navigation";
 import Timer from "@/components/timer/timer";
-
-declare global {
-  interface Window {
-    adsbygoogle: any;
-  }
-}
+import AdComponent from "@/components/adsense/AdComponent";
 
 export default function Home() {
   const [showTimer, setShowTimer] = useState(true);
@@ -36,9 +31,6 @@ export default function Home() {
     if (now >= targetDate) {
       setShowTimer(false); // 2026년이 지나면 타이머 숨기기
     }
-
-    if (window.adsbygoogle && !window.adsbygoogle.loaded)
-      (window.adsbygoogle = (window as any).adsbygoogle || []).push({});
   }, [router]);
 
   useEffect(() => {
@@ -229,6 +221,17 @@ export default function Home() {
                 </li>
               </ul>
             </section>
+
+            {/* ============ 광고 배너 ============ */}
+            <div className={styles.ad_banner}>
+              <AdComponent
+                adSlot="7323782821"
+                style={{ display: "block" }}
+                adFormat="auto"
+                adLayout="in-article"
+                responsive={true}
+              />
+            </div>
 
             {/* ============ 정책 링크 ============ */}
             <footer className={styles.footer}>

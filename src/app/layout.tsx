@@ -9,6 +9,7 @@ import localFont from "next/font/local";
 import Script from "next/script";
 import { Analytics } from "@vercel/analytics/react";
 import dynamic from "next/dynamic";
+import { GoogleAdSense } from "@/components/adsense/adsense";
 
 // Render client-side bootstrap without SSR
 const AuthBootstrap = dynamic(() => import("@/components/auth/AuthBootstrap"), {
@@ -52,15 +53,7 @@ export default function RootLayout({
   return (
     <html lang="ko" className={myFont.className}>
       <head>
-        <Script
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2222926756194557"
-          strategy="afterInteractive"
-          crossOrigin="anonymous"
-        />
-        <meta
-          name="google-adsense-account"
-          content="ca-pub-2222926756194557"
-        />
+        <GoogleAdSense />
       </head>
       <body>
         <Image
