@@ -231,7 +231,6 @@ export default function Home() {
                 adSlot="7323782821"
                 style={{ display: "block" }}
                 adFormat="auto"
-                adLayout="in-article"
                 responsive={true}
               />
             </div>
