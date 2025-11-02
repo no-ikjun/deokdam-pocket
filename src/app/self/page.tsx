@@ -93,6 +93,13 @@ export default function SelfPage() {
 
   const checkChunkTrained = async () => {
     try {
+      const selfCheckResponse = await axios.get("/api/self/check");
+      if (selfCheckResponse.data.length === 0) {
+        setTrainingNotificationMessage("학습할 데이터가 없습니다.");
+        setTrainingNotificationType("error");
+        setTrainingNotification(true);
+        return;
+      }
       const response = await axios.get("/api/self/openai/refine/check");
       const twelveHoursAgo = new Date(Date.now() - 12 * 60 * 60 * 1000); // 현재 시각 - 12시간
       if (new Date(response.data.createdAt) > twelveHoursAgo) {
