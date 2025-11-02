@@ -7,7 +7,7 @@ import Link from "next/link";
 import { useAuthStore } from "@/stores/auth";
 import { useRouter } from "next/navigation";
 import Timer from "@/components/timer/timer";
-import AdBanner728x90 from "@/components/AdBanner/728x90";
+import AdComponent from "@/components/adsense/AdComponent";
 
 export default function Home() {
   const [showTimer, setShowTimer] = useState(true);
@@ -222,7 +222,16 @@ export default function Home() {
               </ul>
             </section>
 
-            <AdBanner728x90 />
+            {/* ============ 광고 배너 ============ */}
+            <div className={styles.ad_banner}>
+              <AdComponent
+                adSlot="7323782821"
+                style={{ display: "block" }}
+                adFormat="auto"
+                adLayout="in-article"
+                responsive={true}
+              />
+            </div>
 
             {/* ============ 정책 링크 ============ */}
             <footer className={styles.footer}>

@@ -539,3 +539,16 @@
     flex: 1 1 calc(50% - 1rem); /* 2열 그리드 */
   }
 }
+
+.ad_banner {
+  width: 100%;
+  max-width: 720px;
+  margin: 1.5rem 0;
+  display: flex;
+  justify-content: center;
+}
+@media (max-width: 480px) {
+  .ad_banner {
+    margin: 1rem 0;
+  }
+}
