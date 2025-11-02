@@ -1,0 +1,235 @@
+.page {
+  position: relative;
+  min-height: 100svh;
+  display: grid;
+  place-items: center;
+  overflow: clip;
+  color: #0b1b3a;
+}
+
+/* 부드러운 배경 */
+.bg {
+  position: absolute;
+  inset: -20%;
+  z-index: -1;
+  background: radial-gradient(
+      60% 50% at 18% 0%,
+      rgba(255, 228, 230, 0.85),
+      transparent 62%
+    ),
+    radial-gradient(
+      50% 50% at 82% 0%,
+      rgba(254, 249, 195, 0.55),
+      transparent 58%
+    ),
+    #f8fafc;
+}
+.bg::before {
+  content: "";
+  position: absolute;
+  inset: -10%;
+  background: conic-gradient(
+    from 0deg at 60% 40%,
+    rgba(255, 69, 82, 0.18),
+    rgba(255, 166, 158, 0.12),
+    rgba(255, 69, 82, 0.18)
+  );
+  filter: blur(64px) saturate(120%);
+  animation: spin 18s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+/* 컨페티 */
+.confetti {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+.particle {
+  position: absolute;
+  top: -6%;
+  transform: translateY(-50%);
+  animation-name: fall, sway;
+  animation-timing-function: linear, ease-in-out;
+  animation-iteration-count: 1, infinite;
+}
+@keyframes fall {
+  to {
+    transform: translateY(110vh) rotate(calc(var(--spin-dir) * 540deg));
+  }
+}
+@keyframes sway {
+  0%,
+  100% {
+    margin-left: 0;
+  }
+  50% {
+    margin-left: 18px;
+  }
+}
+
+/* 카드 */
+.card {
+  width: min(680px, 92vw);
+  border-radius: 20px;
+  padding: 2.2rem 1.6rem 1.8rem;
+  background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.86),
+      rgba(255, 255, 255, 0.62)
+    ),
+    rgba(255, 255, 255, 0.42);
+  backdrop-filter: blur(14px) saturate(150%);
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  outline: 1px solid rgba(249, 80, 80, 0.18);
+  box-shadow: 0 18px 40px rgba(249, 80, 80, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.65);
+  display: grid;
+  gap: 1rem;
+  text-align: center;
+}
+
+.card_icon {
+  width: 40px;
+  height: 40px;
+  margin: 0 auto;
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(1.4rem, 2vw, 1.8rem);
+  font-weight: 900;
+}
+
+.subtitle {
+  margin: 0;
+  color: #64748b;
+  font-size: 0.95rem;
+}
+
+/* 코드 박스 */
+.info_box {
+  margin-top: 0.4rem;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.code_label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #b42323;
+}
+
+.code_row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.code {
+  font-family: monospace;
+  font-size: 1.1rem;
+  padding: 0.4rem 0.8rem;
+  color: #0b1b3a;
+}
+
+.copy_btn {
+  border: none;
+  border-radius: 10px;
+  padding: 0.5rem 0.8rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #0b1b3a;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.85),
+    rgba(255, 255, 255, 0.55)
+  );
+  box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.35);
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.2s ease;
+}
+.copy_btn:hover {
+  color: #f95050;
+}
+
+/* 버튼 영역 */
+.btn_group {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+}
+
+.btn {
+  border-radius: 12px;
+  padding: 0.8rem 1.2rem;
+  font-weight: 900;
+  font-size: 0.95rem;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.1s ease, box-shadow 0.2s ease, background 0.2s ease,
+    color 0.2s ease;
+  outline: none;
+}
+.btn:focus-visible {
+  box-shadow: 0 0 0 4px rgba(255, 69, 82, 0.14);
+}
+
+.primary_btn {
+  color: #fff;
+  background: linear-gradient(145deg, #f56d6d, #e25757);
+  box-shadow: 0 8px 20px rgba(229, 87, 87, 0.25);
+  filter: saturate(0.95);
+}
+.primary_btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 26px rgba(231, 102, 102, 0.3);
+}
+
+.secondary_btn {
+  color: #0b1b3a;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.85),
+    rgba(255, 255, 255, 0.55)
+  );
+  box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.35);
+}
+.secondary_btn:hover {
+  transform: translateY(-1px);
+  color: #f95050;
+}
+
+.ghost_btn {
+  color: #0b1b3a;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.85),
+    rgba(255, 255, 255, 0.55)
+  );
+  box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.35);
+}
+.ghost_btn:hover {
+  transform: translateY(-1px);
+  color: #f95050;
+}
+
+.hint {
+  margin: 0.4rem 0 0;
+  color: #6b7280;
+  font-size: 0.85rem;
+}
+
+/* 반응형 */
+@media (max-width: 640px) {
+  .card {
+    padding: 1.6rem 1rem 1.2rem;
+  }
+}

@@ -14,12 +14,10 @@ export async function POST(req: Request) {
   }
   try {
     const payload = jwt.verify(token, process.env.JWT_SECRET!);
-    const { userUuid, user_uuid } = payload as {
-      userUuid?: string;
-      user_uuid?: string;
+    const { user_uuid } = payload as {
+      user_uuid: string;
     };
-    const resolvedUserUuid = userUuid || user_uuid;
-    if (!resolvedUserUuid) {
+    if (!user_uuid) {
       client.release();
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
@@ -37,14 +35,14 @@ export async function POST(req: Request) {
     }
 
     const existingSelf =
-      await client.sql`SELECT * FROM self WHERE user_uuid = ${resolvedUserUuid} AND self_type = ${self_type};`;
+      await client.sql`SELECT * FROM self WHERE user_uuid = ${user_uuid} AND self_type = ${self_type};`;
     if (existingSelf.rows.length > 0) {
-      await client.sql`DELETE FROM self WHERE user_uuid = ${resolvedUserUuid} AND self_type = ${self_type};`;
+      await client.sql`DELETE FROM self WHERE user_uuid = ${user_uuid} AND self_type = ${self_type};`;
     }
     const selfUuid = uuid4();
     const safeContent = content.replace(/'/g, "''");
 
-    await client.sql`INSERT INTO self (self_uuid, self_type, content, remind, remind_at, user_uuid) VALUES (${selfUuid}, ${self_type}, ${safeContent}, ${remind}, ${remind_at}, ${resolvedUserUuid});`;
+    await client.sql`INSERT INTO self (self_uuid, self_type, content, remind, remind_at, user_uuid) VALUES (${selfUuid}, ${self_type}, ${safeContent}, ${remind}, ${remind_at}, ${user_uuid});`;
     client.release();
     return NextResponse.json({ message: "ok" });
   } catch (error) {

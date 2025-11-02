@@ -1,0 +1,132 @@
+.toastRoot {
+  position: fixed;
+  left: 16px;
+  bottom: 24px;
+  z-index: 2147483646; /* 최상단 보장 */
+  isolation: isolate;
+
+  /* 기존 디자인 그대로 */
+  display: grid;
+  grid-template-columns: 6px auto max-content max-content;
+  align-items: center;
+  gap: 12px;
+
+  background: rgba(17, 20, 24, 0.88);
+  backdrop-filter: saturate(140%) blur(10px);
+  -webkit-backdrop-filter: saturate(140%) blur(10px);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: 14px;
+  box-shadow: 0 6px 24px rgba(2, 6, 23, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  color: #eef2f6;
+  padding: 14px 12px 14px 10px;
+
+  transform: translateX(-120%);
+  opacity: 0;
+  transition: transform 380ms cubic-bezier(0.2, 0.8, 0.2, 1), opacity 280ms ease;
+  outline: none;
+}
+
+.open {
+  transform: translateX(0);
+  opacity: 1;
+}
+.closed {
+  pointer-events: none;
+}
+
+/* 타입별 */
+.default .accent {
+  background: linear-gradient(180deg, #94a3b8, #64748b);
+}
+.success .accent {
+  background: linear-gradient(180deg, #34d399, #059669);
+}
+.warning .accent {
+  background: linear-gradient(180deg, #fbbf24, #f59e0b);
+}
+.error .accent {
+  background: linear-gradient(180deg, #f87171, #dc2626);
+}
+
+.accent {
+  width: 6px;
+  height: 100%;
+  border-radius: 10px;
+}
+.iconWrap {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  color: #e2e8f0;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.textWrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 220px;
+}
+.message {
+  margin: 0;
+  font-size: 0.94rem;
+  line-height: 1.35;
+  letter-spacing: 0.01em;
+  color: #e8edf4;
+}
+
+.actionBtn {
+  margin-left: 8px;
+  padding: 6px 10px;
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: #0ea5e9;
+  background: transparent;
+  border: 1px solid rgba(14, 165, 233, 0.25);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 120ms ease, background 160ms ease,
+    border-color 160ms ease;
+}
+.actionBtn:hover {
+  background: rgba(14, 165, 233, 0.08);
+  border-color: rgba(14, 165, 233, 0.45);
+  transform: translateY(-1px);
+}
+
+.closeBtn {
+  appearance: none;
+  border: none;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  width: 28px;
+  height: 28px;
+  border-radius: 10px;
+  color: #cbd5e1;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: background 160ms ease, border-color 160ms ease,
+    transform 120ms ease;
+}
+.closeBtn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(148, 163, 184, 0.4);
+  transform: translateY(-1px);
+}
+
+.toastRoot + .toastRoot {
+  margin-top: 10px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toastRoot {
+    transition: none;
+    transform: none;
+    opacity: 1;
+  }
+}
