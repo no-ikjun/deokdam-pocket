@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import styles from "./page.module.css";
 import Image from "next/image";
@@ -10,7 +10,7 @@ import ToastPopup from "@/components/toastPopup/toastPopup";
 
 const EMOJIS = ["🎉", "✨", "🎊", "🌟", "💫", "🎈", "🪽", "🪄"];
 
-export default function CompletePage() {
+function CompletePageContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pocketCode = searchParams.get("code") || "HAPPY25";
@@ -145,5 +145,13 @@ export default function CompletePage() {
         </p>
       </section>
     </main>
+  );
+}
+
+export default function CompletePage() {
+  return (
+    <Suspense fallback={null}>
+      <CompletePageContent />
+    </Suspense>
   );
 }
