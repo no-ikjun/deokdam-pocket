@@ -7,7 +7,6 @@ import styles from "./page.module.css";
 import axios from "axios";
 import Image from "next/image";
 import Link from "next/link";
-import Notification from "@/components/notification_popup";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -151,7 +150,6 @@ export default function Ment() {
 
   return (
     <>
-      <Notification show={showNotification} message={notificationMessage} />
       <div
         style={{ display: `${isLoading ? "flex" : "none"}` }}
         className={styles.sending_div}
