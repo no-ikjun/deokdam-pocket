@@ -74,10 +74,17 @@ export default function SelfPage() {
   const [isTraining, setIsTraining] = useState(false);
 
   const [trainingNotification, setTrainingNotification] = useState(false);
+  const [trainingNotificationType, setTrainingNotificationType] = useState<
+    "success" | "error" | "warning"
+  >("success");
+  const [trainingNotificationMessage, setTrainingNotificationMessage] =
+    useState("");
 
-  const trainAi = async () => {
+  const trainAi = async (retrain: boolean) => {
     try {
-      const response = await axios.post("/api/self/openai/train");
+      const response = await axios.post("/api/self/openai/train", {
+        retrain,
+      });
       return response;
     } catch (error) {
       console.error("Error training AI:", error);
@@ -89,9 +96,16 @@ export default function SelfPage() {
       const response = await axios.get("/api/self/openai/refine/check");
       const twelveHoursAgo = new Date(Date.now() - 12 * 60 * 60 * 1000); // 현재 시각 - 12시간
       if (new Date(response.data.createdAt) > twelveHoursAgo) {
+        setTrainingNotificationMessage(
+          "최근 12시간 이내에 학습된 데이터가 있습니다."
+        );
+        setTrainingNotificationType("warning");
         setTrainingNotification(true);
       } else {
-        trainAi();
+        await trainAi(true);
+        setTrainingNotificationMessage("AI 학습이 완료되었습니다.");
+        setTrainingNotificationType("success");
+        setTrainingNotification(true);
       }
     } catch (error) {
       console.error("Error checking chunk trained:", error);
@@ -428,7 +442,7 @@ export default function SelfPage() {
                 setTrainingLoading(true);
 
                 try {
-                  const trainResponse = await trainAi();
+                  const trainResponse = await trainAi(false);
                   if (trainResponse && trainResponse.status === 200) {
                     window.location.href = "/self/chat";
                   }
@@ -480,8 +494,8 @@ export default function SelfPage() {
       >
         <ToastPopup
           open={trainingNotification}
-          type="warning"
-          message="12시간 이내에 학습된 데이터가 있습니다."
+          type={trainingNotificationType}
+          message={trainingNotificationMessage}
           duration={2000}
           onClose={() => setTrainingNotification(false)}
           actionLabel=""

@@ -18,6 +18,8 @@ function parseSelfType(selfType: string | null) {
 export async function POST(req: Request) {
   const client = await db.connect();
   const token = cookies().get("token")?.value;
+  const requestBody = (await req.json()) || {};
+  const retrain = requestBody.retrain || false;
   let user_uuid = "";
 
   if (!token) {
@@ -45,8 +47,21 @@ export async function POST(req: Request) {
       { status: 500 }
     );
   }
-  // 없으면 self 데이터 임베딩 수행
-  if (chunkCount === 0) {
+  // 재학습인 경우에는 기존 데이터 삭제
+  if (retrain) {
+    try {
+      await client.sql`DELETE FROM user_chunks WHERE user_id = ${user_uuid};`;
+      chunkCount = 0;
+    } catch (error) {
+      client.release();
+      return NextResponse.json(
+        { error: "Internal Server Error" + error },
+        { status: 500 }
+      );
+    }
+  }
+  // 없으면 self 데이터 임베딩 수행 (재학습인 경우에도 수행)
+  if (chunkCount === 0 || retrain) {
     try {
       const { rows } =
         await client.sql`SELECT * FROM self WHERE user_uuid = ${user_uuid};`;
