@@ -869,6 +869,7 @@
 
 /* QR 영역 */
 .qr_wrap {
+  height: fit-content;
   display: grid;
   place-items: center;
   padding: 0.8rem;
@@ -892,8 +893,9 @@
 .qr_placeholder,
 .qr_img,
 .qr_canvas {
-  width: 200px;
-  height: 200px;
+  width: fit-content;
+  height: fit-content;
+  padding: 0.25rem;
   border-radius: 12px;
   background: linear-gradient(
     120deg,
