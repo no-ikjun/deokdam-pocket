@@ -23,7 +23,7 @@ export default function SelfPage() {
   });
   const [loading, setLoading] = useState(true);
 
-  // 최초 진입 시 답변 완료 여부 불러오기
+  // 최초 진입 시 답변 완료 여부 불러오기 + 톤 설정 불러오기
   useEffect(() => {
     let mounted = true;
     const getUsedStatus = async () => {
@@ -49,6 +49,14 @@ export default function SelfPage() {
       }
     };
     getUsedStatus();
+
+    const storedTone = localStorage.getItem("self_chat_tone") as
+      | "mild"
+      | "spicy"
+      | null;
+    if (storedTone) {
+      setTone(storedTone);
+    }
     return () => {
       mounted = false;
     };
@@ -71,6 +79,12 @@ export default function SelfPage() {
 
   const [openSettings, setOpenSettings] = useState(false);
   const [tone, setTone] = useState<"mild" | "spicy">("mild");
+
+  const changeTone = (newTone: "mild" | "spicy") => {
+    localStorage.setItem("self_chat_tone", newTone);
+    setTone(newTone);
+  };
+
   const [isTraining, setIsTraining] = useState(false);
 
   const [trainingNotification, setTrainingNotification] = useState(false);
@@ -521,7 +535,7 @@ export default function SelfPage() {
                 className={`${styles.tone_button} ${
                   tone === "mild" ? styles.active_tone : ""
                 }`}
-                onClick={() => setTone("mild")}
+                onClick={() => changeTone("mild")}
               >
                 순한맛 😊
               </button>
@@ -529,7 +543,7 @@ export default function SelfPage() {
                 className={`${styles.tone_button} ${
                   tone === "spicy" ? styles.active_tone : ""
                 }`}
-                onClick={() => setTone("spicy")}
+                onClick={() => changeTone("spicy")}
               >
                 매운맛 🌶️
               </button>
