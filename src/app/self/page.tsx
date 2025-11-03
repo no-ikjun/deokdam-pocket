@@ -6,6 +6,8 @@ import Image from "next/image";
 import styles from "./page.module.css";
 import axios from "axios";
 import Modal from "@/components/modal/modal";
+import LoadingIndicator from "@/components/loadingIndicator/loadingIndicator";
+import ToastPopup from "@/components/toastPopup/toastPopup";
 
 type UsedState = {
   goals: boolean;
@@ -21,7 +23,7 @@ export default function SelfPage() {
   });
   const [loading, setLoading] = useState(true);
 
-  // 최초 진입 시 답변 완료 여부 불러오기
+  // 최초 진입 시 답변 완료 여부 불러오기 + 톤 설정 불러오기
   useEffect(() => {
     let mounted = true;
     const getUsedStatus = async () => {
@@ -47,6 +49,14 @@ export default function SelfPage() {
       }
     };
     getUsedStatus();
+
+    const storedTone = localStorage.getItem("self_chat_tone") as
+      | "mild"
+      | "spicy"
+      | null;
+    if (storedTone) {
+      setTone(storedTone);
+    }
     return () => {
       mounted = false;
     };
@@ -65,12 +75,72 @@ export default function SelfPage() {
   const retrospectDisabled = loading || used.retrospect;
   const skeletons = new Array(3).fill(null);
 
+  const [trainingLoading, setTrainingLoading] = useState(false);
+
   const [openSettings, setOpenSettings] = useState(false);
   const [tone, setTone] = useState<"mild" | "spicy">("mild");
+
+  const changeTone = (newTone: "mild" | "spicy") => {
+    localStorage.setItem("self_chat_tone", newTone);
+    setTone(newTone);
+  };
+
   const [isTraining, setIsTraining] = useState(false);
+
+  const [trainingNotification, setTrainingNotification] = useState(false);
+  const [trainingNotificationType, setTrainingNotificationType] = useState<
+    "success" | "error" | "warning"
+  >("success");
+  const [trainingNotificationMessage, setTrainingNotificationMessage] =
+    useState("");
+
+  const trainAi = async (retrain: boolean) => {
+    try {
+      const response = await axios.post("/api/self/openai/train", {
+        retrain,
+      });
+      return response;
+    } catch (error) {
+      console.error("Error training AI:", error);
+    }
+  };
+
+  const checkChunkTrained = async () => {
+    try {
+      const selfCheckResponse = await axios.get("/api/self/check");
+      if (selfCheckResponse.data.length === 0) {
+        setTrainingNotificationMessage("학습할 데이터가 없습니다.");
+        setTrainingNotificationType("error");
+        setTrainingNotification(true);
+        return;
+      }
+      const response = await axios.get("/api/self/openai/refine/check");
+      const twelveHoursAgo = new Date(Date.now() - 12 * 60 * 60 * 1000); // 현재 시각 - 12시간
+      if (new Date(response.data.createdAt) > twelveHoursAgo) {
+        setTrainingNotificationMessage(
+          "최근 12시간 이내에 학습된 데이터가 있습니다."
+        );
+        setTrainingNotificationType("warning");
+        setTrainingNotification(true);
+      } else {
+        await trainAi(true);
+        setTrainingNotificationMessage("AI 학습이 완료되었습니다.");
+        setTrainingNotificationType("success");
+        setTrainingNotification(true);
+      }
+    } catch (error) {
+      console.error("Error checking chunk trained:", error);
+    }
+  };
 
   return (
     <main className={styles.self_wrap} aria-label="나에게 덕담 남기기">
+      {trainingLoading && (
+        <LoadingIndicator
+          text="대화를 준비하는 중..."
+          subText="이 과정은 다소 시간이 걸릴 수 있습니다."
+        />
+      )}
       <div className={styles.header}>
         <Image src="/images/pocket.png" alt="logo" width={28} height={28} />
         <h1 className={styles.page_title}>새해를 맞이하는 나</h1>
@@ -364,19 +434,18 @@ export default function SelfPage() {
         <div className={styles.future_head}>
           <div className={styles.future_title_area}>
             <span className={styles.ads_notice}>
-              <span className={styles.future_dot} /> 광고 시청 후
+              <span className={styles.future_dot} /> AI 기반 서비스
             </span>
             <h3 className={styles.future_title}>1년 뒤의 나와 대화하기</h3>
             <p className={styles.future_desc}>
-              위 기능 중 한개 이상을 사용하면, <strong>순한맛/매운맛</strong>{" "}
-              말투를 선택해 AI와 대화할 수 있어요.
+              내가 이용한 서비스 데이터를 바탕으로 AI가 1년 뒤의 나를 예측하고
+              대화할 수 있어요.
             </p>
           </div>
         </div>
 
         <div className={styles.future_actions}>
-          <Link
-            href="/self/chat"
+          <div
             className={styles.glass_primary_btn}
             style={
               used.retrospect || used.goals || used.oneyear
@@ -386,6 +455,25 @@ export default function SelfPage() {
             aria-disabled={
               used.retrospect || used.goals || used.oneyear ? false : true
             }
+            onClick={async (e) => {
+              if (!used.retrospect && !used.goals && !used.oneyear) {
+                e.preventDefault();
+                e.stopPropagation();
+              } else {
+                setTrainingLoading(true);
+
+                try {
+                  const trainResponse = await trainAi(false);
+                  if (trainResponse && trainResponse.status === 200) {
+                    window.location.href = "/self/chat";
+                  }
+                } catch (error) {
+                  console.error("Error training AI:", error);
+                } finally {
+                  setTrainingLoading(false);
+                }
+              }
+            }}
           >
             <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden>
               <path
@@ -406,7 +494,7 @@ export default function SelfPage() {
               />
             </svg>
             대화 시작하기
-          </Link>
+          </div>
           <div
             className={styles.glass_secondary_btn}
             onClick={(e) => {
@@ -425,6 +513,14 @@ export default function SelfPage() {
         onClose={() => setOpenSettings(false)}
         ariaTitle="환경설정"
       >
+        <ToastPopup
+          open={trainingNotification}
+          type={trainingNotificationType}
+          message={trainingNotificationMessage}
+          duration={2000}
+          onClose={() => setTrainingNotification(false)}
+          actionLabel=""
+        />
         <div className={styles.settings_modal}>
           <h3 className={styles.settings_title}>환경설정</h3>
           <p className={styles.settings_desc}>
@@ -439,22 +535,22 @@ export default function SelfPage() {
                 className={`${styles.tone_button} ${
                   tone === "mild" ? styles.active_tone : ""
                 }`}
-                onClick={() => setTone("mild")}
+                onClick={() => changeTone("mild")}
               >
-                🩵 순한맛
+                순한맛 😊
               </button>
               <button
                 className={`${styles.tone_button} ${
                   tone === "spicy" ? styles.active_tone : ""
                 }`}
-                onClick={() => setTone("spicy")}
+                onClick={() => changeTone("spicy")}
               >
-                🔥 매운맛
+                매운맛 🌶️
               </button>
             </div>
             <p className={styles.tone_hint}>
               * 순한맛은 부드럽고 공감형 톤, 매운맛은 직설적이고 솔직한 피드백
-              스타일이에요.
+              스타일입니다.
             </p>
           </div>
 
@@ -465,17 +561,24 @@ export default function SelfPage() {
             <button
               type="button"
               className={styles.train_button}
-              onClick={() => {
+              onClick={async () => {
                 setIsTraining(true);
-                setTimeout(() => {
+                try {
+                  await checkChunkTrained();
+                } catch (error) {
+                  console.error("Error training AI:", error);
+                } finally {
                   setIsTraining(false);
-                  alert("최신 데이터가 반영되었어요 ✨");
-                }, 1500);
+                }
               }}
               disabled={isTraining}
             >
               {isTraining ? "학습 중..." : "AI 학습시키기"}
             </button>
+            <p className={styles.tone_hint}>
+              * AI 학습은 다소 시간이 걸릴 수 있으며, 최근에 학습된 데이터가
+              있을 경우 추가 학습이 불가합니다.
+            </p>
           </div>
 
           <div className={styles.settings_footer}>

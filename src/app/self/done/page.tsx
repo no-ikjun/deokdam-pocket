@@ -1,12 +1,13 @@
 "use client";
 
 import { useMemo } from "react";
-import Link from "next/link";
 import styles from "./page.module.css";
+import { useRouter } from "next/navigation";
 
 const EMOJIS = ["🎉", "✨", "🎊", "🌟", "💫", "🎈", "🪽", "🪄"];
 
 export default function DonePage() {
+  const router = useRouter();
   // 컨페티 파티클(이모지) 랜덤 배치
   const particles = useMemo(() => {
     return Array.from({ length: 36 }).map((_, i) => {
@@ -71,12 +72,22 @@ export default function DonePage() {
         </p>
 
         <div className={styles.actions}>
-          <Link href="/" className={styles.ghost_btn}>
+          <div
+            className={styles.ghost_btn}
+            onClick={() => {
+              router.replace("/");
+            }}
+          >
             홈으로 나가기
-          </Link>
-          <Link href="/self" className={styles.primary_btn}>
+          </div>
+          <div
+            className={styles.primary_btn}
+            onClick={() => {
+              router.replace("/self");
+            }}
+          >
             다른 질문에 답하기
-          </Link>
+          </div>
         </div>
       </section>
     </main>

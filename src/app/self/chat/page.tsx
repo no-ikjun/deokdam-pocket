@@ -147,29 +147,20 @@ export default function SelfChatPage() {
       status: "done",
     };
 
-    const pendingMessage: ChatMessage = {
-      id: createId(),
-      role: "assistant",
-      content: "생각을 정리하고 있어요...",
-      status: "pending",
-    };
-
     setInput("");
-    setMessages((prev) => [...prev, userMessage, pendingMessage]);
+    setMessages((prev) => [...prev, userMessage]);
     setIsLoading(true);
     setError(null);
 
     try {
-      const response = await fetch("/api/self/chat", {
+      const response = await fetch("/api/self/chat/send", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          messages: [
-            ...conversationHistory,
-            { role: "user", content: trimmed },
-          ],
+          tone: localStorage.getItem("self_chat_tone") || "mild",
+          query: trimmed,
         }),
       });
 
@@ -180,32 +171,25 @@ export default function SelfChatPage() {
       const data = (await response.json()) as {
         reply?: string;
         error?: string;
+        context?: any;
       };
-      const reply = data.reply?.trim();
+      const reply = data.reply ?? "";
 
       if (!reply) {
         throw new Error(data.error || "응답이 비어 있습니다.");
       }
 
-      setMessages((prev) =>
-        prev.map((message) =>
-          message.id === pendingMessage.id
-            ? { ...message, content: reply, status: "done" }
-            : message
-        )
-      );
+      setMessages((prev) => [
+        ...prev,
+        { id: createId(), role: "assistant", content: reply, status: "done" },
+      ]);
     } catch (err) {
       console.error(err);
       setError("응답을 가져오지 못했습니다. 잠시 후 다시 시도해주세요.");
       setMessages((prev) =>
         prev.map((message) =>
-          message.id === pendingMessage.id
-            ? {
-                ...message,
-                content:
-                  "죄송해요. 지금은 답변을 드릴 수 없어요. 잠시 후 다시 시도해주세요.",
-                status: "error",
-              }
+          message.id === userMessage.id
+            ? { ...message, status: "error" }
             : message
         )
       );
@@ -266,6 +250,26 @@ export default function SelfChatPage() {
               <p className={styles.bubble_text}>{message.content}</p>
             </article>
           ))}
+
+          {/* 타이핑 애니메이션 버블 */}
+          {isLoading && (
+            <article
+              className={`${styles.chat_bubble} ${styles.assistant_bubble}`}
+            >
+              <div className={styles.bubble_meta}>
+                <span className={styles.bubble_role}>1년 후의 나</span>
+              </div>
+              <div
+                className={styles.typing_bubble}
+                aria-live="polite"
+                aria-label="응답 생성중"
+              >
+                <span className={styles.dot} />
+                <span className={styles.dot} />
+                <span className={styles.dot} />
+              </div>
+            </article>
+          )}
           <div ref={endRef} />
         </div>
 

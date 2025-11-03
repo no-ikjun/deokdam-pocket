@@ -3,13 +3,14 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 
+// 마지막 chunk 생성 일시 조회
 export async function GET() {
   const client = await db.connect();
   const token = cookies().get("token")?.value;
 
   if (!token) {
     client.release();
-    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   try {
@@ -17,17 +18,20 @@ export async function GET() {
     const { user_uuid } = payload as { user_uuid?: string };
     if (!user_uuid) {
       client.release();
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { rows } =
-      await client.sql`SELECT self_type FROM self WHERE user_uuid = ${user_uuid};`;
+      await client.sql`SELECT created_at FROM user_chunks WHERE user_id = ${user_uuid} order by created_at LIMIT 1;`;
     client.release();
 
-    return NextResponse.json(rows);
+    const createdAt = rows[0].created_at;
+    return NextResponse.json({ createdAt });
   } catch (error) {
-    console.log(error);
-    client.release();
-    return NextResponse.json({ message: "error" }, { status: 500 });
+    console.error("Error verifying token:", error);
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
   }
 }
