@@ -134,49 +134,52 @@ const Timer = ({ hideTimer }: TimerProps) => {
   return (
     <div className={_.main}>
       <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
-        <Image src="/images/pocket.png" alt="pocket" width={35} height={35} />
-        <p className={_.modal_title}>덕담 주머니 소식 받기</p>
-        <p className={_.modal_ment}>
-          이메일 주소를 입력하면
-          <br />
-          오픈 및 이벤트 소식을 빠르게 받아볼 수 있어요!
-        </p>
-        <input
-          onChange={(val) => {
-            setEmail(val.target.value);
-            setError("");
-          }}
-          className={_.input}
-          placeholder="이메일 주소를 입력해주세요"
-        />
-
-        <div className={_.check_div}>
-          <input
-            type="checkbox"
-            value="text/html"
-            onChange={() => setIsChecked(!isChecked)}
-          />
-          <p>
-            (필수) 개인정보 수집 및 이용에 동의합니다.{" "}
-            <Link
-              href="https://ikjun.notion.site/148ee261b89580b59763da5773d1ea72?pvs=4"
-              className={_.show_policy}
-              target="_blank"
-            >
-              약관 보기
-            </Link>
+        <div className={_.modal_div}>
+          <Image src="/images/pocket.png" alt="pocket" width={35} height={35} />
+          <p className={_.modal_title}>덕담 주머니 소식 받기</p>
+          <p className={_.modal_ment}>
+            이메일 주소를 입력하면
+            <br />
+            오픈 및 이벤트 소식을 빠르게 받아볼 수 있어요!
           </p>
+          <input
+            onChange={(val) => {
+              setEmail(val.target.value);
+              setError("");
+            }}
+            className={_.input}
+            placeholder="이메일 주소를 입력해주세요"
+          />
+
+          <div className={_.check_div}>
+            <input
+              type="checkbox"
+              value="text/html"
+              onChange={() => setIsChecked(!isChecked)}
+            />
+            <p>
+              (필수) 개인정보 수집 및 이용에 동의합니다.{" "}
+              <Link
+                href="https://ikjun.notion.site/148ee261b89580b59763da5773d1ea72?pvs=4"
+                className={_.show_policy}
+                target="_blank"
+              >
+                약관 보기
+              </Link>
+            </p>
+          </div>
+          {error && <p className={_.error}>{error}</p>}
+          <button
+            className={[_.submit_btn, myFont.className].join(" ")}
+            onClick={handleSubmit}
+          >
+            확인
+          </button>
         </div>
-        {error && <p className={_.error}>{error}</p>}
-        <button
-          className={[_.submit_btn, myFont.className].join(" ")}
-          onClick={handleSubmit}
-        >
-          확인
-        </button>
       </Modal>
-      <p className={_.title}>2026년까지 얼마 남지 않았어요!</p>
+
       <div className={showDiv ? [_.show, _.fade_div].join(" ") : _.fade_div}>
+        <p className={_.title}>2026년까지 얼마 남지 않았어요!</p>
         <div className={_.timer_div}>
           <div className={_.timer}>
             <div className={_.ment_div}>

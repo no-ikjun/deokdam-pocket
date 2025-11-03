@@ -29,8 +29,9 @@ export default function Home() {
     const now = new Date();
     const targetDate = new Date("2026-01-01T00:00:00+09:00"); // KST
     if (
-      now >= targetDate ||
-      (process.env.NODE_ENV as string) === "development"
+      now >= targetDate
+      // now >= targetDate ||
+      // (process.env.NODE_ENV as string) === "development"
     ) {
       setShowTimer(false); // 2026년이 지나면 타이머 숨기기
     }
