@@ -305,7 +305,7 @@ export async function refineText(refineReq: RefineRequest) {
 
       inserted++;
     }
-
+    await sql`ANALYZE user_chunks;`;
     return NextResponse.json({
       ok: true,
       inserted,

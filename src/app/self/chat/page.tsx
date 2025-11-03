@@ -160,16 +160,14 @@ export default function SelfChatPage() {
     setError(null);
 
     try {
-      const response = await fetch("/api/self/chat", {
+      const response = await fetch("/api/self/chat/send", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          messages: [
-            ...conversationHistory,
-            { role: "user", content: trimmed },
-          ],
+          tone: localStorage.getItem("self_chat_tone") || "mild",
+          query: trimmed,
         }),
       });
 
@@ -180,18 +178,19 @@ export default function SelfChatPage() {
       const data = (await response.json()) as {
         reply?: string;
         error?: string;
+        context?: any;
       };
-      const reply = data.reply?.trim();
+      const reply = data.reply ?? "";
 
       if (!reply) {
         throw new Error(data.error || "응답이 비어 있습니다.");
       }
 
       setMessages((prev) =>
-        prev.map((message) =>
-          message.id === pendingMessage.id
-            ? { ...message, content: reply, status: "done" }
-            : message
+        prev.map((m) =>
+          m.id === pendingMessage.id
+            ? { ...m, content: reply, status: "done" }
+            : m
         )
       );
     } catch (err) {
