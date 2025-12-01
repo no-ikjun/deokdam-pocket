@@ -1,12 +1,8 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
 import Image from "next/image";
 import styles from "./page.module.css";
 import backgroundImg from "../../public/images/background.webp";
-import Head from "next/head";
-import localFont from "next/font/local";
-import Script from "next/script";
 import { Analytics } from "@vercel/analytics/react";
 import dynamic from "next/dynamic";
 import { GoogleAdSense } from "@/components/adsense/adsense";
@@ -28,30 +24,13 @@ export const metadata: Metadata = {
   },
 };
 
-const myFont = localFont({
-  src: [
-    {
-      path: "./fonts/NanumMyeongjo.ttf",
-      weight: "400",
-    },
-    {
-      path: "./fonts/NanumMyeongjoBold.ttf",
-      weight: "800",
-    },
-    {
-      path: "./fonts/NanumMyeongjoExtraBold.ttf",
-      weight: "900",
-    },
-  ],
-});
-
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ko" className={myFont.className}>
+    <html lang="ko">
       <head>
         <GoogleAdSense />
       </head>

@@ -1,13 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import styles from "./signin.module.css";
-import localFont from "next/font/local";
 import axios from "axios";
 import Link from "next/link";
-
-const myFont = localFont({
-  src: "./fonts/NanumMyeongjo.ttf",
-});
 
 const SignIn = () => {
   const [name, setName] = useState<string>("");
@@ -118,7 +113,7 @@ const SignIn = () => {
         </div>
       </div>
       <button
-        className={[styles.submit_btn, myFont.className].join(" ")}
+        className={styles.submit_btn}
         onClick={async () => {
           try {
             const response = await axios.get(

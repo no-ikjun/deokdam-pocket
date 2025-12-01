@@ -4,12 +4,7 @@ import { useEffect, useState } from "react";
 import _ from "./page.module.css";
 import Image from "next/image";
 import Link from "next/link";
-import localFont from "next/font/local";
 import MentExample from "@/components/ment_example";
-
-const myFont = localFont({
-  src: "./fonts/NanumMyeongjo.ttf",
-});
 
 const mentList = [
   {
@@ -150,20 +145,10 @@ export default function Temp() {
                 덕담 주머니를 만들고 덕담을 남기면 다른 사용자의 덕담을 차곡차곡
                 모을 수 있어요.
               </p>
-              {/* <textarea
-                className={[_.text_field, myFont.className].join(" ")}
-                placeholder="새해 덕담을 적어주세요"
-                onChange={(e) => {}}
-              />
-              <div style={{ width: "100%" }}>
-                <p className={_.word_length} style={{ color: "#949494" }}>
-                  0 / 150자
-                  <br />
-                </p>
-              </div> */}
+              {/* <textarea className={_.text_field} placeholder="새해 덕담을 적어주세요" /> */}
               <div className={_.button_div}>
                 <button
-                  className={[_.submit_btn, myFont.className].join(" ")}
+                  className={_.submit_btn}
                   onClick={async () => {
                     setAnimation(true);
                     location.href = "/select";
