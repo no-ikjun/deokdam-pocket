@@ -121,7 +121,7 @@
   padding: 0 18px;
   text-decoration: none;
   color: #fff;
-  font-weight: 900;
+  font-weight: 700;
   font-size: 1.02rem;
 
   background: linear-gradient(145deg, #f56d6d, #e25757);
@@ -173,7 +173,8 @@
   border: none;
   border-radius: 12px;
   color: #fff;
-  font-weight: 800;
+  font-size: 0.95rem;
+  font-weight: 700;
   cursor: pointer;
   display: inline-flex;
   align-items: center;

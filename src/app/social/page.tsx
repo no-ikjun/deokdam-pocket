@@ -9,6 +9,7 @@ import LoadingIndicator from "@/components/loadingIndicator/loadingIndicator";
 import PocketCard from "./component/pocket_card";
 import Modal from "@/components/modal/modal";
 import InviteModal from "./component/invite_modal";
+import ToastPopup from "@/components/toastPopup/toastPopup";
 
 type Pocket = {
   pocket_uuid: string;
@@ -28,6 +29,8 @@ export default function SocialPage() {
   const [code, setCode] = useState("");
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(true);
+  const [toastOpen, setToastOpen] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
   const [myPockets, setMyPockets] = useState<Pocket[]>([]);
 
   const fetchMyPockets = async () => {
@@ -58,12 +61,25 @@ export default function SocialPage() {
     );
   }, [myPockets, query]);
 
-  const joinByCode = (event?: React.FormEvent) => {
+  const joinByCode = async (event?: React.FormEvent) => {
     event?.preventDefault();
-    const trimmed = code.trim();
+    const trimmed = code.trim().toUpperCase();
     if (!trimmed) return;
-    alert(`코드 ${trimmed} 로 덕담 주머니에 참여 시도!`);
-    setCode("");
+    try {
+      const response = await axios.post("/api/pocket/join", {
+        pocket_code: trimmed,
+      });
+      console.log(response);
+      if (response.status === 200) {
+        setCode("");
+        setToastMessage("덕담 주머니 참여 성공!");
+        setToastOpen(true);
+        void fetchMyPockets();
+      }
+    } catch (error) {
+      setToastMessage("참여 실패. 다시 시도해 주세요.");
+      setToastOpen(true);
+    }
   };
 
   const [message, setMessage] = useState("");
@@ -88,6 +104,12 @@ export default function SocialPage() {
   return (
     <main className={styles.page} aria-label="덕담 주머니 소셜 허브">
       {loading && <LoadingIndicator />}
+      <ToastPopup
+        open={toastOpen}
+        type={toastMessage.includes("성공") ? "success" : "error"}
+        message={toastMessage}
+        onClose={() => setToastOpen(false)}
+      />
       <div className={styles.page_inner}>
         <section className={styles.hero_wrap}>
           {/* 좌측: 타이틀 */}
@@ -128,7 +150,9 @@ export default function SocialPage() {
                 aria-label="덕담 주머니 코드 입력"
                 maxLength={16}
               />
-              <div className={styles.join_btn}>참여</div>
+              <div className={styles.join_btn} onClick={joinByCode}>
+                참여
+              </div>
             </form>
           </aside>
         </section>

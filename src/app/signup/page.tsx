@@ -27,8 +27,11 @@ export default function LoginPage() {
   };
 
   // 개발용 로그인 버튼 핸들러
-  const handleDevLogin = async () => {
-    const res = await fetch("/api/auth/dev-login", { method: "POST" });
+  const handleDevLogin = async ({ number }: { number: number }) => {
+    const res = await fetch("/api/auth/dev-login", {
+      body: JSON.stringify({ number }),
+      method: "POST",
+    });
     if (!res.ok) {
       alert("dev 로그인 실패");
       return;
@@ -85,19 +88,47 @@ export default function LoginPage() {
 
         {/* ✅ 로컬 개발용 로그인 버튼 */}
         {process.env.NODE_ENV === "development" && (
-          <button
-            className={styles.devLogin}
-            style={{
-              backgroundColor: "#444",
-              color: "#fff",
-              borderRadius: "8px",
-              padding: "10px 14px",
-              fontSize: "14px",
-            }}
-            onClick={handleDevLogin}
-          >
-            🚀 로컬 개발용 간이 로그인
-          </button>
+          <>
+            <button
+              className={styles.devLogin}
+              style={{
+                backgroundColor: "#444",
+                color: "#fff",
+                borderRadius: "8px",
+                padding: "10px 14px",
+                fontSize: "14px",
+              }}
+              onClick={() => handleDevLogin({ number: 1 })}
+            >
+              🚀 로컬 개발용 간이 로그인
+            </button>
+            <button
+              className={styles.devLogin}
+              style={{
+                backgroundColor: "#444",
+                color: "#fff",
+                borderRadius: "8px",
+                padding: "10px 14px",
+                fontSize: "14px",
+              }}
+              onClick={() => handleDevLogin({ number: 2 })}
+            >
+              🚀 로컬 개발용 간이 로그인 2
+            </button>
+            <button
+              className={styles.devLogin}
+              style={{
+                backgroundColor: "#444",
+                color: "#fff",
+                borderRadius: "8px",
+                padding: "10px 14px",
+                fontSize: "14px",
+              }}
+              onClick={() => handleDevLogin({ number: 3 })}
+            >
+              🚀 로컬 개발용 간이 로그인 3
+            </button>
+          </>
         )}
       </div>
 

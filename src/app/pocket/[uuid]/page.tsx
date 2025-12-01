@@ -8,6 +8,8 @@ import styles from "./page.module.css";
 import LoadingIndicator from "@/components/loadingIndicator/loadingIndicator";
 import Modal from "@/components/modal/modal";
 import InviteModal from "@/app/social/component/invite_modal";
+import ToastPopup from "@/components/toastPopup/toastPopup";
+import DeokdamWriteModal from "../component/deokdam_write";
 
 type Pocket = {
   pocket_uuid: string;
@@ -21,7 +23,6 @@ type Pocket = {
   code: string;
   open_at: string;
   created_at: string;
-  current_messages?: number;
 };
 
 const formatDate = (iso: string, showYear?: boolean) => {
@@ -38,9 +39,14 @@ export default function PocketDetailPage() {
   const { uuid } = useParams<{ uuid: string }>();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
-  const [modalOpen, setModalOpen] = useState(false);
+  const [inviteModalOpen, setInviteModalOpen] = useState(false);
+  const [writeModalOpen, setWriteModalOpen] = useState(false);
+  const [toastOpen, setToastOpen] = useState(false);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [pocket, setPocket] = useState<Pocket | null>(null);
+  const [currentCount, setCurrentCount] = useState<number>(0);
   const [madeByDisplay, setMadeByDisplay] = useState<string>("");
+  const [members, setMembers] = useState<{ id: string; name: string }[]>([]);
 
   const fetchDetail = async () => {
     setLoading(true);
@@ -55,26 +61,96 @@ export default function PocketDetailPage() {
     }
   };
 
+  const fetchMemberName = async (user_uuid: string) => {
+    try {
+      const response = await axios.get("/api/user/name", {
+        params: { user_uuid },
+      });
+      if (response.status === 200) {
+        return response.data.name;
+      }
+      return "알 수 없음";
+    } catch (error) {
+      console.error("Error fetching user name:", error);
+      return "알 수 없음";
+    }
+  };
+
   useEffect(() => {
+    if (!pocket) return;
     let isMounted = true;
-    const fetchMadeBy = async () => {
+
+    const loadMeta = async () => {
+      const start = Date.now();
+      setLoading(true);
       try {
-        const response = await axios.get("/api/user/name", {
-          params: { user_uuid: pocket?.made_by },
-        });
-        if (response.status === 200) {
-          if (isMounted) setMadeByDisplay(response.data.name);
-        } else {
-          if (isMounted) setMadeByDisplay("알 수 없음");
-        }
+        const madeByPromise = axios
+          .get("/api/user/name", { params: { user_uuid: pocket.made_by } })
+          .then((res) => {
+            const name = res.status === 200 ? res.data.name : "알 수 없음";
+
+            void axios
+              .get("/api/pocket/info/count", {
+                params: { pocket_uuid: pocket.pocket_uuid },
+              })
+              .then((countRes) => {
+                if (!isMounted) return;
+                if (countRes.status === 200) {
+                  setCurrentCount(countRes.data.ment_count as number);
+                }
+              })
+              .catch((err) => {
+                // 실패시 기존 값 유지
+                console.error("Error fetching pocket count:", err);
+              });
+
+            return name;
+          })
+          .catch(() => "알 수 없음");
+
+        const membersPromise = (async () => {
+          try {
+            const authRes = await axios.get("/api/auth/me");
+            const myId =
+              authRes.status === 200 ? authRes.data.user_uuid : undefined;
+            const targets = pocket.members.filter((id) => id !== myId);
+            const resolved = await Promise.all(
+              targets.map(async (memberId) => ({
+                id: memberId,
+                name: await fetchMemberName(memberId),
+              }))
+            );
+            return resolved;
+          } catch (error) {
+            console.error("Error fetching members:", error);
+            return [];
+          }
+        })();
+
+        const [madeByName, memberData] = await Promise.all([
+          madeByPromise,
+          membersPromise,
+        ]);
+
+        if (!isMounted) return;
+        setMadeByDisplay(madeByName);
+        setMembers(memberData);
       } catch (error) {
-        console.error("Error fetching user name:", error);
-        if (isMounted) setMadeByDisplay("알 수 없음");
+        if (!isMounted) return;
+        console.error("Error loading pocket meta:", error);
+        setMadeByDisplay("알 수 없음");
+        setMembers([]);
       } finally {
-        if (isMounted) setLoading(false);
+        const elapsed = Date.now() - start;
+        const delay = Math.max(0, 200 - elapsed); // 최소 표시 시간으로 깜빡임 완화
+        setTimeout(() => {
+          if (isMounted) setLoading(false);
+        }, delay);
       }
     };
-    void fetchMadeBy();
+
+    void loadMeta();
+
     return () => {
       isMounted = false;
     };
@@ -86,12 +162,11 @@ export default function PocketDetailPage() {
   }, [uuid]);
 
   const progress = useMemo(() => {
-    const cur = pocket?.current_messages ?? 0;
+    const cur = currentCount;
     const goal = pocket?.goal ?? 1;
     if (goal <= 0) return 0;
     return Math.min(Math.round((cur / goal) * 100), 100);
-  }, [pocket]);
-
+  }, [currentCount, pocket]);
   const iconScaleStyle: CSSProperties = useMemo(
     () =>
       ({
@@ -122,34 +197,20 @@ export default function PocketDetailPage() {
     return `D-${diff}`;
   }, [pocket]);
 
-  const copy = async (text: string, ok = "복사했어요!") => {
-    try {
-      await navigator.clipboard.writeText(text);
-      alert(ok);
-    } catch {
-      alert("복사에 실패했어요. 직접 복사해 주세요.");
-    }
-  };
-
-  const handleWriteWish = () => {
-    // TODO: 실제 덕담 작성 페이지 경로에 맞게 교체
-    // 예: window.location.href = `/pocket/${uuid}/write`;
-    alert("덕담 작성 페이지로 이동하도록 구현해 주세요 :)");
-  };
-
-  const handleCopyCode = () => {
+  const handleCopyCode = async () => {
     if (!pocket) return;
-    void copy(pocket.code, "참여 코드가 복사됐어요!");
+    await navigator.clipboard.writeText(pocket.code);
+    setToastMessage("참여 코드가 복사됐어요!");
+    setToastOpen(true);
   };
 
   const progressText = useMemo(() => {
     if (!pocket) return "";
-    const cur = pocket.current_messages ?? 0;
+    const cur = currentCount;
     const goal = pocket.goal ?? 0;
     if (goal > 0) return `${cur}개의 덕담 / 목표 ${goal}개`;
     return `${cur}개의 덕담이 모였어요`;
-  }, [pocket]);
-
+  }, [currentCount, pocket]);
   const membersText = useMemo(() => {
     if (!pocket) return "";
     const cur = pocket.members.length;
@@ -161,12 +222,46 @@ export default function PocketDetailPage() {
 
   return (
     <main className={styles.page} aria-label="덕담 주머니 상세 페이지">
+      <ToastPopup
+        open={toastOpen}
+        type="success"
+        message={toastMessage || "복사했어요!"}
+        duration={2000}
+        onClose={() => setToastOpen(false)}
+        actionLabel=""
+      />
       {loading && <LoadingIndicator />}
-      <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)}>
+      <Modal isOpen={inviteModalOpen} onClose={() => setInviteModalOpen(false)}>
         <InviteModal
-          name={pocket?.name || "덕담 주머니"}
+          name={pocket?.name || ""}
           uuid={pocket?.pocket_uuid || ""}
           code={pocket?.code || ""}
+        />
+      </Modal>
+      <Modal isOpen={writeModalOpen} onClose={() => setWriteModalOpen(false)}>
+        <DeokdamWriteModal
+          members={members}
+          onSubmit={async (data) => {
+            console.log("Deokdam submitted:", data);
+            const response = await axios.post("/api/deokdam", {
+              destination: data.receivers,
+              pocket: uuid,
+              desc: data.message,
+              isAnonymous: data.anonymous,
+            });
+            if (response.status === 201) {
+              console.log(
+                "Deokdam created with UUID:",
+                response.data.deokdam_uuid
+              );
+            } else {
+              console.error("Failed to create deokdam:", response);
+            }
+            setWriteModalOpen(false);
+            setCurrentCount((prev) => prev * 1 + 1);
+            setToastMessage("덕담을 보냈어요!");
+            setToastOpen(true);
+          }}
         />
       </Modal>
       <div className={styles.back_button_div}>
@@ -242,7 +337,7 @@ export default function PocketDetailPage() {
         {/* 오른쪽: 정보 + 액션 패널 */}
         <section className={styles.info_panel}>
           <header className={styles.info_header}>
-            <span className={styles.year_badge}>2026 덕담 주머니</span>
+            <span className={styles.year_badge}>덕담 주머니 정보</span>
             {pocket?.code && (
               <button
                 type="button"
@@ -293,14 +388,14 @@ export default function PocketDetailPage() {
             <button
               type="button"
               className={styles.primary_action}
-              onClick={handleWriteWish}
+              onClick={() => setWriteModalOpen(true)}
             >
               <span className={styles.action_label}>덕담 남기기</span>
             </button>
             <button
               type="button"
               className={styles.secondary_action}
-              onClick={() => setModalOpen(true)}
+              onClick={() => setInviteModalOpen(true)}
             >
               <span className={styles.action_label}>초대하기</span>
             </button>
@@ -316,7 +411,7 @@ export default function PocketDetailPage() {
 
       <footer className={styles.page_footer}>
         <p className={styles.footer_note}>
-          ⓒ 2024 덕담 주머니 · 함께 나누는 말 한마디가 새해를 바꿔요.
+          ⓒ 2024 덕담 주머니 · 함께 나누는 말 한마디가 큰 힘이 돼요.
         </p>
       </footer>
     </main>
