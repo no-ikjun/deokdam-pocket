@@ -47,6 +47,9 @@ export default function PocketDetailPage() {
   const [currentCount, setCurrentCount] = useState<number>(0);
   const [madeByDisplay, setMadeByDisplay] = useState<string>("");
   const [members, setMembers] = useState<{ id: string; name: string }[]>([]);
+  const [myDeokdamCount, setMyDeokdamCount] = useState<number>(0);
+
+  const [myModalOpen, setMyModalOpen] = useState(false);
 
   const fetchDetail = async () => {
     setLoading(true);
@@ -76,6 +79,23 @@ export default function PocketDetailPage() {
     }
   };
 
+  const fetchMyDeokdamCount = async () => {
+    if (!uuid) return 0;
+    try {
+      const response = await axios.get("/api/deokdam/mine/count", {
+        params: { pocket_uuid: uuid },
+      });
+      if (response.status === 200) {
+        const val = Number(response.data.deokdam_count);
+        return Number.isFinite(val) ? val : 0;
+      }
+    } catch (error) {
+      console.error("Error fetching my deokdam count:", error);
+      return 0;
+    }
+    return 0;
+  };
+
   useEffect(() => {
     if (!pocket) return;
     let isMounted = true;
@@ -86,27 +106,24 @@ export default function PocketDetailPage() {
       try {
         const madeByPromise = axios
           .get("/api/user/name", { params: { user_uuid: pocket.made_by } })
-          .then((res) => {
-            const name = res.status === 200 ? res.data.name : "알 수 없음";
-
-            void axios
-              .get("/api/pocket/info/count", {
-                params: { pocket_uuid: pocket.pocket_uuid },
-              })
-              .then((countRes) => {
-                if (!isMounted) return;
-                if (countRes.status === 200) {
-                  setCurrentCount(countRes.data.ment_count as number);
-                }
-              })
-              .catch((err) => {
-                // 실패시 기존 값 유지
-                console.error("Error fetching pocket count:", err);
-              });
-
-            return name;
-          })
+          .then((res) => (res.status === 200 ? res.data.name : "알 수 없음"))
           .catch(() => "알 수 없음");
+
+        const countPromise = axios
+          .get("/api/pocket/info/count", {
+            params: { pocket_uuid: pocket.pocket_uuid },
+          })
+          .then((countRes) => {
+            if (countRes.status !== 200) return null;
+            const val = Number(countRes.data.ment_count);
+            return Number.isFinite(val) ? val : null;
+          })
+          .catch((err) => {
+            console.error("Error fetching pocket count:", err);
+            return null;
+          });
+
+        const myCountPromise = fetchMyDeokdamCount();
 
         const membersPromise = (async () => {
           try {
@@ -127,14 +144,19 @@ export default function PocketDetailPage() {
           }
         })();
 
-        const [madeByName, memberData] = await Promise.all([
-          madeByPromise,
-          membersPromise,
-        ]);
+        const [madeByName, memberData, totalCount, myCount] = await Promise.all(
+          [madeByPromise, membersPromise, countPromise, myCountPromise]
+        );
 
         if (!isMounted) return;
         setMadeByDisplay(madeByName);
         setMembers(memberData);
+        if (typeof totalCount === "number") {
+          setCurrentCount(totalCount);
+        }
+        if (typeof myCount === "number") {
+          setMyDeokdamCount(myCount);
+        }
       } catch (error) {
         if (!isMounted) return;
         console.error("Error loading pocket meta:", error);
@@ -167,13 +189,12 @@ export default function PocketDetailPage() {
     if (goal <= 0) return 0;
     return Math.min(Math.round((cur / goal) * 100), 100);
   }, [currentCount, pocket]);
-  const iconScaleStyle: CSSProperties = useMemo(
-    () =>
-      ({
-        "--icon-scale": 0.95 + (progress / 100) * 0.6,
-      } as CSSProperties),
-    [progress]
-  );
+  const iconScaleStyle: CSSProperties = useMemo(() => {
+    // 50%에서 1.0x가 되는 기준 스케일, 진행률 기반으로 선형 조정
+    // (0% -> 0.85x, 50% -> 1x, 100% -> 1.15x)
+    const scale = 0.85 + (progress / 100) * 0.3;
+    return { "--icon-scale": scale } as CSSProperties;
+  }, [progress]);
 
   const progressBarStyle: CSSProperties = useMemo(
     () =>
@@ -264,6 +285,21 @@ export default function PocketDetailPage() {
           }}
         />
       </Modal>
+      <Modal isOpen={myModalOpen} onClose={() => setMyModalOpen(false)}>
+        <div className={styles.mydeokdam_modal}>
+          <p className={styles.mydeokdam_modal_title}>내가 남긴 덕담</p>
+          <p className={styles.mydeokdam_modal_desc}>
+            내가 보낸 덕담 목록은 곧 확인할 수 있어요.
+          </p>
+          <button
+            type="button"
+            className={styles.mydeokdam_modal_button}
+            onClick={() => setMyModalOpen(false)}
+          >
+            닫기
+          </button>
+        </div>
+      </Modal>
       <div className={styles.back_button_div}>
         <span
           className={styles.back_link}
@@ -331,6 +367,24 @@ export default function PocketDetailPage() {
               </p>
               <p className={styles.progress_meta}>{membersText}</p>
             </div>
+          </div>
+
+          <div className={styles.mydeokdam_card}>
+            <div className={styles.mydeokdam_top}>
+              <p className={styles.mydeokdam_label}>내가 남긴 덕담</p>
+              <p className={styles.mydeokdam_value}>
+                {myDeokdamCount}
+                <span className={styles.mydeokdam_unit}>개</span>
+              </p>
+            </div>
+
+            <button
+              type="button"
+              className={styles.mydeokdam_button}
+              onClick={() => setMyModalOpen(true)}
+            >
+              내가 남긴 덕담 확인하기
+            </button>
           </div>
         </section>
 

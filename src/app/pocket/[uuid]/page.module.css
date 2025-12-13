@@ -45,7 +45,7 @@
   border-radius: 22px;
   padding: 1.5rem 1.6rem 1.4rem;
   display: grid;
-  grid-template-rows: auto auto 1fr;
+  grid-template-rows: auto auto auto;
   gap: 1.2rem;
 
   background: linear-gradient(
@@ -108,7 +108,7 @@
   background: none;
   box-shadow: none;
   transform: scale(var(--icon-scale, 1));
-  transition: transform 0.4s ease-out;
+  transition: transform 0.45s ease-in-out;
 }
 
 .icon_glow {
@@ -117,8 +117,8 @@
 
 .icon_inner {
   position: relative;
-  width: 180px;
-  height: 180px;
+  width: 160px;
+  height: 160px;
   border-radius: 0;
   display: grid;
   place-items: center;
@@ -216,6 +216,145 @@
   font-size: 0.82rem;
   font-weight: 600;
   color: #9ca3af;
+}
+
+/* 내가 남긴 덕담 카드 */
+
+.mydeokdam_card {
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.5rem 0.9rem;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid rgba(255, 255, 255, 0.95);
+  box-shadow: 0 10px 26px rgba(248, 113, 113, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  min-height: 62px;
+}
+
+.mydeokdam_top {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.mydeokdam_label {
+  margin: 0;
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: #ef4444;
+}
+
+.mydeokdam_value {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #0b1b3a;
+  letter-spacing: -0.02em;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.mydeokdam_unit {
+  margin-left: 0;
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: #9ca3af;
+}
+
+.mydeokdam_hint {
+  margin: 0;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #4b5563;
+  flex: 1;
+}
+
+.mydeokdam_button {
+  margin-left: auto;
+  padding: 0.36rem 0.78rem;
+  border-radius: 9px;
+  border: none;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #b42323;
+  background: rgba(254, 226, 226, 0.85);
+  box-shadow: inset 0 0 0 1px rgba(248, 113, 113, 0.4),
+    0 6px 16px rgba(248, 113, 113, 0.2);
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.mydeokdam_button:hover {
+  transform: translateY(-1px);
+  background: rgba(254, 226, 226, 0.95);
+  box-shadow: inset 0 0 0 1px rgba(248, 113, 113, 0.5),
+    0 10px 20px rgba(248, 113, 113, 0.24);
+}
+
+.mydeokdam_button:active {
+  transform: translateY(0);
+  background: rgba(254, 226, 226, 0.9);
+  box-shadow: inset 0 0 0 1px rgba(248, 113, 113, 0.55),
+    0 6px 14px rgba(248, 113, 113, 0.2);
+}
+
+.mydeokdam_modal {
+  min-width: 240px;
+  max-width: 320px;
+  padding: 1.2rem 1.4rem 1.1rem;
+  display: grid;
+  gap: 0.6rem;
+}
+
+.mydeokdam_modal_title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.mydeokdam_modal_desc {
+  margin: 0;
+  font-size: 0.93rem;
+  color: #4b5563;
+  line-height: 1.4;
+}
+
+.mydeokdam_modal_button {
+  justify-self: flex-end;
+  padding: 0.48rem 0.9rem;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #b42323;
+  background: rgba(254, 226, 226, 0.9);
+  box-shadow: inset 0 0 0 1px rgba(248, 113, 113, 0.4),
+    0 6px 14px rgba(248, 113, 113, 0.18);
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.mydeokdam_modal_button:hover {
+  transform: translateY(-1px);
+  background: rgba(254, 226, 226, 0.98);
+  box-shadow: inset 0 0 0 1px rgba(248, 113, 113, 0.48),
+    0 10px 18px rgba(248, 113, 113, 0.22);
+}
+
+.mydeokdam_modal_button:active {
+  transform: translateY(0);
+  background: rgba(254, 226, 226, 0.9);
+  box-shadow: inset 0 0 0 1px rgba(248, 113, 113, 0.52),
+    0 6px 14px rgba(248, 113, 113, 0.18);
 }
 
 /* ========== 오른쪽: 정보 패널 ========== */
@@ -372,6 +511,7 @@
 .actions_block {
   display: flex;
   flex-direction: column;
+  justify-content: center;
   gap: 0.6rem;
   margin-top: 0.4rem;
 }
@@ -431,7 +571,7 @@
 }
 
 .info_footer {
-  margin-top: 0.3rem;
+  text-align: center;
 }
 
 .info_footer_text {
