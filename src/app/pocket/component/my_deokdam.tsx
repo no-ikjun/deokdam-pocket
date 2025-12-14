@@ -16,6 +16,7 @@ type MyDeokdam = {
   desc: string;
   destination: string[];
   isAnonymous: boolean;
+  is_anony?: boolean;
   created_at: string;
 };
 
@@ -41,13 +42,21 @@ export default function MyDeokdamModal({
   const [list, setList] = useState<MyDeokdam[]>([]);
 
   const fetchMyDeokdams = async () => {
+    if (!pocketUuid) return;
     setLoading(true);
     try {
-      const res = await axios.get("/api/deokdam/mine", {
+      const res = await axios.get("/api/deokdam/mine/pocket", {
         params: { pocket_uuid: pocketUuid },
       });
       if (res.status === 200) {
-        setList(res.data as MyDeokdam[]);
+        const data = (res.data as MyDeokdam[]).map((item) => ({
+          ...item,
+          isAnonymous:
+            typeof item.is_anony === "boolean"
+              ? item.is_anony
+              : item.isAnonymous,
+        }));
+        setList(data);
       }
     } catch (e) {
       console.error(e);
@@ -57,7 +66,7 @@ export default function MyDeokdamModal({
   };
 
   useEffect(() => {
-    if (!open) return;
+    if (!open || !pocketUuid) return;
     void fetchMyDeokdams();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);

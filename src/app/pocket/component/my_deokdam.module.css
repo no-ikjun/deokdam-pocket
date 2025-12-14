@@ -3,6 +3,7 @@
   display: grid;
   gap: 1rem;
   padding: 1.1rem 1.05rem 1rem;
+  overflow: hidden;
 }
 
 /* header */
@@ -30,6 +31,31 @@
   display: grid;
   place-items: center;
   padding: 1.2rem 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.loading :global(.overlay) {
+  position: static !important;
+  inset: auto !important;
+  width: 100% !important;
+  height: auto !important;
+  max-width: 100%;
+  background: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  display: flex !important;
+  justify-content: center;
+  align-items: center;
+  padding: 0.6rem 0;
+  z-index: 0 !important;
+}
+
+.loading :global(.spinner_wrap) {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .empty {
@@ -86,8 +112,8 @@
 
 .desc {
   margin: 0;
-  font-size: 0.98rem;
-  font-weight: 800;
+  font-size: 0.95rem;
+  font-weight: 600;
   line-height: 1.55;
   color: #111827;
   white-space: pre-wrap;
@@ -95,8 +121,8 @@
 
 .to {
   margin: 0;
-  font-size: 0.86rem;
-  font-weight: 800;
+  font-size: 0.75rem;
+  font-weight: 600;
   color: #6b7280;
 }
 

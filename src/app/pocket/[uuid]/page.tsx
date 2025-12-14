@@ -10,6 +10,7 @@ import Modal from "@/components/modal/modal";
 import InviteModal from "@/app/social/component/invite_modal";
 import ToastPopup from "@/components/toastPopup/toastPopup";
 import DeokdamWriteModal from "../component/deokdam_write";
+import MyDeokdamModal from "../component/my_deokdam";
 
 type Pocket = {
   pocket_uuid: string;
@@ -285,21 +286,12 @@ export default function PocketDetailPage() {
           }}
         />
       </Modal>
-      <Modal isOpen={myModalOpen} onClose={() => setMyModalOpen(false)}>
-        <div className={styles.mydeokdam_modal}>
-          <p className={styles.mydeokdam_modal_title}>내가 남긴 덕담</p>
-          <p className={styles.mydeokdam_modal_desc}>
-            내가 보낸 덕담 목록은 곧 확인할 수 있어요.
-          </p>
-          <button
-            type="button"
-            className={styles.mydeokdam_modal_button}
-            onClick={() => setMyModalOpen(false)}
-          >
-            닫기
-          </button>
-        </div>
-      </Modal>
+      <MyDeokdamModal
+        open={myModalOpen}
+        onClose={() => setMyModalOpen(false)}
+        pocketUuid={pocket?.pocket_uuid ?? ""}
+        members={members}
+      />
       <div className={styles.back_button_div}>
         <span
           className={styles.back_link}
@@ -381,7 +373,7 @@ export default function PocketDetailPage() {
             <button
               type="button"
               className={styles.mydeokdam_button}
-              onClick={() => setMyModalOpen(true)}
+              onClick={() => pocket && setMyModalOpen(true)}
             >
               내가 남긴 덕담 확인하기
             </button>

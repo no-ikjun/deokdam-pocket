@@ -31,7 +31,7 @@ export async function GET(req: Request) {
     }
 
     const { rows } =
-      await client.sql`SELECT deokdam_uuid, destination, desc, is_anony, updated_at, created_at
+      await client.sql`SELECT deokdam_uuid, destination, "desc", is_anony, updated_at, created_at
       FROM deokdam
       WHERE "from" = ${user_uuid}
         AND pocket = ${pocket_uuid};
