@@ -177,6 +177,7 @@ export default function PocketDetailPage() {
     return () => {
       isMounted = false;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pocket]);
 
   useEffect(() => {
@@ -281,6 +282,7 @@ export default function PocketDetailPage() {
             }
             setWriteModalOpen(false);
             setCurrentCount((prev) => prev * 1 + 1);
+            setMyDeokdamCount((prev) => prev * 1 + 1);
             setToastMessage("덕담을 보냈어요!");
             setToastOpen(true);
           }}

@@ -28,6 +28,7 @@
   width: min(720px, 92vw);
   border-radius: 20px;
   padding: 1.25rem;
+  overflow: hidden;
   background: linear-gradient(
       180deg,
       rgba(255, 255, 255, 0.86),

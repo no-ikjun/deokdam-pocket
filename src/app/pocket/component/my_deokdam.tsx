@@ -85,8 +85,8 @@ export default function MyDeokdamModal({
           </div>
         ) : list.length === 0 ? (
           <div className={styles.empty}>
-            아직 내가 남긴 덕담이 없어.
-            <br />첫 덕담을 남겨볼까?
+            아직 이 주머니에 남긴 덕담이 없어요.
+            <br />첫 덕담을 남겨보세요!
           </div>
         ) : (
           <div className={styles.list}>
