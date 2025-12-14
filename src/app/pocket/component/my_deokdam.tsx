@@ -91,9 +91,7 @@ export default function MyDeokdamModal({
     setModifyId(item.deokdam_uuid);
     setModifyDesc(item.desc ?? "");
     setModifyAnonymous(
-      typeof item.isAnonymous === "boolean"
-        ? item.isAnonymous
-        : !!item.is_anony
+      typeof item.isAnonymous === "boolean" ? item.isAnonymous : !!item.is_anony
     );
   };
 
@@ -154,7 +152,7 @@ export default function MyDeokdamModal({
 
         {loading ? (
           <div className={styles.loading}>
-            <LoadingIndicator />
+            <LoadingIndicator text="덕담 불러오는 중..." />
           </div>
         ) : list.length === 0 ? (
           <div className={styles.empty}>
