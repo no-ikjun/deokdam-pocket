@@ -1,12 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import styles from "./signup.module.css";
-import localFont from "next/font/local";
 import axios from "axios";
-
-const myFont = localFont({
-  src: "./fonts/NanumMyeongjo.ttf",
-});
 
 interface SignUpProps {
   ment: string;
@@ -129,7 +124,7 @@ const SignUp: React.FC<SignUpProps> = ({ ment, onSubmitted, onCanceled }) => {
         </div>
       </div>
       <button
-        className={[styles.submit_btn, myFont.className].join(" ")}
+        className={styles.submit_btn}
         onClick={async () => {
           if (name.length > 10) {
             alert("주머니 이름은 최대 10글자까지 가능합니다!");

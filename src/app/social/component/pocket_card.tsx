@@ -64,31 +64,45 @@ export default function PocketCard({
   const [showModal, setShowModal] = useState(false);
 
   const [made_by_display, setMadeByDisplay] = useState<string>("알 수 없음");
+  const [mentCount, setMentCount] = useState<number>(0);
 
   useEffect(() => {
     let isMounted = true;
-    const fetchMadeBy = async () => {
+    const fetchMeta = async () => {
+      setLoading(true);
       try {
-        const response = await axios.get("/api/user/name", {
-          params: { user_uuid: made_by },
-        });
-        if (response.status === 200) {
-          if (isMounted) setMadeByDisplay(response.data.name);
+        const [nameRes, countRes] = await Promise.all([
+          axios.get("/api/user/name", { params: { user_uuid: made_by } }),
+          axios.get("/api/pocket/info/count", {
+            params: { pocket_uuid },
+          }),
+        ]);
+
+        if (!isMounted) return;
+
+        if (nameRes.status === 200) {
+          setMadeByDisplay(nameRes.data.name);
         } else {
-          if (isMounted) setMadeByDisplay("알 수 없음");
+          setMadeByDisplay("알 수 없음");
+        }
+
+        if (countRes.status === 200) {
+          const count = Number(countRes.data.ment_count) || 0;
+          setMentCount(count);
         }
       } catch (error) {
-        console.error("Error fetching user name:", error);
-        if (isMounted) setMadeByDisplay("알 수 없음");
+        if (!isMounted) return;
+        console.error("Error fetching pocket meta:", error);
+        setMadeByDisplay("알 수 없음");
       } finally {
         if (isMounted) setLoading(false);
       }
     };
-    void fetchMadeBy();
+    void fetchMeta();
     return () => {
       isMounted = false;
     };
-  }, [made_by]);
+  }, [made_by, pocket_uuid]);
 
   const ddayText = useMemo(() => {
     if (!open_at) return "";
@@ -144,30 +158,22 @@ export default function PocketCard({
               style={
                 {
                   ["--progress-width" as any]: `${Math.min(
-                    (name.length / goal) * 100,
+                    goal > 0 ? Math.round((mentCount / goal) * 100) : 0,
                     100
                   )}%`,
                 } as CSSProperties
               }
             />
           </div>
-          <p className={styles.pocket_progress_text}>덕담 0 / {goal}개</p>
+          <p className={styles.pocket_progress_text}>
+            덕담 {mentCount} / {goal}개
+          </p>
         </div>
 
         <footer className={styles.pocket_footer}>
           <div
             className={styles.ghost_btn}
             onClick={() => {
-              // const origin =
-              //   typeof window !== "undefined" ? window.location.origin : "";
-              // if (!origin) {
-              //   alert("브라우저에서 열었을 때 링크를 복사할 수 있어요.");
-              //   return;
-              // }
-              // void copyToClipboard(
-              //   `${origin}/pocket/${pocket_uuid}`,
-              //   "주머니 링크가 복사되었어요!"
-              // );
               setShowModal(true);
             }}
           >

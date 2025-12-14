@@ -4,16 +4,18 @@ import { db } from "@vercel/postgres";
 
 const JWT_SECRET = process.env.JWT_SECRET || "dev-secret";
 
-export async function POST() {
+export async function POST(req: Request) {
   if (process.env.NODE_ENV !== "development") {
     return NextResponse.json({ error: "forbidden" }, { status: 403 });
   }
 
   const client = await db.connect();
   try {
+    const { number } = await req.json();
+
     const provider = "DEV";
-    const providerId = "LOCAL";
-    const name = "로컬개발자";
+    const providerId = `LOCAL_${number}`;
+    const name = `로컬개발자 ${number}`;
 
     // 2. 유저 존재 여부 확인
     const existingUserResult = await client.sql`

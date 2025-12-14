@@ -3,14 +3,9 @@
 import React, { useState, useEffect } from "react";
 import _ from "./timer.module.css";
 import Image from "next/image";
-import localFont from "next/font/local";
 import Link from "next/link";
 import Modal from "@/components/modal/modal";
 import axios from "axios";
-
-const myFont = localFont({
-  src: "fonts/NanumMyeongjo.ttf",
-});
 
 type TimerProps = {
   hideTimer: () => void;
@@ -169,10 +164,7 @@ const Timer = ({ hideTimer }: TimerProps) => {
             </p>
           </div>
           {error && <p className={_.error}>{error}</p>}
-          <button
-            className={[_.submit_btn, myFont.className].join(" ")}
-            onClick={handleSubmit}
-          >
+          <button className={_.submit_btn} onClick={handleSubmit}>
             확인
           </button>
         </div>
@@ -234,7 +226,7 @@ const Timer = ({ hideTimer }: TimerProps) => {
             </p>
             <div className={_.button_div}>
               <button
-                className={[_.submit_btn, myFont.className].join(" ")}
+                className={_.submit_btn}
                 onClick={() => {
                   setShowModal(true);
                 }}

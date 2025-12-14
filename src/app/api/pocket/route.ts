@@ -39,6 +39,7 @@ export async function POST(req: Request) {
     };
 
     if (!name || !desc || !icon || !maxMembers || !goalCount || !openDate) {
+      client.release();
       return NextResponse.json(
         { message: "All fields are required" },
         { status: 400 }

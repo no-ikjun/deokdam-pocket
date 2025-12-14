@@ -10,12 +10,7 @@ import Link from "next/link";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import localFont from "next/font/local";
 import { useRouter } from "next/navigation";
-
-const myFont = localFont({
-  src: "../fonts/NanumMyeongjo.ttf",
-});
 
 const getMents = async () => {
   try {
@@ -264,7 +259,7 @@ export default function Ment() {
                     }
                   />
                   <button
-                    className={[styles.rement_btn, myFont.className].join(" ")}
+                    className={styles.rement_btn}
                     onClick={() => rement(ment.ment_uuid)}
                   >
                     전송

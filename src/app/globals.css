@@ -3,3 +3,11 @@
   padding: 0;
   margin: 0;
 }
+
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css");
+
+html,
+body {
+  font-family: "Pretendard", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo",
+    system-ui, "Noto Sans KR", sans-serif;
+}

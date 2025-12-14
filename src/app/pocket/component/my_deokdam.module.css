@@ -1,0 +1,413 @@
+.container {
+  width: 100%;
+  max-width: 100%;
+  display: grid;
+  gap: 0.9rem;
+  padding: 0.2rem 0;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.header {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.header_top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.header_back {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-weight: 900;
+  font-size: 0.9rem;
+  color: #0b1b3a;
+  padding: 0.35rem 0.5rem;
+  border-radius: 10px;
+  box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.25);
+}
+
+.header_back:hover {
+  color: #f95050;
+  box-shadow: inset 0 0 0 1px rgba(249, 80, 80, 0.35);
+}
+
+.title {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 900;
+  color: #0b1b3a;
+  letter-spacing: -0.01em;
+}
+
+.sub {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #475569;
+}
+
+/* ===== States ===== */
+.loading {
+  display: grid;
+  place-items: center;
+  padding: 1rem 0.2rem;
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  min-width: 0;
+}
+
+/* LoadingIndicator 스타일 오염 방지 (유지) */
+.loading :global(.overlay) {
+  position: static !important;
+  inset: auto !important;
+  width: 100% !important;
+  height: auto !important;
+  max-width: 100% !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  display: flex !important;
+  justify-content: center;
+  align-items: center;
+  padding: 0.6rem 0;
+  z-index: 0 !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+}
+
+.loading :global(.spinner_wrap) {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.empty {
+  padding: 1rem;
+  border-radius: 16px;
+  text-align: center;
+
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.85),
+    rgba(255, 255, 255, 0.55)
+  );
+  box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.35);
+
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #475569;
+}
+
+/* ===== List ===== */
+.list {
+  display: grid;
+  gap: 0.75rem;
+  max-height: min(56vh, 520px);
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+.item {
+  padding: 0.95rem 0.95rem;
+  border-radius: 16px;
+  display: grid;
+  gap: 0.45rem;
+
+  background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.86),
+      rgba(255, 255, 255, 0.62)
+    ),
+    rgba(255, 255, 255, 0.42);
+  box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.35),
+    0 10px 22px rgba(148, 163, 184, 0.12);
+
+  transition: transform 0.1s ease, box-shadow 0.2s ease;
+}
+
+/* meta */
+.meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.date {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #94a3b8;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 900;
+
+  color: #b42323;
+  background: rgba(254, 226, 226, 0.95);
+  box-shadow: inset 0 0 0 1px rgba(248, 113, 113, 0.45);
+}
+
+/* text */
+.desc {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 700;
+  line-height: 1.55;
+  color: #0f172a;
+  white-space: pre-wrap;
+}
+
+.to {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #6b7280;
+}
+
+.to_names {
+  color: #0b1b3a;
+}
+
+.list_bottom {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modify_btn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #475569;
+  padding: 0.25rem 0.5rem;
+  border-radius: 8px;
+  box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.25);
+  transition: all 0.2s ease;
+}
+.modify_btn:hover {
+  color: #f95050;
+  box-shadow: inset 0 0 0 1px rgba(249, 80, 80, 0.35);
+  transition: all 0.2s ease;
+}
+
+/* ===== Footer / Close Button ===== */
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 0.1rem;
+}
+
+.close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0.8rem 1.1rem;
+  border-radius: 12px;
+  font-weight: 900;
+  font-size: 0.95rem;
+  user-select: none;
+  cursor: pointer;
+
+  border: none;
+  color: #0b1b3a;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.9),
+    rgba(255, 255, 255, 0.7)
+  );
+  box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.35);
+
+  transition: transform 0.1s ease, box-shadow 0.2s ease, color 0.2s ease,
+    background 0.2s ease;
+}
+
+.close:hover {
+  transform: translateY(-1px);
+  color: #f95050;
+  box-shadow: inset 0 0 0 1px rgba(249, 80, 80, 0.45),
+    0 10px 18px rgba(249, 80, 80, 0.12);
+}
+
+/* ===== 덕담 수정 컴포넌트 ===== */
+.edit_shell {
+  display: grid;
+  gap: 0.9rem;
+  padding: 0.2rem;
+}
+
+.edit_meta {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.edit_date {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #6b7280;
+}
+
+.edit_to {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #6b7280;
+}
+
+/* ===== Text Area (DeokdamWriteModal 스타일) ===== */
+.text_area_wrap {
+  margin-top: 0.2rem;
+  position: relative;
+}
+
+.text_area {
+  width: 100%;
+  min-height: 140px;
+  padding: 0.9rem 1rem;
+  border-radius: 14px;
+
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  background: rgba(255, 255, 255, 0.9);
+
+  font-size: 0.95rem;
+  color: #0f172a;
+
+  resize: none;
+  outline: none;
+
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.text_area:focus {
+  border-color: rgba(249, 80, 80, 0.55);
+  box-shadow: 0 0 0 3px rgba(249, 80, 80, 0.18);
+}
+
+.text_count {
+  position: absolute;
+  bottom: 8px;
+  right: 12px;
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+/* ===== Toggle (DeokdamWriteModal 스타일) ===== */
+.toggle_row {
+  width: 100%;
+  margin-top: 0.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.toggle_label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.toggle_switch {
+  position: relative;
+  width: 42px;
+  height: 24px;
+  display: inline-block;
+}
+
+.toggle_switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  inset: 0;
+  background: #cbd5e1;
+  border-radius: 34px;
+  transition: 0.3s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  top: 3px;
+  background: white;
+  border-radius: 50%;
+  transition: 0.3s;
+}
+
+.toggle_switch input:checked + .slider {
+  background: #f95050;
+}
+
+.toggle_switch input:checked + .slider:before {
+  transform: translateX(18px);
+}
+
+/* ===== Buttons (DeokdamWriteModal 스타일) ===== */
+.edit_actions {
+  display: flex;
+  gap: 0.6rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btn {
+  padding: 0.85rem 1.2rem;
+  font-size: 1.05rem;
+  font-weight: 900;
+  border-radius: 14px;
+  cursor: pointer;
+  text-align: center;
+  user-select: none;
+  transition: transform 0.15s ease, box-shadow 0.2s ease;
+}
+
+.primary_btn {
+  background: linear-gradient(140deg, #f56d6d, #e25757 60%, #d93a3a);
+  color: white;
+  box-shadow: 0 10px 22px rgba(229, 87, 87, 0.28);
+}
+
+.primary_btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 26px rgba(231, 102, 102, 0.35);
+}
+
+.secondary_btn {
+  background: rgba(255, 255, 255, 0.9);
+  color: #0f172a;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+.secondary_btn:hover {
+  transform: translateY(-1px);
+  border-color: rgba(249, 80, 80, 0.45);
+  color: #f95050;
+}
+
+/* 모바일 대응 */
+@media (max-width: 480px) {
+  .list {
+    max-height: min(50vh, 400px);
+  }
+}
