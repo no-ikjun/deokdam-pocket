@@ -14,13 +14,13 @@ export default function LoginPage() {
 
   const { setAuthenticated } = useAuthStore();
 
-  /** ✅ 실제 카카오 로그인 */
+  /** 카카오 로그인 */
   const handleKakaoLogin = () => {
     const kakaoAuthUrl = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${REST_API_KEY}&redirect_uri=${REDIRECT_URI}`;
     window.location.href = kakaoAuthUrl;
   };
 
-  /** ✅ 실제 구글 로그인 */
+  /** 구글 로그인 */
   const handleGoogleLogin = () => {
     const url = `https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=${GOOGLE_CLIENT_ID}&redirect_uri=${GOOGLE_REDIRECT_URI}&scope=openid%20email%20profile`;
     window.location.href = url;
@@ -86,7 +86,7 @@ export default function LoginPage() {
           구글로 로그인
         </button>
 
-        {/* ✅ 로컬 개발용 로그인 버튼 */}
+        {/* 로컬 개발용 로그인 버튼 */}
         {process.env.NODE_ENV === "development" && (
           <>
             <button
