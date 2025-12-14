@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import styles from "../page.module.css";
 import { useQRCode } from "next-qrcode";
 import ToastPopup from "@/components/toastPopup/toastPopup";
@@ -27,6 +27,25 @@ export default function InviteModal({
     [inviteLink, safeOrigin, uuid]
   );
   const qrContainerRef = useRef<HTMLDivElement>(null);
+  const [qrSize, setQrSize] = useState<number>(200);
+
+  useEffect(() => {
+    const el = qrContainerRef.current;
+    if (!el) return;
+
+    const compute = () => {
+      const rect = el.getBoundingClientRect();
+      const next = Math.max(140, Math.min(Math.floor(rect.width - 16), 260));
+      setQrSize(next);
+    };
+
+    compute();
+
+    const ro = new ResizeObserver(() => compute());
+    ro.observe(el);
+
+    return () => ro.disconnect();
+  }, []);
 
   const [toastMessage, setToastMessage] = useState("");
   const [toastOpen, setToastOpen] = useState(false);
@@ -177,7 +196,7 @@ export default function InviteModal({
                 errorCorrectionLevel: "M",
                 margin: 3,
                 scale: 4,
-                width: 200,
+                width: qrSize,
                 color: {
                   dark: "#000000",
                   light: "#FFFFFF00",
