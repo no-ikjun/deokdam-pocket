@@ -230,38 +230,48 @@ export default function Home() {
         </header>
 
         {/* 2) 핵심 CTA 2개 (큰 카드) */}
-        <section className={styles.cta_row}>
-          <Link href="/self" className={styles.cta_card}>
-            <div className={styles.cta_icon}>
-              <Image
-                src="/images/for_me.png"
-                alt="나에게"
-                width={44}
-                height={44}
-              />
-            </div>
-            <div className={styles.cta_texts}>
-              <h3 className={styles.cta_title}>나에게</h3>
-              <p className={styles.cta_desc}>목표 · 회고 · 1년 후 나</p>
-            </div>
-            <span className={styles.cta_arrow}>→</span>
-          </Link>
+        <section className={styles.cta_highlight}>
+          <div className={styles.cta_highlight_head}>
+            <p className={styles.cta_intro}>
+              따뜻한 마음, 지금 바로 전해보세요.
+            </p>
+            <p className={styles.cta_sub}>
+              나를 위한 덕담 또는 함께 나눌 주머니로 바로 이어집니다.
+            </p>
+          </div>
+          <div className={styles.cta_row}>
+            <Link href="/self" className={styles.cta_card}>
+              <div className={styles.cta_icon}>
+                <Image
+                  src="/images/for_me.png"
+                  alt="나에게"
+                  width={44}
+                  height={44}
+                />
+              </div>
+              <div className={styles.cta_texts}>
+                <h3 className={styles.cta_title}>나에게 덕담 남기기</h3>
+                <p className={styles.cta_desc}>목표 · 회고 · 1년 후 나</p>
+              </div>
+              <span className={styles.cta_arrow}>→</span>
+            </Link>
 
-          <Link href="/social" className={styles.cta_card}>
-            <div className={styles.cta_icon}>
-              <Image
-                src="/images/for_others.png"
-                alt="주머니로"
-                width={44}
-                height={44}
-              />
-            </div>
-            <div className={styles.cta_texts}>
-              <h3 className={styles.cta_title}>주머니로</h3>
-              <p className={styles.cta_desc}>가족·친구·동료와 덕담 나누기</p>
-            </div>
-            <span className={styles.cta_arrow}>→</span>
-          </Link>
+            <Link href="/social" className={styles.cta_card}>
+              <div className={styles.cta_icon}>
+                <Image
+                  src="/images/for_others.png"
+                  alt="주머니로"
+                  width={44}
+                  height={44}
+                />
+              </div>
+              <div className={styles.cta_texts}>
+                <h3 className={styles.cta_title}>덕담 주고 받기</h3>
+                <p className={styles.cta_desc}>가족·친구·동료와 덕담 나누기</p>
+              </div>
+              <span className={styles.cta_arrow}>→</span>
+            </Link>
+          </div>
         </section>
 
         {/* 3) 진행 중인 주머니 */}
