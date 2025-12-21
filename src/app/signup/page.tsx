@@ -111,7 +111,7 @@ function LoginPageContent() {
           </button>
 
           {/* 로컬 개발용 로그인 버튼 */}
-          {process.env.NODE_ENV !== "development" && (
+          {process.env.NODE_ENV === "development" && (
             <>
               <button
                 className={styles.devLogin}
