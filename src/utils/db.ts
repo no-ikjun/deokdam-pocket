@@ -7,12 +7,15 @@ import type { VercelPoolClient } from "@vercel/postgres";
  * @param handler - DB 작업을 수행하는 비동기 함수
  * @returns NextResponse 또는 handler의 반환값
  */
-export async function withDbClient<T>(
+export async function withDbClient<T extends NextResponse>(
   handler: (client: VercelPoolClient) => Promise<T>
 ): Promise<T> {
   const client = await db.connect();
   try {
     return await handler(client);
+  } catch (error) {
+    console.error("Database operation error:", error);
+    return NextResponse.json({ message: "error" }, { status: 500 }) as T;
   } finally {
     client.release();
   }
