@@ -2,7 +2,6 @@
 import Image from "next/image";
 import styles from "./page.module.css";
 import { useEffect, useState } from "react";
-import MentExample from "@/components/ment_example";
 import axios from "axios";
 import Link from "next/link";
 import useCountNum from "@/hooks/countUp";
