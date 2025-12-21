@@ -256,8 +256,6 @@ export default function PocketDetailPage() {
         setToastOpen(true);
         // 로딩 인디케이터는 유지하고, 1.5초 후 루트 디렉토리로 이동
         setTimeout(() => {
-          // window.location.replace를 사용하여 즉시 페이지 전환
-          // 로딩은 페이지 전환과 함께 자동으로 사라짐
           window.location.replace("/");
         }, 1500);
       } else if (errorMessage === "Already a member of this pocket") {
