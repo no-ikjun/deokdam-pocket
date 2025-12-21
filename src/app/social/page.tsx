@@ -159,6 +159,7 @@ export default function SocialPage() {
                 label="참여"
                 loadingLabel=""
                 loading={joinLoading}
+                disabled={joinLoading}
                 onClick={joinByCode}
                 fontSize="0.95rem"
               />

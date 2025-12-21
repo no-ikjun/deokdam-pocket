@@ -5,6 +5,7 @@ import axios from "axios";
 import Modal from "@/components/modal/modal";
 import LoadingIndicator from "@/components/loadingIndicator/loadingIndicator";
 import styles from "./my_deokdam.module.css";
+import { LoadingButton } from "@/components/loadingButton/loadingButton";
 
 type Member = {
   id: string;
@@ -217,14 +218,15 @@ export default function MyDeokdamModal({
                 취소
               </div>
 
-              <div
-                role="button"
-                tabIndex={0}
-                className={`${styles.btn} ${styles.primary_btn}`}
+              <LoadingButton
+                label="저장하기"
+                fontSize="1rem"
+                width="100%"
+                loading={saving}
+                loadingLabel="저장 중..."
+                disabled={saving}
                 onClick={saveEdit}
-              >
-                {saving ? "저장 중..." : "저장하기"}
-              </div>
+              />
             </div>
           </section>
         ) : (

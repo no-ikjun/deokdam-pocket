@@ -286,6 +286,8 @@ export default function NewPouchPage() {
             fontSize="1rem"
             width="100%"
             loading={loading}
+            disabled={loading}
+            loadingLabel="만드는 중..."
             type="submit"
           />
         </div>

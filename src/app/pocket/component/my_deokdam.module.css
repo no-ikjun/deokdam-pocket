@@ -364,10 +364,11 @@
 
 /* ===== Buttons (DeokdamWriteModal 스타일) ===== */
 .edit_actions {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(120px, 0.8fr) minmax(160px, 1.2fr); /* 취소를 더 작게, 저장을 넓게 */
   gap: 0.6rem;
-  justify-content: center;
-  flex-wrap: wrap;
+  width: min(100%, 420px); /* 너무 넓지 않게 제한 */
+  margin: 0.2rem auto 0;
 }
 
 .btn {

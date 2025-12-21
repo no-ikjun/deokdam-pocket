@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import styles from "./deokdam_write.module.css";
 import ToastPopup from "@/components/toastPopup/toastPopup";
 import Image from "next/image";
+import { LoadingButton } from "@/components/loadingButton/loadingButton";
 
 type WriteModalProps = {
   members: { id: string; name: string }[];
@@ -11,7 +12,7 @@ type WriteModalProps = {
     receivers: string[];
     message: string;
     anonymous: boolean;
-  }) => void;
+  }) => void | Promise<void>;
 };
 
 export default function DeokdamWriteModal({
@@ -21,6 +22,8 @@ export default function DeokdamWriteModal({
   const [selected, setSelected] = useState<string[]>([]);
   const [message, setMessage] = useState("");
   const [anonymous, setAnonymous] = useState(false);
+
+  const [loading, setLoading] = useState(false);
 
   const [toastOpen, setToastOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
@@ -39,7 +42,7 @@ export default function DeokdamWriteModal({
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (selected.length === 0) {
       setToastMessage("대상을 먼저 선택해 주세요!");
       setToastOpen(true);
@@ -51,11 +54,21 @@ export default function DeokdamWriteModal({
       return;
     }
 
-    onSubmit({
-      receivers: selected,
-      message,
-      anonymous,
-    });
+    setLoading(true);
+    try {
+      await Promise.resolve(
+        onSubmit({
+          receivers: selected,
+          message,
+          anonymous,
+        })
+      );
+    } catch (err) {
+      setToastMessage("덕담을 보내는 중 문제가 생겼어요. 다시 시도해주세요.");
+      setToastOpen(true);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const isAllChecked = useMemo(
@@ -167,14 +180,15 @@ export default function DeokdamWriteModal({
         </div>
 
         {/* 제출 버튼 */}
-        <div
-          role="button"
-          tabIndex={0}
-          className={`${styles.btn} ${styles.primary_btn}`}
+        <LoadingButton
+          label="덕담 남기기"
+          fontSize="1rem"
+          width="100%"
+          loading={loading}
+          loadingLabel="저장 중..."
+          disabled={loading}
           onClick={handleSubmit}
-        >
-          덕담 남기기
-        </div>
+        />
       </div>
     </>
   );
