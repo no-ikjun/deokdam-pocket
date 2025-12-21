@@ -1,10 +1,8 @@
-import { db } from "@vercel/postgres";
 import { NextRequest, NextResponse } from "next/server";
+import { withDbClient } from "@/utils/db";
 
 export async function GET(req: NextRequest) {
-  const client = await db.connect();
-
-  try {
+  return withDbClient(async (client) => {
     const { searchParams } = req.nextUrl;
     const user_uuid = searchParams.get("user_uuid");
     if (!user_uuid) {
@@ -22,10 +20,5 @@ export async function GET(req: NextRequest) {
     }
 
     return NextResponse.json({ name: rows[0].name }, { status: 200 });
-  } catch (error) {
-    console.error(error);
-    return NextResponse.json({ message: "error" }, { status: 500 });
-  } finally {
-    client.release();
-  }
+  });
 }

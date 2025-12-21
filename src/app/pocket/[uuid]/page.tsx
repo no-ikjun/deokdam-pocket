@@ -12,20 +12,7 @@ import ToastPopup from "@/components/toastPopup/toastPopup";
 import DeokdamWriteModal from "../component/deokdam_write";
 import MyDeokdamModal from "../component/my_deokdam";
 import { useAuthStore } from "@/stores/auth";
-
-type Pocket = {
-  pocket_uuid: string;
-  made_by: string;
-  name: string;
-  desc: string;
-  icon: string;
-  limit: number;
-  goal: number;
-  members: string[];
-  code: string;
-  open_at: string;
-  created_at: string;
-};
+import type { Pocket } from "@/types/pocket";
 
 const formatDate = (iso: string, showYear?: boolean) => {
   const d = new Date(iso);

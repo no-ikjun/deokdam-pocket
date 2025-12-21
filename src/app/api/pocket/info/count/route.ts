@@ -1,9 +1,8 @@
-import { db } from "@vercel/postgres";
 import { NextResponse } from "next/server";
+import { withDbClient } from "@/utils/db";
 
 export async function GET(req: Request) {
-  const client = await db.connect();
-  try {
+  return withDbClient(async (client) => {
     const { searchParams } = new URL(req.url);
     const pocket_uuid = searchParams.get("pocket_uuid") ?? "";
 
@@ -18,14 +17,9 @@ export async function GET(req: Request) {
       WHERE pocket = ${pocket_uuid};
     `;
 
-    client.release();
     return NextResponse.json(
       { ment_count: count.rows[0].ment_count },
       { status: 200 }
     );
-  } catch (error) {
-    console.error("Error fetching pocket ment count", error);
-    client.release();
-    return NextResponse.json({ message: "error" }, { status: 500 });
-  }
+  });
 }
