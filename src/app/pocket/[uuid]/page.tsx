@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState, type CSSProperties } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import axios from "axios";
 import styles from "./page.module.css";
@@ -11,6 +11,7 @@ import InviteModal from "@/app/social/component/invite_modal";
 import ToastPopup from "@/components/toastPopup/toastPopup";
 import DeokdamWriteModal from "../component/deokdam_write";
 import MyDeokdamModal from "../component/my_deokdam";
+import { useAuthStore } from "@/stores/auth";
 
 type Pocket = {
   pocket_uuid: string;
@@ -39,26 +40,51 @@ const formatDate = (iso: string, showYear?: boolean) => {
 export default function PocketDetailPage() {
   const { uuid } = useParams<{ uuid: string }>();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const isInvite = searchParams.get("invite") === "true";
+  const authStatus = useAuthStore((s) => s.status);
+  const authUser = useAuthStore((s) => s.user);
+  const checkAuth = useAuthStore((s) => s.checkAuth);
   const [loading, setLoading] = useState(true);
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
   const [writeModalOpen, setWriteModalOpen] = useState(false);
   const [toastOpen, setToastOpen] = useState(false);
+  const [toastType, setToastType] = useState<"success" | "error">("success");
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [pocket, setPocket] = useState<Pocket | null>(null);
   const [currentCount, setCurrentCount] = useState<number>(0);
   const [madeByDisplay, setMadeByDisplay] = useState<string>("");
   const [members, setMembers] = useState<{ id: string; name: string }[]>([]);
   const [myDeokdamCount, setMyDeokdamCount] = useState<number>(0);
+  const [autoJoinAttempted, setAutoJoinAttempted] = useState(false);
 
   const [myModalOpen, setMyModalOpen] = useState(false);
 
   const fetchDetail = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(`/api/pocket/${uuid}`);
-      if (res.status === 200) setPocket(res.data);
-    } catch (e) {
+      // invite 파라미터가 있으면 함께 전달
+      const url = isInvite
+        ? `/api/pocket/${uuid}?invite=true`
+        : `/api/pocket/${uuid}`;
+      const res = await axios.get(url);
+      if (res.status === 200) {
+        setPocket(res.data);
+      }
+    } catch (e: any) {
       console.error(e);
+      // 401 에러면 비로그인 상태이므로 로그인 페이지로 리다이렉트
+      if (e.response?.status === 401) {
+        const currentUrl = window.location.pathname + window.location.search;
+        router.push(`/signup?returnUrl=${encodeURIComponent(currentUrl)}`);
+        return;
+      }
+      // 404 에러면 주머니가 없거나 접근 권한이 없는 경우
+      if (e.response?.status === 404) {
+        alert("주머니를 찾을 수 없어요.");
+        router.push("/social");
+        return;
+      }
       alert("주머니 정보를 불러오지 못했어요.");
     } finally {
       setLoading(false);
@@ -180,10 +206,142 @@ export default function PocketDetailPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pocket]);
 
+  // 주머니 코드만 가져오는 함수 (초대된 유저용)
+  const fetchPocketCode = async (): Promise<string | null> => {
+    try {
+      const res = await axios.get(`/api/pocket/${uuid}?invite=true`);
+      if (res.status === 200 && res.data?.code) {
+        return res.data.code;
+      }
+    } catch (e: any) {
+      console.error("Error fetching pocket code:", e);
+      // 401 에러면 비로그인 상태이므로 로그인 페이지로 리다이렉트
+      if (e.response?.status === 401) {
+        const currentUrl = window.location.pathname + window.location.search;
+        router.push(`/signup?returnUrl=${encodeURIComponent(currentUrl)}`);
+        return null;
+      }
+    }
+    return null;
+  };
+
+  // 자동 참여 시도 함수
+  const attemptAutoJoin = async (pocketCode: string) => {
+    if (!authUser || autoJoinAttempted) return;
+
+    setAutoJoinAttempted(true);
+    setLoading(true);
+    let isFull = false; // 인원이 가득 찬 경우를 추적
+    try {
+      const response = await axios.post("/api/pocket/join", {
+        pocket_code: pocketCode,
+      });
+
+      if (response.status === 200) {
+        setToastType("success");
+        setToastMessage("주머니에 참여했어요!");
+        setToastOpen(true);
+        // 주머니 정보 새로고침 (이제 멤버이므로 정상적으로 로드됨)
+        await fetchDetail();
+      }
+    } catch (error: any) {
+      console.error("Auto join error:", error);
+
+      const errorMessage =
+        error.response?.data?.message || "참여에 실패했어요.";
+      if (errorMessage === "인원이 가득 찼어요") {
+        isFull = true; // 인원이 가득 찬 경우 표시
+        setToastType("error");
+        setToastMessage("인원이 가득 찼어요");
+        setToastOpen(true);
+        // 로딩 인디케이터는 유지하고, 1.5초 후 루트 디렉토리로 이동
+        setTimeout(() => {
+          // window.location.replace를 사용하여 즉시 페이지 전환
+          // 로딩은 페이지 전환과 함께 자동으로 사라짐
+          window.location.replace("/");
+        }, 1500);
+      } else if (errorMessage === "Already a member of this pocket") {
+        // 이미 멤버인 경우는 조용히 처리하고 정보 로드
+        // autoJoinAttempted는 true로 유지하여 재시도 방지
+        await fetchDetail();
+      } else {
+        setToastType("error");
+        setToastMessage(errorMessage);
+        setToastOpen(true);
+        // 에러 발생 시에도 주머니 정보는 로드 시도
+        // autoJoinAttempted는 true로 유지하여 재시도 방지
+        await fetchDetail();
+      }
+    } finally {
+      // 인원이 가득 찬 경우가 아니면 로딩 인디케이터 끄기
+      if (!isFull) {
+        setLoading(false);
+      }
+    }
+  };
+
+  // 인증 상태 확인 및 자동 참여 처리
   useEffect(() => {
-    if (uuid) void fetchDetail();
+    if (authStatus === "idle") {
+      checkAuth();
+    }
+  }, [authStatus, checkAuth]);
+
+  // 초대된 유저가 비로그인 상태인 경우: 로그인 페이지로 리다이렉트
+  useEffect(() => {
+    if (isInvite && authStatus === "unauthenticated" && uuid) {
+      const currentUrl = window.location.pathname + window.location.search;
+      router.push(`/signup?returnUrl=${encodeURIComponent(currentUrl)}`);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [uuid]);
+  }, [isInvite, authStatus, uuid]);
+
+  // 초대된 유저인 경우: 먼저 가입하고 그 다음 정보 로드
+  useEffect(() => {
+    if (
+      isInvite &&
+      authStatus === "authenticated" &&
+      authUser &&
+      !autoJoinAttempted &&
+      uuid
+    ) {
+      const handleInviteFlow = async () => {
+        // 먼저 주머니 코드만 가져오기
+        const pocketCode = await fetchPocketCode();
+        if (pocketCode) {
+          // 코드를 가져왔으면 바로 자동 참여 시도
+          await attemptAutoJoin(pocketCode);
+        } else {
+          // 코드를 가져오지 못한 경우 (이미 리다이렉트되었거나 에러)
+          setLoading(false);
+        }
+      };
+
+      // 약간의 지연을 두어 인증 상태가 완전히 안정화되도록 함
+      const timer = setTimeout(() => {
+        handleInviteFlow();
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isInvite, authStatus, authUser, autoJoinAttempted, uuid]);
+
+  // 일반 유저 또는 초대된 유저가 가입 완료한 후: 주머니 정보 로드
+  useEffect(() => {
+    // 초대된 유저가 아직 가입 시도 중이면 정보를 로드하지 않음
+    // (attemptAutoJoin 내부에서 fetchDetail을 호출하므로 여기서는 호출하지 않음)
+    if (isInvite && authStatus === "authenticated" && !autoJoinAttempted) {
+      return;
+    }
+
+    // 초대된 유저가 아니거나, 가입이 완료된 경우 정보 로드
+    // 초대된 유저의 경우 attemptAutoJoin에서 이미 fetchDetail을 호출하므로
+    // 여기서는 일반 유저만 처리
+    if (uuid && (!isInvite || autoJoinAttempted)) {
+      void fetchDetail();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [uuid, isInvite, authStatus, autoJoinAttempted]);
 
   const progress = useMemo(() => {
     const cur = currentCount;
@@ -247,7 +405,7 @@ export default function PocketDetailPage() {
     <main className={styles.page} aria-label="덕담 주머니 상세 페이지">
       <ToastPopup
         open={toastOpen}
-        type="success"
+        type={toastType}
         message={toastMessage || "복사했어요!"}
         duration={2000}
         onClose={() => setToastOpen(false)}
@@ -298,7 +456,13 @@ export default function PocketDetailPage() {
         <span
           className={styles.back_link}
           onClick={() => {
-            if (typeof window !== "undefined" && window.history.length > 1) {
+            // 초대를 통해 들어온 경우 루트 경로로 이동
+            if (isInvite) {
+              router.replace("/");
+            } else if (
+              typeof window !== "undefined" &&
+              window.history.length > 1
+            ) {
               router.back();
             } else {
               router.replace("/social");

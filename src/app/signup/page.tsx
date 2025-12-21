@@ -1,11 +1,14 @@
 "use client";
 
+import { useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import styles from "./page.module.css";
 import Link from "next/link";
 import { useAuthStore } from "@/stores/auth";
 
 export default function LoginPage() {
+  const searchParams = useSearchParams();
   const REST_API_KEY = process.env.NEXT_PUBLIC_KAKAO_REST_API_KEY!;
   const REDIRECT_URI = `${process.env.NEXT_PUBLIC_SERVICE_URL}/kakao/callback`;
 
@@ -13,6 +16,14 @@ export default function LoginPage() {
   const GOOGLE_REDIRECT_URI = `${process.env.NEXT_PUBLIC_SERVICE_URL}/google/callback`;
 
   const { setAuthenticated } = useAuthStore();
+
+  // returnUrl이 있으면 localStorage에 저장
+  useEffect(() => {
+    const returnUrl = searchParams.get("returnUrl");
+    if (returnUrl) {
+      localStorage.setItem("returnUrl", returnUrl);
+    }
+  }, [searchParams]);
 
   /** 카카오 로그인 */
   const handleKakaoLogin = () => {
@@ -40,7 +51,19 @@ export default function LoginPage() {
     // 서버가 HttpOnly 쿠키를 심었고, 응답으로 유저를 돌려줌
     const user = await res.json(); // { user_uuid, name }
     useAuthStore.getState().setAuthenticated(user);
-    window.location.href = "/";
+
+    // returnUrl이 있으면 해당 URL로, 없으면 홈으로
+    // signup 페이지는 히스토리에 남기지 않기 위해 홈으로 대체
+    const returnUrl = localStorage.getItem("returnUrl");
+    if (returnUrl) {
+      localStorage.removeItem("returnUrl");
+      // signup 페이지로 시작하는 경우 홈으로 대체
+      const targetUrl = returnUrl.startsWith("/signup") ? "/" : returnUrl;
+      // replace를 사용하여 signup 페이지를 히스토리에서 제거
+      window.location.replace(targetUrl);
+    } else {
+      window.location.replace("/");
+    }
   };
 
   return (

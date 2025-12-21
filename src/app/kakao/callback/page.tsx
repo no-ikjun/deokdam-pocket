@@ -73,10 +73,20 @@ export default function KakaoCallbackPage() {
           throw new Error("Backend login failed");
         }
 
-        // 3) 성공 → 홈으로
+        // 3) 성공 → returnUrl이 있으면 해당 URL로, 없으면 홈으로
         if (!canceled) {
           await checkAuth();
-          if (!canceled) router.replace("/");
+          // returnUrl이 있으면 해당 URL로 리다이렉트, 없으면 홈으로
+          // signup 페이지는 히스토리에 남기지 않기 위해 홈으로 대체
+          const returnUrl = localStorage.getItem("returnUrl");
+          if (returnUrl) {
+            localStorage.removeItem("returnUrl");
+            // signup 페이지로 시작하는 경우 홈으로 대체
+            const targetUrl = returnUrl.startsWith("/signup") ? "/" : returnUrl;
+            if (!canceled) router.replace(targetUrl);
+          } else {
+            if (!canceled) router.replace("/");
+          }
         }
       } catch (err) {
         console.error("Login error:", err);

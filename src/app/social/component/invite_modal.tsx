@@ -22,10 +22,17 @@ export default function InviteModal({
   const safeOrigin =
     typeof window !== "undefined" ? window.location.origin : "";
 
-  const fullLink = useMemo(
-    () => inviteLink || `${safeOrigin}/pocket/${uuid}`,
-    [inviteLink, safeOrigin, uuid]
-  );
+  const fullLink = useMemo(() => {
+    if (inviteLink) {
+      // inviteLink가 제공되면 그대로 사용 (이미 invite 파라미터가 포함되어 있을 수 있음)
+      return inviteLink;
+    }
+    // inviteLink가 없으면 invite 파라미터를 포함한 링크 생성
+    const baseUrl = `${safeOrigin}/pocket/${uuid}`;
+    const url = new URL(baseUrl);
+    url.searchParams.set("invite", "true");
+    return url.toString();
+  }, [inviteLink, safeOrigin, uuid]);
   const qrContainerRef = useRef<HTMLDivElement>(null);
   const [qrSize, setQrSize] = useState<number>(200);
 

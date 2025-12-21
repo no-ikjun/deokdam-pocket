@@ -24,7 +24,7 @@ export async function POST(req: Request) {
     const { pocket_code } = await req.json();
 
     const pocketResult = await client.sql`
-      SELECT pocket_uuid, members
+      SELECT pocket_uuid, members, "limit"
       FROM pocket
       WHERE code = ${pocket_code};
     `;
@@ -39,11 +39,21 @@ export async function POST(req: Request) {
 
     const pocket = pocketResult.rows[0];
     const members: string[] = pocket.members || [];
+    const limit: number = pocket.limit || 0;
 
     if (members.includes(user_uuid)) {
       client.release();
       return NextResponse.json(
         { message: "Already a member of this pocket" },
+        { status: 400 }
+      );
+    }
+
+    // 인원 제한 체크: limit > 0이고 현재 멤버 수가 limit 이상이면 참여 거부
+    if (limit > 0 && members.length >= limit) {
+      client.release();
+      return NextResponse.json(
+        { message: "인원이 가득 찼어요" },
         { status: 400 }
       );
     }
