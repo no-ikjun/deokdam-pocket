@@ -37,7 +37,7 @@ export async function GET(req: Request, { params }: RouteParams) {
           LIMIT 1;
         `;
 
-        if (memberQuery.rowCount > 0) {
+        if (memberQuery.rows.length > 0) {
           const pocket = memberQuery.rows[0];
           return NextResponse.json(pocket, { status: 200 });
         }
@@ -61,7 +61,7 @@ export async function GET(req: Request, { params }: RouteParams) {
           LIMIT 1;
         `;
 
-        if (publicQuery.rowCount > 0) {
+        if (publicQuery.rows.length > 0) {
           const pocket = publicQuery.rows[0];
           return NextResponse.json(pocket, { status: 200 });
         }
@@ -94,7 +94,7 @@ export async function GET(req: Request, { params }: RouteParams) {
       LIMIT 1;
     `;
 
-    if (query.rowCount === 0) {
+    if (query.rows.length === 0) {
       return NextResponse.json({ message: "Not found" }, { status: 404 });
     }
 
