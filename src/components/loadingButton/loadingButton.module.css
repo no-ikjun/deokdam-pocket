@@ -1,0 +1,87 @@
+.btn {
+  width: var(--btn-width);
+  height: var(--btn-height);
+  padding: 0 16px;
+
+  border: none;
+  border-radius: 12px;
+
+  color: #fff;
+  font-size: var(--btn-font-size);
+  font-weight: 700;
+
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  filter: saturate(0.95);
+  transition: transform 0.1s ease, box-shadow 0.2s ease, filter 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+}
+
+.content {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.text {
+  line-height: 1;
+}
+
+/* variant */
+.variant_red {
+  background: linear-gradient(145deg, #f56d6d, #e25757);
+  box-shadow: 0 6px 18px rgba(229, 87, 87, 0.28);
+}
+.variant_red:hover {
+  box-shadow: 0 10px 22px rgba(231, 102, 102, 0.34);
+}
+
+.variant_blue {
+  background: linear-gradient(145deg, #4aa3ff, #2f7fe6);
+  box-shadow: 0 6px 18px rgba(47, 127, 230, 0.25);
+}
+.variant_blue:hover {
+  box-shadow: 0 10px 22px rgba(47, 127, 230, 0.32);
+}
+
+.variant_gray {
+  background: linear-gradient(145deg, #64748b, #475569);
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.18);
+}
+.variant_gray:hover {
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.22);
+}
+
+/* disabled (includes loading) */
+.disabled {
+  opacity: 0.55;
+  filter: saturate(0.75);
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+  pointer-events: none; /* 클릭 완전 차단 */
+}
+
+/* spinner */
+.spinner {
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: rgba(255, 255, 255, 0.95);
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

@@ -144,7 +144,7 @@
 /* 코드 참여 인풋/버튼 */
 .join_row {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: minmax(0, 1fr) auto;
   gap: 10px;
   align-items: center;
 }
@@ -165,28 +165,6 @@
   border-color: rgba(255, 69, 82, 0.45); /* Self 페이지 아웃라인 톤 */
   box-shadow: 0 0 0 4px rgba(255, 69, 82, 0.14);
   background: rgba(255, 255, 255, 0.98);
-}
-
-.join_btn {
-  height: 50px;
-  padding: 0 16px;
-  border: none;
-  border-radius: 12px;
-  color: #fff;
-  font-size: 0.95rem;
-  font-weight: 700;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(145deg, #f56d6d, #e25757);
-  box-shadow: 0 6px 18px rgba(229, 87, 87, 0.28);
-  filter: saturate(0.95);
-  transition: transform 0.1s ease, box-shadow 0.2s ease, filter 0.2s ease;
-}
-.join_btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 22px rgba(231, 102, 102, 0.34);
 }
 
 /* 스크린리더 전용 */

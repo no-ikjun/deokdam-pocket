@@ -7,6 +7,7 @@ import Image from "next/image";
 import axios from "axios";
 import LoadingIndicator from "@/components/loadingIndicator/loadingIndicator";
 import ToastPopup from "@/components/toastPopup/toastPopup";
+import { LoadingButton } from "@/components/loadingButton/loadingButton";
 
 type OpenMode = "seollal" | "custom";
 
@@ -68,7 +69,7 @@ export default function NewPouchPage() {
     return value;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (!name || !icon || !maxMembers || !goalCount) {
@@ -280,13 +281,13 @@ export default function NewPouchPage() {
           >
             취소
           </div>
-          <div
-            role="submit"
-            className={styles.submit_btn}
-            onClick={handleSubmit}
-          >
-            덕담 주머니 만들기
-          </div>
+          <LoadingButton
+            label="덕담 주머니 만들기"
+            fontSize="1rem"
+            width="100%"
+            loading={loading}
+            type="submit"
+          />
         </div>
       </form>
 

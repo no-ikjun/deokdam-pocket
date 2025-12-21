@@ -10,6 +10,7 @@ import PocketCard from "./component/pocket_card";
 import Modal from "@/components/modal/modal";
 import InviteModal from "./component/invite_modal";
 import ToastPopup from "@/components/toastPopup/toastPopup";
+import { LoadingButton } from "@/components/loadingButton/loadingButton";
 
 type Pocket = {
   pocket_uuid: string;
@@ -29,6 +30,7 @@ export default function SocialPage() {
   const [code, setCode] = useState("");
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(true);
+  const [joinLoading, setJoinLoading] = useState(false);
   const [toastOpen, setToastOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [myPockets, setMyPockets] = useState<Pocket[]>([]);
@@ -65,6 +67,7 @@ export default function SocialPage() {
     event?.preventDefault();
     const trimmed = code.trim().toUpperCase();
     if (!trimmed) return;
+    setJoinLoading(true);
     try {
       const response = await axios.post("/api/pocket/join", {
         pocket_code: trimmed,
@@ -79,6 +82,8 @@ export default function SocialPage() {
     } catch (error) {
       setToastMessage("참여 실패. 다시 시도해 주세요.");
       setToastOpen(true);
+    } finally {
+      setJoinLoading(false);
     }
   };
 
@@ -150,9 +155,13 @@ export default function SocialPage() {
                 aria-label="덕담 주머니 코드 입력"
                 maxLength={16}
               />
-              <div className={styles.join_btn} onClick={joinByCode}>
-                참여
-              </div>
+              <LoadingButton
+                label="참여"
+                loadingLabel=""
+                loading={joinLoading}
+                onClick={joinByCode}
+                fontSize="0.95rem"
+              />
             </form>
           </aside>
         </section>
