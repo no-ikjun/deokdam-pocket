@@ -68,91 +68,93 @@ function LoginPageContent() {
 
   return (
     <div className={styles.container}>
-      <div className={styles.titleContainer}>
-        <Image src="/images/pocket.png" alt="pocket" width={50} height={50} />
-        <div className={styles.logoText}>
-          <h1 className={styles.title}>덕담 주머니</h1>
-          <p className={styles.subtitle}>for 2026 병오년</p>
+      <div className={styles.main}>
+        <div className={styles.titleContainer}>
+          <Image src="/images/pocket.png" alt="pocket" width={50} height={50} />
+          <div className={styles.logoText}>
+            <h1 className={styles.title}>덕담 주머니</h1>
+            <p className={styles.subtitle}>for 2026 병오년</p>
+          </div>
+          <Image src="/images/pocket.png" alt="pocket" width={50} height={50} />
         </div>
-        <Image src="/images/pocket.png" alt="pocket" width={50} height={50} />
-      </div>
 
-      <Image
-        src="/images/3d_pocket.png"
-        alt="pocket"
-        width={200}
-        height={200}
-      />
+        <Image
+          src="/images/3d_pocket.png"
+          alt="pocket"
+          width={200}
+          height={200}
+        />
 
-      <h2 className={styles.loginTitle}>
-        간편 로그인 후 서비스를 이용해보세요!
-      </h2>
+        <h2 className={styles.loginTitle}>
+          간편 로그인 후 서비스를 이용해보세요!
+        </h2>
 
-      <div className={styles.buttonGroup}>
-        <button className={styles.kakao} onClick={handleKakaoLogin}>
-          <Image
-            src="/images/kakao_icon.svg"
-            alt="kakao"
-            width={20}
-            height={20}
-          />
-          카카오계정으로 로그인
-        </button>
+        <div className={styles.buttonGroup}>
+          <button className={styles.kakao} onClick={handleKakaoLogin}>
+            <Image
+              src="/images/kakao_icon.svg"
+              alt="kakao"
+              width={20}
+              height={20}
+            />
+            카카오계정으로 로그인
+          </button>
 
-        <button className={styles.google} onClick={handleGoogleLogin}>
-          <Image
-            src="/images/google_icon.svg"
-            alt="google"
-            width={20}
-            height={20}
-          />
-          구글로 로그인
-        </button>
+          <button className={styles.google} onClick={handleGoogleLogin}>
+            <Image
+              src="/images/google_icon.svg"
+              alt="google"
+              width={20}
+              height={20}
+            />
+            구글로 로그인
+          </button>
 
-        {/* 로컬 개발용 로그인 버튼 */}
-        {process.env.NODE_ENV === "development" && (
-          <>
-            <button
-              className={styles.devLogin}
-              style={{
-                backgroundColor: "#444",
-                color: "#fff",
-                borderRadius: "8px",
-                padding: "10px 14px",
-                fontSize: "14px",
-              }}
-              onClick={() => handleDevLogin({ number: 1 })}
-            >
-              🚀 로컬 개발용 간이 로그인
-            </button>
-            <button
-              className={styles.devLogin}
-              style={{
-                backgroundColor: "#444",
-                color: "#fff",
-                borderRadius: "8px",
-                padding: "10px 14px",
-                fontSize: "14px",
-              }}
-              onClick={() => handleDevLogin({ number: 2 })}
-            >
-              🚀 로컬 개발용 간이 로그인 2
-            </button>
-            <button
-              className={styles.devLogin}
-              style={{
-                backgroundColor: "#444",
-                color: "#fff",
-                borderRadius: "8px",
-                padding: "10px 14px",
-                fontSize: "14px",
-              }}
-              onClick={() => handleDevLogin({ number: 3 })}
-            >
-              🚀 로컬 개발용 간이 로그인 3
-            </button>
-          </>
-        )}
+          {/* 로컬 개발용 로그인 버튼 */}
+          {process.env.NODE_ENV === "development" && (
+            <>
+              <button
+                className={styles.devLogin}
+                style={{
+                  backgroundColor: "#444",
+                  color: "#fff",
+                  borderRadius: "8px",
+                  padding: "10px 14px",
+                  fontSize: "14px",
+                }}
+                onClick={() => handleDevLogin({ number: 1 })}
+              >
+                🚀 로컬 개발용 간이 로그인
+              </button>
+              <button
+                className={styles.devLogin}
+                style={{
+                  backgroundColor: "#444",
+                  color: "#fff",
+                  borderRadius: "8px",
+                  padding: "10px 14px",
+                  fontSize: "14px",
+                }}
+                onClick={() => handleDevLogin({ number: 2 })}
+              >
+                🚀 로컬 개발용 간이 로그인 2
+              </button>
+              <button
+                className={styles.devLogin}
+                style={{
+                  backgroundColor: "#444",
+                  color: "#fff",
+                  borderRadius: "8px",
+                  padding: "10px 14px",
+                  fontSize: "14px",
+                }}
+                onClick={() => handleDevLogin({ number: 3 })}
+              >
+                🚀 로컬 개발용 간이 로그인 3
+              </button>
+            </>
+          )}
+        </div>
       </div>
 
       <footer className={styles.footer}>
