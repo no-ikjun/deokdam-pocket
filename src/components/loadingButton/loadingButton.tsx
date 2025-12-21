@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import styles from "./LoadingButton.module.css";
+import styles from "./loadingButton.module.css";
 
 type LoadingButtonProps = {
   label: string;
