@@ -150,6 +150,89 @@
   color: #64748b;
 }
 
+/* 선택형 질문 영역 */
+.choice_area {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.choice_list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.choice_item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.9rem 1rem;
+  border-radius: 12px;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px) saturate(150%);
+  border: 1.5px solid rgba(210, 210, 210, 0.4);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.1s ease,
+    box-shadow 0.2s ease;
+}
+
+.choice_item:hover {
+  background: rgba(255, 255, 255, 1);
+  border-color: rgba(148, 163, 184, 0.6);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  transform: translateY(-1px);
+}
+
+.choice_selected {
+  border-color: rgba(249, 80, 80, 0.7);
+  background: rgba(255, 245, 245, 0.98);
+  box-shadow: 0 4px 16px rgba(249, 80, 80, 0.2),
+    0 0 0 2px rgba(249, 80, 80, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.choice_selected:hover {
+  background: rgba(255, 240, 240, 1);
+  border-color: rgba(249, 80, 80, 0.85);
+  box-shadow: 0 6px 20px rgba(249, 80, 80, 0.25),
+    0 0 0 2px rgba(249, 80, 80, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+}
+
+.choice_text {
+  font-size: 0.98rem;
+  font-weight: 600;
+  color: #0b1b3a;
+  flex: 1;
+}
+
+.choice_check {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.check_circle {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(148, 163, 184, 0.5);
+  display: grid;
+  place-items: center;
+  color: rgba(148, 163, 184, 0.5);
+  background: rgba(255, 255, 255, 0.6);
+  transition: all 0.2s ease;
+}
+
+.check_active {
+  border-color: #f95050;
+  color: #f95050;
+  background: rgba(255, 245, 245, 0.95);
+}
+
 /* 리마인드 */
 .remind_row {
   display: grid;
