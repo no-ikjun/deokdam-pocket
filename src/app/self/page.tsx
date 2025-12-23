@@ -219,10 +219,12 @@ export default function SelfPage() {
                 </svg>
               </div>
               <div className={styles.card_body}>
-                <span className={styles.overline}>새해 목표 세우기</span>
-                <h3 className={styles.card_title}>올해 이루고 싶은 것</h3>
+                <span className={styles.overline}>
+                  직접 생각해보는 미래의 나
+                </span>
+                <h3 className={styles.card_title}>새해 목표 세우기</h3>
                 <p className={styles.card_desc}>
-                  5문항으로 나만의 목표 구체화하기
+                  어떤 해로 남기고 싶은지 생각해봐요
                 </p>
                 <div className={styles.card_meta}>
                   <span className={styles.chip}>질문 5개</span>
@@ -298,12 +300,10 @@ export default function SelfPage() {
                 </svg>
               </div>
               <div className={styles.card_body}>
-                <span className={styles.overline}>
-                  나에게 1년만 주어진다면?
-                </span>
+                <span className={styles.overline}>만약 시간이 1년뿐이라면</span>
                 <h3 className={styles.card_title}>가장 중요한 것</h3>
                 <p className={styles.card_desc}>
-                  우선순위를 드러내는 4문항 시나리오
+                  내려놓을 것과 끝까지 지키고 싶은 것들
                 </p>
                 <div className={styles.card_meta}>
                   <span className={styles.chip}>질문 4개</span>
@@ -379,10 +379,10 @@ export default function SelfPage() {
                 </svg>
               </div>
               <div className={styles.card_body}>
-                <span className={styles.overline}>올해 되돌아보기</span>
+                <span className={styles.overline}>올해를 지나온 나에게</span>
                 <h3 className={styles.card_title}>감사 · 성장 · 다짐</h3>
                 <p className={styles.card_desc}>
-                  3섹션으로 올해를 정리해보아요
+                  잘한 것보다, 버텨낸 나를 기록하는 시간
                 </p>
                 <div className={styles.card_meta}>
                   <span className={styles.chip}>섹션 3개</span>
