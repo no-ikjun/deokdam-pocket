@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import styles from "./page.module.css";
 import LoadingIndicator from "@/components/loadingIndicator/loadingIndicator";
+import ToastPopup from "@/components/toastPopup/toastPopup";
 import { FORM_SCHEMAS, type Q } from "./questions";
 
 export type InputType = "goals" | "oneyear" | "retrospect";
@@ -90,6 +91,12 @@ export default function InputPage() {
   const schema = FORM_SCHEMAS[typeParam] ?? FORM_SCHEMAS.goals;
 
   const [loading, setLoading] = useState(false);
+  const [loadingData, setLoadingData] = useState(true);
+  const [toast, setToast] = useState<{
+    open: boolean;
+    message: string;
+    type: "success" | "error" | "warning" | "default";
+  }>({ open: false, message: "", type: "default" });
 
   // 폼 상태
   const [answers, setAnswers] = useState<Record<string, string>>({});
@@ -108,20 +115,105 @@ export default function InputPage() {
   // draft 키
   const draftKey = useMemo(() => `${KEY_PREFIX}:${typeParam}`, [typeParam]);
 
-  // 초기 로드 (draft 불러오기)
+  // 초기 로드 (기존 데이터 또는 draft 불러오기)
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem(draftKey);
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        setAnswers(parsed.answers || {});
-        setIndex(parsed.index || 0);
-        setRemindEnabled(parsed.remindEnabled ?? true);
-        setRemindTiming(parsed.remindTiming || remindConfig.defaultTiming);
-        setRemindMethod(parsed.remindMethod || remindConfig.defaultMethod);
+    const loadData = async () => {
+      setLoadingData(true);
+      try {
+        // 1. 먼저 기존 저장된 데이터 확인
+        const selfTypeMap = {
+          goals: "GOALS",
+          oneyear: "ONEYEAR",
+          retrospect: "RETROSPECT",
+        }[typeParam];
+
+        const response = await fetch(
+          `/api/self/input?type=${selfTypeMap}`
+        ).catch(() => null);
+
+        if (response?.ok) {
+          const data = await response.json();
+          if (data.content) {
+            try {
+              const content = JSON.parse(data.content);
+              const loadedAnswers: Record<string, string> = {};
+
+              // 질문별로 답변 매핑
+              schema.qs.forEach((question) => {
+                const answerData = content.find(
+                  (item: any) => item.id === question.id
+                );
+                if (answerData) {
+                  if (question.type === "choice") {
+                    // 선택형: 기존 답변이 옵션에 있는지 확인
+                    const isInOptions = question.options.includes(
+                      answerData.answer
+                    );
+                    if (isInOptions) {
+                      loadedAnswers[question.id] = answerData.answer;
+                    } else {
+                      // 옵션에 없으면 "기타"로 처리
+                      loadedAnswers[question.id] = "기타";
+                      loadedAnswers[`${question.id}_other`] = answerData.answer;
+                    }
+                  } else {
+                    loadedAnswers[question.id] = answerData.answer;
+                  }
+                }
+              });
+
+              setAnswers(loadedAnswers);
+              if (data.remind !== undefined) {
+                setRemindEnabled(data.remind);
+              }
+              if (data.remind_at) {
+                try {
+                  const remindData = JSON.parse(data.remind_at);
+                  if (remindData.timing) {
+                    setRemindTiming(remindData.timing);
+                  }
+                  if (remindData.method) {
+                    setRemindMethod(remindData.method);
+                  }
+                } catch {}
+              }
+            } catch (e) {
+              console.error("Failed to parse existing data", e);
+            }
+          }
+        } else {
+          // 기존 데이터가 없으면 draft 확인
+          const raw = localStorage.getItem(draftKey);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            setAnswers(parsed.answers || {});
+            setIndex(parsed.index || 0);
+            setRemindEnabled(parsed.remindEnabled ?? true);
+            setRemindTiming(parsed.remindTiming || remindConfig.defaultTiming);
+            setRemindMethod(parsed.remindMethod || remindConfig.defaultMethod);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to load data", error);
+        // 에러 시 draft만 로드
+        try {
+          const raw = localStorage.getItem(draftKey);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            setAnswers(parsed.answers || {});
+            setIndex(parsed.index || 0);
+            setRemindEnabled(parsed.remindEnabled ?? true);
+            setRemindTiming(parsed.remindTiming || remindConfig.defaultTiming);
+            setRemindMethod(parsed.remindMethod || remindConfig.defaultMethod);
+          }
+        } catch {}
+      } finally {
+        setLoadingData(false);
       }
-    } catch {}
-  }, [draftKey, remindConfig]);
+    };
+
+    loadData();
+  }, [typeParam, draftKey, remindConfig, schema.qs]);
 
   // 자동 저장
   useEffect(() => {
@@ -169,6 +261,10 @@ export default function InputPage() {
         // 다중 선택: JSON 배열에 최소 하나 이상 있어야 함
         try {
           const selectedOptions: string[] = val ? JSON.parse(val) : [];
+          // "기타"가 포함되어 있으면 기타 입력값도 확인
+          if (selectedOptions.includes("기타")) {
+            return otherInputValue.trim().length > 0;
+          }
           return selectedOptions.length > 0;
         } catch {
           return false;
@@ -250,16 +346,49 @@ export default function InputPage() {
           schema.qs.map((question) => {
             const answer = (answers[question.id] || "").trim();
             // "기타" 선택 시 기타 입력값 사용
-            if (
-              question.type === "choice" &&
-              answer === "기타" &&
-              answers[`${question.id}_other`]
-            ) {
-              return {
-                id: question.id,
-                label: question.label,
-                answer: answers[`${question.id}_other`].trim(),
-              };
+            if (question.type === "choice") {
+              if (question.multiple === true) {
+                // 다중 선택: JSON 배열 처리
+                try {
+                  const selectedOptions: string[] = answer
+                    ? JSON.parse(answer)
+                    : [];
+                  if (selectedOptions.includes("기타")) {
+                    const otherValue = answers[`${question.id}_other`]?.trim();
+                    if (otherValue) {
+                      // "기타"를 실제 입력값으로 교체
+                      const filtered = selectedOptions.filter(
+                        (o) => o !== "기타"
+                      );
+                      return {
+                        id: question.id,
+                        label: question.label,
+                        answer: JSON.stringify([...filtered, otherValue]),
+                      };
+                    }
+                  }
+                  return {
+                    id: question.id,
+                    label: question.label,
+                    answer,
+                  };
+                } catch {
+                  return {
+                    id: question.id,
+                    label: question.label,
+                    answer,
+                  };
+                }
+              } else {
+                // 단일 선택
+                if (answer === "기타" && answers[`${question.id}_other`]) {
+                  return {
+                    id: question.id,
+                    label: question.label,
+                    answer: answers[`${question.id}_other`].trim(),
+                  };
+                }
+              }
             }
             return {
               id: question.id,
@@ -289,16 +418,35 @@ export default function InputPage() {
       router.replace("/self/done");
     } catch (error) {
       console.error(error);
-      alert("저장에 실패했습니다. 잠시 후 다시 시도해주세요.");
+      setToast({
+        open: true,
+        message: "저장에 실패했습니다. 잠시 후 다시 시도해주세요.",
+        type: "error",
+      });
     } finally {
       setIsSubmitting(false);
       setLoading(false);
     }
   };
 
+  if (loadingData) {
+    return (
+      <main className={styles.wrap}>
+        <LoadingIndicator />
+      </main>
+    );
+  }
+
   return (
     <main className={styles.wrap}>
       {loading && <LoadingIndicator />}
+      <ToastPopup
+        open={toast.open}
+        message={toast.message}
+        type={toast.type}
+        duration={3000}
+        onClose={() => setToast({ ...toast, open: false })}
+      />
       {/* 헤더 */}
       <header className={styles.header}>
         <span
@@ -417,18 +565,48 @@ export default function InputPage() {
               })}
             </ul>
             {/* 기타 선택 시 입력 필드 */}
-            {q.multiple !== true && val === "기타" && (
-              <div className={styles.other_input_area}>
-                <input
-                  type="text"
-                  className={styles.other_input}
-                  placeholder="직접 입력해주세요"
-                  value={otherInputValue}
-                  onChange={(e) => setOtherInput(e.target.value)}
-                  autoFocus
-                />
-              </div>
-            )}
+            {(() => {
+              if (q.multiple === true) {
+                // 다중 선택: "기타"가 선택되어 있는지 확인
+                try {
+                  const selectedOptions: string[] = val ? JSON.parse(val) : [];
+                  if (selectedOptions.includes("기타")) {
+                    return (
+                      <div className={styles.other_input_area}>
+                        <input
+                          type="text"
+                          className={styles.other_input}
+                          placeholder="직접 입력해주세요"
+                          value={otherInputValue}
+                          onChange={(e) => setOtherInput(e.target.value)}
+                          autoFocus
+                        />
+                      </div>
+                    );
+                  }
+                } catch {
+                  return null;
+                }
+                return null;
+              } else {
+                // 단일 선택
+                if (val === "기타") {
+                  return (
+                    <div className={styles.other_input_area}>
+                      <input
+                        type="text"
+                        className={styles.other_input}
+                        placeholder="직접 입력해주세요"
+                        value={otherInputValue}
+                        onChange={(e) => setOtherInput(e.target.value)}
+                        autoFocus
+                      />
+                    </div>
+                  );
+                }
+                return null;
+              }
+            })()}
           </div>
         )}
 
