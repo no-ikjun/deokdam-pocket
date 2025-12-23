@@ -233,42 +233,137 @@
   background: rgba(255, 245, 245, 0.95);
 }
 
-/* 리마인드 */
-.remind_row {
-  display: grid;
-  gap: 6px;
+/* 기타 입력 필드 */
+.other_input_area {
+  margin-top: 0.8rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid rgba(148, 163, 184, 0.2);
 }
-.remind_btn {
+
+.other_input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.45);
+  background: rgba(255, 255, 255, 0.9);
+  font-size: 0.95rem;
+  color: #0b1b3a;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.other_input:focus {
+  outline: none;
+  border-color: rgba(249, 80, 80, 0.5);
+  box-shadow: 0 0 0 3px rgba(249, 80, 80, 0.1);
+  background: rgba(255, 255, 255, 1);
+}
+
+/* 리마인드 */
+.remind_section {
+  width: 100%;
+  padding: 0.8rem 0;
+  margin-top: 1rem;
+  border-top: 1px solid rgba(148, 163, 184, 0.2);
+  display: grid;
+  gap: 0.8rem;
+}
+
+.remind_toggle_row {
   display: flex;
   align-items: center;
-  justify-self: start;
-  font-size: 0.9rem;
-  font-weight: 800;
-  padding: 0.55rem 0.8rem;
-  border-radius: 10px;
-  border: 1px solid rgba(148, 163, 184, 0.35);
-  background: rgba(255, 255, 255, 0.82);
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.remind_options_row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.remind_label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #0b1b3a;
+  white-space: nowrap;
+}
+
+.remind_option_group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.remind_option_label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #64748b;
+  white-space: nowrap;
+}
+
+/* Toggle switch (iOS style) */
+.toggle_switch {
+  position: relative;
+  width: 44px;
+  height: 26px;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.toggle_switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  inset: 0;
+  background: #cbd5e1;
+  border-radius: 34px;
+  transition: 0.3s;
   cursor: pointer;
 }
-.remind_panel {
-  display: grid;
-  gap: 6px;
-  padding: 0.6rem;
-  border-radius: 12px;
-  border: 1px dashed rgba(148, 163, 184, 0.45);
-  background: rgba(255, 255, 255, 0.72);
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: 3px;
+  top: 3px;
+  background: white;
+  border-radius: 50%;
+  transition: 0.3s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
-.remind_label {
-  display: grid;
-  gap: 4px;
-  font-size: 0.9rem;
-  color: #0b1b3a;
+
+.toggle_switch input:checked + .slider {
+  background: #f95050;
 }
+
+.toggle_switch input:checked + .slider:before {
+  transform: translateX(18px);
+}
+
 .select {
-  padding: 0.45rem 0.6rem;
+  padding: 0.5rem 0.7rem;
   border-radius: 10px;
   border: 1px solid rgba(148, 163, 184, 0.45);
   background: #fff;
+  font-size: 0.9rem;
+  color: #0b1b3a;
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  flex-shrink: 0;
+}
+
+.select:focus {
+  outline: none;
+  border-color: rgba(249, 80, 80, 0.5);
+  box-shadow: 0 0 0 3px rgba(249, 80, 80, 0.1);
 }
 
 /* 액션 버튼 영역 */
