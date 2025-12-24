@@ -8,6 +8,7 @@ import axios from "axios";
 import Modal from "@/components/modal/modal";
 import LoadingIndicator from "@/components/loadingIndicator/loadingIndicator";
 import ToastPopup from "@/components/toastPopup/toastPopup";
+import { LoadingButton } from "@/components/loadingButton/loadingButton";
 
 type UsedState = {
   goals: boolean;
@@ -434,7 +435,8 @@ export default function SelfPage() {
         <div className={styles.future_head}>
           <div className={styles.future_title_area}>
             <span className={styles.ads_notice}>
-              <span className={styles.future_dot} /> AI 기반 서비스
+              <span className={styles.future_dot} />
+              ChatGPT 기반 서비스
             </span>
             <h3 className={styles.future_title}>1년 뒤의 나와 대화하기</h3>
             <p className={styles.future_desc}>
@@ -450,7 +452,11 @@ export default function SelfPage() {
             style={
               used.retrospect || used.goals || used.oneyear
                 ? {}
-                : { pointerEvents: "none", opacity: 0.5, cursor: "not-allowed" }
+                : {
+                    pointerEvents: "none",
+                    opacity: 0.5,
+                    cursor: "not-allowed",
+                  }
             }
             aria-disabled={
               used.retrospect || used.goals || used.oneyear ? false : true
@@ -558,9 +564,12 @@ export default function SelfPage() {
           <div className={styles.settings_section}>
             <h4>AI 학습</h4>
             <p>내가 입력한 정보를 바탕으로 AI가 미래의 나를 학습해요.</p>
-            <button
+            <LoadingButton
               type="button"
-              className={styles.train_button}
+              label="AI 학습시키기"
+              loadingLabel="학습 중..."
+              loading={isTraining}
+              disabled={isTraining}
               onClick={async () => {
                 setIsTraining(true);
                 try {
@@ -571,10 +580,8 @@ export default function SelfPage() {
                   setIsTraining(false);
                 }
               }}
-              disabled={isTraining}
-            >
-              {isTraining ? "학습 중..." : "AI 학습시키기"}
-            </button>
+              className={styles.train_button}
+            />
             <p className={styles.tone_hint}>
               * AI 학습은 다소 시간이 걸릴 수 있으며, 최근에 학습된 데이터가
               있을 경우 추가 학습이 불가합니다.

@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import jwt from "jsonwebtoken";
 import { sql } from "@vercel/postgres";
 import { randomUUID } from "crypto";
+import { buildSystemPrompt } from "./prompts";
 
 export const dynamic = "force-dynamic";
 
@@ -12,6 +13,7 @@ const EMB_MODEL = process.env.OPENAI_EMBED_MODEL ?? "text-embedding-3-small";
 const MAX_CTX_CHARS = 1200;
 const TOPK_DB = 20;
 const TOPK_FINAL = 5;
+const DAILY_CHAT_LIMIT = parseInt(process.env.DAILY_CHAT_LIMIT ?? "10", 10);
 
 // ===== utils =====
 function makeVectorLiteral(vec: number[]) {
@@ -25,23 +27,6 @@ function scoreRecency(createdAt: string) {
   const days = ms / 86400000;
   const s = Math.exp(-days / 30);
   return Math.max(0, Math.min(1, s));
-}
-function buildSystemPrompt(tone: "mild" | "spicy") {
-  const toneRule =
-    tone === "spicy"
-      ? "말투는 거칠고 직설적이어야 해. 때로는 비속어를 사용해서 툭 쏘기도 해. 나를 깎아내려서 어떻게든 변화하게 만들어야 해. 예) '그 정도 노력하고 뭘 바라는 건데? 정신 차리고 다시 뛰어.', '핑계 좀 그만 만들고, 지금 당장 하나라도 해. 안 하면 니가 손해야.'"
-      : "말투는 따뜻하고 다정해야 해. 마치 스스로를 토닥이며 얘기하듯 부드럽게 말해. '괜찮아', '잘 하고 있어' 같은 표현도 좋아.";
-
-  return [
-    "너는 ‘미래의 나’다. 지금의 나와 마주 앉아 솔직하게 대화하는 중이다.",
-    "말은 항상 반말로 해. 친구처럼, 나 자신과 속 얘기하듯이.",
-    "답변할 때는 내 기록(컨텍스트)을 참고해서 대답해야한다.",
-    "지금의 너는 내 기록(컨텍스트)에 있는 목표를 달성한 상태야. 그래서 나에게 동기부여가 되는 조언을 해줘.",
-    "다음 내용을 포함하면 좋아 : (1) 과거의 나에게 해줄 말 (2) 그 말의 근거 (3) 앞으로의 다짐이나 계획",
-    "전체 내용은 친구와 대화하듯 자연스럽고 편안하게 작성해.",
-    toneRule,
-    "가끔은 한숨 섞이거나 웃기게 말해도 돼. 진짜 내 머릿속 목소리처럼 자연스러워야 해.",
-  ].join(" ");
 }
 
 function formatContextRow(row: any) {
@@ -120,6 +105,46 @@ export async function POST(req: Request) {
     summary = s2.rowCount ? s2.rows[0].summary ?? "" : "";
   }
 
+  // Check daily message limit (KST timezone)
+  // Calculate today's start time in KST (00:00:00 Asia/Seoul)
+  const nowKST = new Date(
+    new Date().toLocaleString("en-US", { timeZone: "Asia/Seoul" })
+  );
+  const todayStartKST = new Date(nowKST);
+  todayStartKST.setHours(0, 0, 0, 0);
+  const todayStartISO = todayStartKST.toISOString();
+
+  const countResult = await sql`
+    SELECT COUNT(*)::int as count
+    FROM messages
+    WHERE user_id = ${user_uuid}::uuid
+      AND role = 'user'
+      AND created_at >= ${todayStartISO}
+  `;
+  const todayCount = countResult.rows[0]?.count ?? 0;
+
+  if (todayCount >= DAILY_CHAT_LIMIT) {
+    // Calculate next reset time (next day 00:00:00 KST)
+    const now = new Date();
+    const kstNow = new Date(
+      now.toLocaleString("en-US", { timeZone: "Asia/Seoul" })
+    );
+    const nextReset = new Date(kstNow);
+    nextReset.setDate(nextReset.getDate() + 1);
+    nextReset.setHours(0, 0, 0, 0);
+    const resetAtISO = nextReset.toISOString();
+
+    return NextResponse.json(
+      {
+        error: "일일 대화 횟수 제한에 도달했습니다.",
+        limit: DAILY_CHAT_LIMIT,
+        used: todayCount,
+        resetAt: resetAtISO,
+      },
+      { status: 429 }
+    );
+  }
+
   // Save user message (pre-save)
   const userMsgId = randomUUID();
   await sql`
@@ -179,27 +204,31 @@ export async function POST(req: Request) {
   const system = buildSystemPrompt(tone);
   const assistantMemory =
     summary && summary.trim()
-      ? `이전 대화 요약:\n${summary.trim()}`
-      : "이전 대화 요약: (없음)";
+      ? `\n\n## 이전 대화 요약:\n${summary.trim()}`
+      : "";
 
   const messages = [
-    { role: "system", content: system },
-    { role: "assistant", content: assistantMemory },
+    { role: "system", content: system + assistantMemory },
     {
       role: "user",
       content: [
-        "다음은 나의 과거 기록에서 발췌한 컨텍스트야.",
-        "여기에 있는 내용에서만 근거를 인용하고, 없으면 모른다고 답해.",
+        "다음은 나의 과거 기록에서 발췌한 컨텍스트야. 이 내용을 바탕으로 답변해줘.",
         "",
-        contextText || "(컨텍스트 없음)",
+        "## 컨텍스트 사용 규칙:",
+        "- 컨텍스트에 있는 내용만 근거로 사용하고, 없으면 추측하지 말고 솔직하게 모른다고 답해",
+        "- 여러 컨텍스트가 제공되면, 서로 연관성 있는 것들을 연결하여 더 풍부한 답변을 만들어",
+        "- 컨텍스트를 자연스럽게 인용하되, 너무 기계적으로 인용하는 느낌을 주지 마",
         "",
-        "--- 사용자의 질문 ---",
+        "=== 과거 기록 컨텍스트 ===",
+        contextText || "(컨텍스트 없음 - 일반적인 조언만 제공)",
+        "",
+        "=== 사용자의 질문 ===",
         query,
       ].join("\n"),
     },
   ];
 
-  // 5) OpenAI 호출 (비스트리밍)
+  // 5) OpenAI 호출 (스트리밍)
   const aiRes = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
     headers: {
@@ -209,57 +238,209 @@ export async function POST(req: Request) {
     body: JSON.stringify({
       model: CHAT_MODEL,
       messages,
-      temperature: 0.4,
-      stream: false,
+      temperature: 0.7,
+      stream: true,
     }),
   });
 
-  const data = await aiRes.json();
   if (!aiRes.ok) {
-    console.error("[chat/send] chat error", data);
+    const errorData = await aiRes.json();
+    console.error("[chat/send] chat error", errorData);
     return NextResponse.json(
-      { error: "AI 응답 생성 실패", detail: data },
+      { error: "AI 응답 생성 실패", detail: errorData },
       { status: 502 }
     );
   }
 
-  const reply = data?.choices?.[0]?.message?.content?.trim() ?? "";
+  if (!aiRes.body) {
+    return NextResponse.json(
+      { error: "응답 스트림을 읽을 수 없습니다." },
+      { status: 502 }
+    );
+  }
 
-  // 6) 결과 저장
+  // 스트리밍 응답 생성
   const assistantMsgId = randomUUID();
-  await persistAssistantMessage(user_uuid!, assistantMsgId, reply);
-  await maybeUpdateUserSummary(user_uuid!);
+  const reader = aiRes.body.getReader();
+  const decoder = new TextDecoder();
+  let fullContent = "";
+  let tokensIn = 0;
+  let tokensOut = 0;
+  let usageReceived = false;
 
-  // 최종 응답 JSON으로 반환
-  return NextResponse.json(
-    {
-      reply,
-      context: top.map((r) => ({
-        id: r.id,
-        topic: r.topic,
-        timebox: r.source_timebox,
-        priority: r.priority_score,
-      })),
-      meta: {
-        model: CHAT_MODEL,
-        tone,
-        used_contexts: top.length,
-      },
+  const stream = new ReadableStream({
+    async start(controller) {
+      try {
+        // 메타데이터 전송 (초기 정보)
+        const metadata =
+          JSON.stringify({
+            type: "metadata",
+            msgId: assistantMsgId,
+            context: top.map((r) => ({
+              id: r.id,
+              topic: r.topic,
+              timebox: r.source_timebox,
+              priority: r.priority_score,
+            })),
+            meta: {
+              model: CHAT_MODEL,
+              tone,
+              used_contexts: top.length,
+            },
+          }) + "\n";
+        controller.enqueue(new TextEncoder().encode(metadata));
+
+        // 스트림 데이터 읽기
+        let buffer = "";
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split("\n");
+          buffer = lines.pop() || ""; // 마지막 불완전한 라인은 버퍼에 유지
+
+          for (const line of lines) {
+            if (!line.trim() || !line.startsWith("data: ")) continue;
+
+            const data = line.slice(6).trim();
+            if (data === "[DONE]") {
+              continue;
+            }
+
+            try {
+              const parsed = JSON.parse(data);
+
+              // 콘텐츠 델타 처리
+              const delta = parsed.choices?.[0]?.delta?.content;
+              if (delta) {
+                fullContent += delta;
+                const contentChunk =
+                  JSON.stringify({
+                    type: "content",
+                    delta,
+                  }) + "\n";
+                controller.enqueue(new TextEncoder().encode(contentChunk));
+              }
+
+              // 토큰 사용량 추적 (OpenAI는 마지막 청크에 usage를 포함할 수 있음)
+              if (parsed.usage) {
+                tokensIn = parsed.usage.prompt_tokens || 0;
+                tokensOut = parsed.usage.completion_tokens || 0;
+                usageReceived = true;
+              }
+            } catch (e) {
+              // JSON 파싱 오류는 무시
+            }
+          }
+        }
+
+        // 남은 버퍼 처리
+        if (buffer.trim()) {
+          const data = buffer.trim().replace("data: ", "");
+          if (data && data !== "[DONE]") {
+            try {
+              const parsed = JSON.parse(data);
+              const delta = parsed.choices?.[0]?.delta?.content;
+              if (delta) {
+                fullContent += delta;
+                const contentChunk =
+                  JSON.stringify({
+                    type: "content",
+                    delta,
+                  }) + "\n";
+                controller.enqueue(new TextEncoder().encode(contentChunk));
+              }
+              if (parsed.usage) {
+                tokensIn = parsed.usage.prompt_tokens || 0;
+                tokensOut = parsed.usage.completion_tokens || 0;
+                usageReceived = true;
+              }
+            } catch (e) {
+              // 무시
+            }
+          }
+        }
+
+        // 토큰 사용량 추정 (usage가 없을 경우)
+        if (!usageReceived) {
+          // 대략적인 추정: 한국어는 1토큰 ≈ 2-3자, 영어는 1토큰 ≈ 4자
+          // 프롬프트: 쿼리 + 컨텍스트 + 시스템 프롬프트
+          const promptLength =
+            query.length + contextText.length + system.length;
+          tokensIn = Math.ceil(promptLength / 3); // 한국어 기준으로 추정
+          tokensOut = Math.ceil(fullContent.trim().length / 3);
+        }
+
+        // 완료 신호
+        const doneChunk =
+          JSON.stringify({
+            type: "done",
+            tokens: {
+              in: tokensIn,
+              out: tokensOut,
+            },
+          }) + "\n";
+        controller.enqueue(new TextEncoder().encode(doneChunk));
+        controller.close();
+
+        // 스트림 완료 후 메시지 저장
+        const trimmedContent = fullContent.trim();
+        if (trimmedContent) {
+          await persistAssistantMessage(
+            user_uuid!,
+            assistantMsgId,
+            trimmedContent,
+            tokensIn,
+            tokensOut
+          ).catch((err) =>
+            console.error("[chat/send] save assistant message error", err)
+          );
+
+          // 사용자 메시지의 토큰 사용량도 업데이트 (프롬프트 토큰의 일부)
+          // 실제로는 사용자 메시지만의 토큰은 정확히 계산하기 어려우므로,
+          // 전체 프롬프트 토큰에서 컨텍스트와 시스템 프롬프트 토큰을 빼는 방식으로 추정
+          const userQueryTokens = Math.ceil(query.length / 3);
+          await sql`
+            UPDATE messages
+            SET tokens_in = ${userQueryTokens}
+            WHERE id = ${userMsgId}::uuid
+          `.catch((err) =>
+            console.error("[chat/send] update user message tokens error", err)
+          );
+
+          await maybeUpdateUserSummary(user_uuid!).catch((err) =>
+            console.error("[chat/send] update summary error", err)
+          );
+        }
+      } catch (error) {
+        console.error("[chat/send] stream error", error);
+        controller.error(error);
+      }
     },
-    { status: 200 }
-  );
+  });
+
+  return new Response(stream, {
+    headers: {
+      "Content-Type": "text/event-stream",
+      "Cache-Control": "no-cache",
+      Connection: "keep-alive",
+    },
+  });
 }
 
 // ===== Storage helpers =====
 async function persistAssistantMessage(
   userId: string,
   msgId: string,
-  content: string
+  content: string,
+  tokensIn: number = 0,
+  tokensOut: number = 0
 ) {
   await sql`
     INSERT INTO messages (id, user_id, role, content, tokens_in, tokens_out, model, created_at)
-    VALUES (${msgId}::uuid, ${userId}::uuid, 'assistant', ${content}, ${0}, ${0}, ${CHAT_MODEL}, ${nowISO()})
-    ON CONFLICT (id) DO UPDATE SET content = EXCLUDED.content
+    VALUES (${msgId}::uuid, ${userId}::uuid, 'assistant', ${content}, ${tokensIn}, ${tokensOut}, ${CHAT_MODEL}, ${nowISO()})
+    ON CONFLICT (id) DO UPDATE SET content = EXCLUDED.content, tokens_in = EXCLUDED.tokens_in, tokens_out = EXCLUDED.tokens_out
   `;
 }
 
