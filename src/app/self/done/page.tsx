@@ -1,51 +1,17 @@
 "use client";
 
-import { useMemo } from "react";
 import styles from "./page.module.css";
 import { useRouter } from "next/navigation";
-
-const EMOJIS = ["🎉", "✨", "🎊", "🌟", "💫", "🎈", "🪽", "🪄"];
+import ConfettiEffect from "@/components/confetti/ConfettiEffect";
 
 export default function DonePage() {
   const router = useRouter();
-  // 컨페티 파티클(이모지) 랜덤 배치
-  const particles = useMemo(() => {
-    return Array.from({ length: 36 }).map((_, i) => {
-      const left = Math.random() * 100; // %
-      const delay = Math.random() * 1.2; // s
-      const dur = 5 + Math.random() * 3; // s
-      const size = 18 + Math.floor(Math.random() * 10); // px
-      const emoji = EMOJIS[i % EMOJIS.length];
-      const rotate = Math.random() > 0.5 ? 1 : -1;
-      return { left, delay, dur, size, emoji, rotate };
-    });
-  }, []);
 
   return (
-    <main className={styles.page} aria-label="완료 페이지">
-      {/* 배경 애니메이션 레이어 */}
-      <div className={styles.bg} aria-hidden />
-
-      {/* 축하 이모지 컨페티 */}
-      <div className={styles.confetti} aria-hidden>
-        {particles.map((p, idx) => (
-          <span
-            key={idx}
-            className={styles.particle}
-            style={
-              {
-                left: `${p.left}%`,
-                animationDelay: `${p.delay}s`,
-                animationDuration: `${p.dur}s`,
-                fontSize: `${p.size}px`,
-                ["--spin-dir" as any]: p.rotate,
-              } as React.CSSProperties
-            }
-          >
-            {p.emoji}
-          </span>
-        ))}
-      </div>
+    <ConfettiEffect particleCount={100} zIndex={2}>
+      <main className={styles.page} aria-label="완료 페이지">
+        {/* 배경 애니메이션 레이어 */}
+        <div className={styles.bg} aria-hidden />
 
       {/* 글래스 카드 */}
       <section className={styles.card}>
@@ -90,6 +56,7 @@ export default function DonePage() {
           </div>
         </div>
       </section>
-    </main>
+      </main>
+    </ConfettiEffect>
   );
 }

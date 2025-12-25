@@ -1,14 +1,13 @@
 "use client";
 
-import { Suspense, useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import styles from "./page.module.css";
 import Image from "next/image";
 import InviteModal from "@/app/social/component/invite_modal";
 import Modal from "@/components/modal/modal";
 import ToastPopup from "@/components/toastPopup/toastPopup";
-
-const EMOJIS = ["🎉", "✨", "🎊", "🌟", "💫", "🎈", "🪽", "🪄"];
+import ConfettiEffect from "@/components/confetti/ConfettiEffect";
 
 function CompletePageContent() {
   const searchParams = useSearchParams();
@@ -33,18 +32,6 @@ function CompletePageContent() {
     navigator.clipboard.writeText(text);
   };
 
-  const particles = useMemo(() => {
-    return Array.from({ length: 32 }).map((_, i) => {
-      const left = Math.random() * 100;
-      const delay = Math.random() * 1.2;
-      const dur = 5 + Math.random() * 3;
-      const size = 18 + Math.floor(Math.random() * 10);
-      const emoji = EMOJIS[i % EMOJIS.length];
-      const rotate = Math.random() > 0.5 ? 1 : -1;
-      return { left, delay, dur, size, emoji, rotate };
-    });
-  }, []);
-
   const goHome = () => {
     router.replace("/social");
   };
@@ -58,38 +45,20 @@ function CompletePageContent() {
     };
 
   return (
-    <main className={styles.page} aria-label="덕담 주머니 생성 완료 페이지">
-      <ToastPopup
-        open={toastOpen}
-        type="success"
-        message={toastMessage}
-        duration={2000}
-        onClose={() => setToastOpen(false)}
-        actionLabel=""
-      />
-      <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)}>
-        <InviteModal name={pocketName} uuid={pocketUuid} code={pocketCode} />
-      </Modal>
-      <div className={styles.bg} aria-hidden />
-      <div className={styles.confetti} aria-hidden>
-        {particles.map((p, idx) => (
-          <span
-            key={idx}
-            className={styles.particle}
-            style={
-              {
-                left: `${p.left}%`,
-                animationDelay: `${p.delay}s`,
-                animationDuration: `${p.dur}s`,
-                fontSize: `${p.size}px`,
-                ["--spin-dir" as any]: p.rotate,
-              } as React.CSSProperties
-            }
-          >
-            {p.emoji}
-          </span>
-        ))}
-      </div>
+    <ConfettiEffect particleCount={100} zIndex={2}>
+      <main className={styles.page} aria-label="덕담 주머니 생성 완료 페이지">
+        <ToastPopup
+          open={toastOpen}
+          type="success"
+          message={toastMessage}
+          duration={2000}
+          onClose={() => setToastOpen(false)}
+          actionLabel=""
+        />
+        <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)}>
+          <InviteModal name={pocketName} uuid={pocketUuid} code={pocketCode} />
+        </Modal>
+        <div className={styles.bg} aria-hidden />
 
       {/* 글래스 카드 */}
       <section className={styles.card}>
@@ -144,7 +113,8 @@ function CompletePageContent() {
           초대받은 사람들은 링크 또는 코드를 입력해 참여할 수 있어요 💌
         </p>
       </section>
-    </main>
+      </main>
+    </ConfettiEffect>
   );
 }
 
