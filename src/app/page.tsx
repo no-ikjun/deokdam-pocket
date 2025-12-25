@@ -576,6 +576,15 @@ export default function Home() {
 
         {/* 4) 광고 + footer */}
         <div className={styles.ad_banner}>
+          {/* 구글 AdSense 광고 */}
+          {/* <AdComponent  
+            adSlot="7323782821"
+            style={{ display: "block" }}
+            adFormat="auto"
+            responsive={true}
+          /> */}
+
+          {/* 커스텀 광고 배너  */}
           <PromoBanner />
         </div>
 
