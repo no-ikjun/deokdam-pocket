@@ -12,6 +12,8 @@ import ToastPopup from "@/components/toastPopup/toastPopup";
 import DeokdamWriteModal from "../component/deokdam_write";
 import MyDeokdamModal from "../component/my_deokdam";
 import ReceivedDeokdamModal from "../component/received_deokdam";
+import PocketOpenedModal from "../component/pocket_opened_modal";
+import ConfettiEffect from "@/components/confetti/ConfettiEffect";
 import { useAuthStore } from "@/stores/auth";
 import type { Pocket } from "@/types/pocket";
 
@@ -48,6 +50,8 @@ export default function PocketDetailPage() {
 
   const [myModalOpen, setMyModalOpen] = useState(false);
   const [receivedModalOpen, setReceivedModalOpen] = useState(false);
+  const [openedModalOpen, setOpenedModalOpen] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
 
   const fetchDetail = async () => {
     setLoading(true);
@@ -349,6 +353,59 @@ export default function PocketDetailPage() {
     };
   }, []);
 
+  // 오픈 상태일 때 컨페티와 안내 모달 띄우기
+  useEffect(() => {
+    if (!pocket || loading) return;
+
+    const open = new Date(pocket.open_at);
+    const today = new Date();
+    open.setHours(0, 0, 0, 0);
+    today.setHours(0, 0, 0, 0);
+    const isOpened = open.getTime() <= today.getTime();
+
+    if (isOpened) {
+      // localStorage로 이미 띄웠는지 확인 (하루에 한 번만)
+      const storageKey = `pocket_opened_${pocket.pocket_uuid}`;
+      const lastShown = localStorage.getItem(storageKey);
+      const todayStr = new Date().toDateString();
+
+      // 디버깅용 로그
+      console.log("오픈 체크:", {
+        isOpened,
+        lastShown,
+        todayStr,
+        open_at: pocket.open_at,
+        shouldShow: lastShown !== todayStr,
+        pocket_uuid: pocket.pocket_uuid,
+      });
+
+      // 테스트를 위해 localStorage 체크를 일시적으로 주석 처리하거나
+      // 항상 표시하려면 아래 조건을 제거하세요
+      if (lastShown !== todayStr) {
+        // 컨페티 표시
+        setShowConfetti(true);
+        // 모달은 약간의 딜레이 후 표시 (컨페티가 먼저 보이도록)
+        const modalTimer = setTimeout(() => {
+          setOpenedModalOpen(true);
+          localStorage.setItem(storageKey, todayStr);
+        }, 500);
+
+        // 컨페티는 5초 후 자동으로 사라짐
+        const confettiTimer = setTimeout(() => {
+          setShowConfetti(false);
+        }, 5000);
+
+        return () => {
+          clearTimeout(modalTimer);
+          clearTimeout(confettiTimer);
+        };
+      } else {
+        // 이미 오늘 띄웠지만, 모달이 닫혀있고 다시 열고 싶을 수 있으므로
+        // 컨페티만 다시 띄우지 않도록 함 (모달은 수동으로 열 수 있음)
+      }
+    }
+  }, [pocket, loading]);
+
   const progress = useMemo(() => {
     const cur = currentCount;
     const goal = pocket?.goal ?? 1;
@@ -418,6 +475,30 @@ export default function PocketDetailPage() {
 
   return (
     <main className={styles.page} aria-label="덕담 주머니 상세 페이지">
+      {showConfetti && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 999,
+            pointerEvents: "none",
+          }}
+        >
+          <ConfettiEffect particleCount={80} zIndex={999}>
+            <div />
+          </ConfettiEffect>
+        </div>
+      )}
+      <Modal
+        isOpen={openedModalOpen}
+        onClose={() => setOpenedModalOpen(false)}
+        ariaTitle="덕담 주머니 오픈 안내"
+      >
+        <PocketOpenedModal
+          onClose={() => setOpenedModalOpen(false)}
+          onViewDeokdams={() => setReceivedModalOpen(true)}
+        />
+      </Modal>
       <ToastPopup
         open={toastOpen}
         type={toastType}
