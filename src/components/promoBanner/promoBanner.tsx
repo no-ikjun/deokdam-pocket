@@ -80,7 +80,26 @@ const PromoBanner: React.FC<PromoBannerProps> = ({
     setSelectedAd(ad);
   }, [ads, showRandom]);
 
-  if (isLoading || !selectedAd) return null;
+  // 스켈레톤 UI
+  if (isLoading) {
+    return (
+      <div className={styles.promo_banner_skeleton}>
+        <span className={styles.ad_badge}>Ad</span>
+        <div className={styles.promo_content}>
+          <div className={`${styles.skeleton} ${styles.skeleton_image}`} />
+          <div className={styles.promo_text}>
+            <div className={`${styles.skeleton} ${styles.skeleton_title}`} />
+            <div
+              className={`${styles.skeleton} ${styles.skeleton_description}`}
+            />
+            <div className={`${styles.skeleton} ${styles.skeleton_cta}`} />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!selectedAd) return null;
 
   return (
     <Link

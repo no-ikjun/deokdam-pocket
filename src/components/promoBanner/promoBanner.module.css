@@ -146,11 +146,105 @@
   }
 }
 
+/* 스켈레톤 UI */
+.promo_banner_skeleton {
+  position: relative;
+  width: 100%;
+  border-radius: 12px;
+  padding: 0.7rem 0.85rem;
+  background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.6),
+      rgba(255, 255, 255, 0.4)
+    ),
+    rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(8px) saturate(120%);
+  -webkit-backdrop-filter: blur(8px) saturate(120%);
+  border: 1px solid rgba(226, 232, 240, 0.5);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  outline: 1px solid rgba(148, 163, 184, 0.1);
+  min-height: 70px;
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(226, 232, 240, 0.5) 0%,
+    rgba(241, 245, 249, 0.7) 50%,
+    rgba(226, 232, 240, 0.5) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s ease-in-out infinite;
+  border-radius: 8px;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.skeleton_image {
+  width: 50px;
+  height: 50px;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+.skeleton_title {
+  width: 70%;
+  height: 16px;
+  margin-bottom: 0.25rem;
+}
+
+.skeleton_description {
+  width: 90%;
+  height: 14px;
+  margin-bottom: 0.25rem;
+}
+
+.skeleton_cta {
+  width: 60px;
+  height: 12px;
+  margin-top: 0.15rem;
+}
+
+@media (max-width: 560px) {
+  .promo_banner_skeleton {
+    padding: 0.65rem 0.75rem;
+    min-height: 65px;
+  }
+
+  .skeleton_image {
+    width: 45px;
+    height: 45px;
+  }
+
+  .skeleton_title {
+    height: 15px;
+  }
+
+  .skeleton_description {
+    height: 13px;
+  }
+
+  .skeleton_cta {
+    height: 11px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .promo_banner {
     transition: none !important;
   }
   .promo_cta {
     transition: none !important;
+  }
+  .skeleton {
+    animation: none !important;
   }
 }
