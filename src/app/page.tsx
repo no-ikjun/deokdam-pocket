@@ -9,6 +9,9 @@ import { useRouter } from "next/navigation";
 import Timer from "@/components/timer/timer";
 import AdComponent from "@/components/adsense/AdComponent";
 import Modal from "@/components/modal/modal";
+import axios from "axios";
+import type { Pocket } from "@/types/pocket";
+import ToastPopup from "@/components/toastPopup/toastPopup";
 
 type PocketCard = {
   pocket_uuid: string;
@@ -20,12 +23,28 @@ type PocketCard = {
   goal: number;
 };
 
-type Activity = {
-  id: string;
-  title: string;
-  subtitle: string;
-  date: string;
-  category: "덕담" | "주머니 참여" | "기능 사용";
+// 스켈레톤 UI 컴포넌트
+const PocketCardSkeleton = () => {
+  return (
+    <div className={styles.skeleton_pocket_card}>
+      <div className={styles.skeleton_pocket_top}>
+        <div className={`${styles.skeleton} ${styles.skeleton_icon}`} />
+        <div className={`${styles.skeleton} ${styles.skeleton_dday}`} />
+      </div>
+      <div className={styles.pocket_body}>
+        <div className={`${styles.skeleton} ${styles.skeleton_name}`} />
+        <div className={`${styles.skeleton} ${styles.skeleton_meta}`} />
+        <div className={styles.pocket_progress_row}>
+          <div
+            className={`${styles.skeleton} ${styles.skeleton_progress_bar}`}
+          />
+          <div
+            className={`${styles.skeleton} ${styles.skeleton_progress_text}`}
+          />
+        </div>
+      </div>
+    </div>
+  );
 };
 
 const formatMonthDay = (iso: string) => {
@@ -54,78 +73,118 @@ export default function Home() {
 
   const [username, setUsername] = useState("");
   const [greeting, setGreeting] = useState("");
+  const [displayedGreeting, setDisplayedGreeting] = useState("");
+  const [isTyping, setIsTyping] = useState(false);
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [nicknameInput, setNicknameInput] = useState("");
   const [emailInput, setEmailInput] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
+  const [toastOpen, setToastOpen] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastType, setToastType] = useState<"success" | "error">("success");
 
-  // ===== 더미 데이터 (API 연결 시 여기만 바꾸면 됨) =====
-  const [todayRemaining, setTodayRemaining] = useState<number>(2);
-  const [activePocketCount, setActivePocketCount] = useState<number>(3);
+  // ===== 데이터 상태 =====
+  const [todayRemaining, setTodayRemaining] = useState<number>(0);
+  const [activePocketCount, setActivePocketCount] = useState<number>(0);
+  const [pockets, setPockets] = useState<PocketCard[]>([]);
+  const [pocketsLoading, setPocketsLoading] = useState<boolean>(true);
 
   const lunarNewYearAt = "2026-02-17T00:00:00+09:00"; // 설날(예시)
-  const [pockets, setPockets] = useState<PocketCard[]>([
-    {
-      pocket_uuid: "p-1",
-      name: "군대 동기 주머니",
-      icon: "pocket.png",
-      open_at: "2026-02-17T00:00:00+09:00",
-      members_count: 5,
-      my_deokdam_count: 3,
-      goal: 20,
-    },
-    {
-      pocket_uuid: "p-2",
-      name: "가족 덕담 주머니",
-      icon: "pocket.png",
-      open_at: "2026-02-17T00:00:00+09:00",
-      members_count: 4,
-      my_deokdam_count: 1,
-      goal: 12,
-    },
-    {
-      pocket_uuid: "p-3",
-      name: "친구들 덕담 주머니",
-      icon: "pocket.png",
-      open_at: "2026-02-10T00:00:00+09:00",
-      members_count: 7,
-      my_deokdam_count: 0,
-      goal: 18,
-    },
-    {
-      pocket_uuid: "p-3",
-      name: "친구들 덕담 주머니",
-      icon: "pocket.png",
-      open_at: "2026-02-10T00:00:00+09:00",
-      members_count: 7,
-      my_deokdam_count: 0,
-      goal: 18,
-    },
-  ]);
 
-  const [recentActivities, setRecentActivities] = useState<Activity[]>([
-    {
-      id: "a-1",
-      title: "가족 덕담 주머니에 덕담 1개 작성",
-      subtitle: "“너는 이미 잘하고 있어. 오늘 할 일 하나만 끝내자.”",
-      date: "2025-12-15T10:30:00+09:00",
-      category: "덕담",
-    },
-    {
-      id: "a-2",
-      title: "친구들 덕담 주머니 참여",
-      subtitle: "7명이 함께 목표 18개 달성 중",
-      date: "2025-12-14T21:05:00+09:00",
-      category: "주머니 참여",
-    },
-    {
-      id: "a-3",
-      title: "나에게 덕담 타이머 설정",
-      subtitle: "새해 카운트다운을 설정했어요",
-      date: "2025-12-13T08:40:00+09:00",
-      category: "기능 사용",
-    },
-  ]);
+  // 주머니 목록 및 내 덕담 개수 가져오기
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchPockets = async () => {
+      if (authStatus !== "authenticated") return;
+
+      setPocketsLoading(true);
+      try {
+        // 주머니 목록 가져오기
+        const response = await axios.get<Pocket[]>("/api/pocket/my");
+        if (!isMounted) return;
+
+        if (response.status === 200 && response.data) {
+          const pocketList = response.data;
+
+          // 각 주머니에 대해 내 덕담 개수 가져오기
+          const pocketsWithCounts = await Promise.all(
+            pocketList.map(async (pocket) => {
+              try {
+                const countResponse = await axios.get<{
+                  deokdam_count: string;
+                }>("/api/deokdam/mine/count", {
+                  params: { pocket_uuid: pocket.pocket_uuid },
+                });
+
+                const myDeokdamCount =
+                  countResponse.status === 200
+                    ? Number(countResponse.data.deokdam_count) || 0
+                    : 0;
+
+                return {
+                  pocket_uuid: pocket.pocket_uuid,
+                  name: pocket.name,
+                  icon: pocket.icon,
+                  open_at: pocket.open_at,
+                  members_count: pocket.members?.length || 0,
+                  my_deokdam_count: myDeokdamCount,
+                  goal: pocket.goal || 0,
+                } as PocketCard;
+              } catch (error) {
+                console.error(
+                  `Error fetching count for pocket ${pocket.pocket_uuid}:`,
+                  error
+                );
+                return {
+                  pocket_uuid: pocket.pocket_uuid,
+                  name: pocket.name,
+                  icon: pocket.icon,
+                  open_at: pocket.open_at,
+                  members_count: pocket.members?.length || 0,
+                  my_deokdam_count: 0,
+                  goal: pocket.goal || 0,
+                } as PocketCard;
+              }
+            })
+          );
+
+          if (!isMounted) return;
+
+          setPockets(pocketsWithCounts);
+          setActivePocketCount(pocketsWithCounts.length);
+
+          // 오늘 남은 덕담 계산 (간단한 예시 - 실제로는 별도 API 필요할 수 있음)
+          const totalGoal = pocketsWithCounts.reduce(
+            (sum, p) => sum + (p.goal || 0),
+            0
+          );
+          const totalMyDeokdam = pocketsWithCounts.reduce(
+            (sum, p) => sum + p.my_deokdam_count,
+            0
+          );
+          setTodayRemaining(Math.max(0, totalGoal - totalMyDeokdam));
+        }
+      } catch (error) {
+        console.error("Error fetching pockets:", error);
+        if (isMounted) {
+          setPockets([]);
+          setActivePocketCount(0);
+        }
+      } finally {
+        if (isMounted) {
+          setPocketsLoading(false);
+        }
+      }
+    };
+
+    void fetchPockets();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [authStatus]);
 
   useEffect(() => {
     if (authStatus === "unauthenticated") {
@@ -133,11 +192,31 @@ export default function Home() {
     }
   }, [authStatus, router]);
 
+  // 사용자 정보 로드
   useEffect(() => {
-    if (user?.name) setUsername(user.name);
-    // if (user?.email) setEmailInput(user.email);
-    if (user?.name) setNicknameInput(user.name);
-  }, [user]);
+    const loadUserInfo = async () => {
+      if (authStatus === "authenticated") {
+        try {
+          const response = await axios.get("/api/auth/me");
+          if (response.status === 200) {
+            const userData = response.data;
+            setUsername(userData.name || "");
+            setNicknameInput(userData.name || "");
+            setEmailInput(userData.email || "");
+          }
+        } catch (error) {
+          console.error("Error loading user info:", error);
+        }
+      }
+    };
+
+    if (user?.name) {
+      setUsername(user.name);
+      setNicknameInput(user.name);
+    }
+
+    void loadUserInfo();
+  }, [user, authStatus]);
 
   useEffect(() => {
     const now = new Date();
@@ -152,13 +231,18 @@ export default function Home() {
     setShowTimer(now < targetDate);
   }, []);
 
+  // 전체 작성한 덕담 개수 계산
+  const totalWrittenDeokdam = useMemo(() => {
+    return pockets.reduce((sum, p) => sum + p.my_deokdam_count, 0);
+  }, [pockets]);
+
   const topBadges = useMemo(
     () => [
       { label: "설날까지", value: calcDday(lunarNewYearAt) },
-      { label: "오늘 남은 덕담", value: `${todayRemaining}개` },
-      { label: "참여중 주머니", value: `${activePocketCount}개` },
+      { label: "작성한 덕담", value: `${totalWrittenDeokdam}개` },
+      { label: "참여 중인 주머니", value: `${activePocketCount}개` },
     ],
-    [todayRemaining, activePocketCount]
+    [totalWrittenDeokdam, activePocketCount]
   );
 
   useEffect(() => {
@@ -169,12 +253,46 @@ export default function Home() {
       `${displayName}님, 소중한 사람에게 마음을 전해보세요.`,
       `설날까지 파이팅! ${displayName}님의 응원으로 채워봐요.`,
       `${displayName}님, 나에게도 따뜻한 말 한마디를 선물해요.`,
+      `${displayName}님, 오늘 하루도 따뜻하게 시작해요.`,
+      `${displayName}님, 새해의 첫 마음을 기록해볼까요?`,
+      `${displayName}님, 함께 나눌 주머니를 만들어볼까요?`,
+      `${displayName}님, 지금 이 순간의 마음을 담아봐요.`,
+      `${displayName}님, 따뜻한 덕담으로 새해를 시작해요.`,
+      `${displayName}님, 소중한 사람들과 마음을 나눠봐요.`,
+      `${displayName}님, 작은 덕담으로 하루를 채워봐요.`,
+      `${displayName}님, 오늘도 따뜻한 마음을 나눠볼까요?`,
     ];
 
     const randomGreeting =
       greetingPool[Math.floor(Math.random() * greetingPool.length)];
     setGreeting(randomGreeting);
   }, [username]);
+
+  // 타이핑 애니메이션
+  useEffect(() => {
+    if (!greeting) {
+      setDisplayedGreeting("");
+      return;
+    }
+
+    setIsTyping(true);
+    setDisplayedGreeting("");
+
+    let currentIndex = 0;
+    const typingInterval = setInterval(() => {
+      if (currentIndex < greeting.length) {
+        setDisplayedGreeting(greeting.slice(0, currentIndex + 1));
+        currentIndex++;
+      } else {
+        setIsTyping(false);
+        clearInterval(typingInterval);
+      }
+    }, 50); // 각 글자마다 50ms 간격
+
+    return () => {
+      clearInterval(typingInterval);
+    };
+  }, [greeting]);
 
   if (showTimer === null) return null;
 
@@ -199,7 +317,10 @@ export default function Home() {
                     priority
                   />
                 </span>
-                <h1 className={styles.greeting}>{greeting}</h1>
+                <h1 className={styles.greeting}>
+                  {displayedGreeting}
+                  {isTyping && <span className={styles.cursor}>|</span>}
+                </h1>
               </div>
 
               <div className={styles.badges}>
@@ -284,87 +405,110 @@ export default function Home() {
           </div>
 
           <div className={styles.pocket_grid}>
-            {pockets.slice(0, 3).map((p) => {
-              const progress =
-                p.goal > 0
-                  ? Math.min(
-                      Math.round((p.my_deokdam_count / p.goal) * 100),
-                      100
-                    )
-                  : 0;
-
-              return (
-                <Link
-                  key={p.pocket_uuid}
-                  href={`/pocket/${p.pocket_uuid}`}
-                  className={styles.pocket_card}
+            {pocketsLoading ? (
+              // 로딩 중 스켈레톤 UI 표시
+              <>
+                <PocketCardSkeleton />
+                <PocketCardSkeleton />
+                <PocketCardSkeleton />
+              </>
+            ) : pockets.length === 0 ? (
+              // 주머니가 없을 때
+              <div
+                style={{
+                  gridColumn: "1 / -1",
+                  textAlign: "center",
+                  padding: "2rem",
+                }}
+              >
+                <p
+                  style={{
+                    margin: 0,
+                    fontSize: "0.95rem",
+                    fontWeight: 700,
+                    color: "#64748b",
+                  }}
                 >
-                  <div className={styles.pocket_top}>
-                    <div className={styles.pocket_icon}>
-                      <Image
-                        src={`/images/${p.icon}`}
-                        alt={p.name}
-                        width={32}
-                        height={32}
-                      />
-                    </div>
-                    <div className={styles.pocket_dday}>
-                      {calcDday(p.open_at)}
-                    </div>
-                  </div>
-
-                  <div className={styles.pocket_body}>
-                    <h3 className={styles.pocket_name}>{p.name}</h3>
-                    <p className={styles.pocket_meta}>
-                      오픈일 {formatMonthDay(p.open_at)} · {p.members_count}명
-                    </p>
-
-                    <div className={styles.pocket_progress_row}>
-                      <div className={styles.progress_bar} aria-hidden>
-                        <div
-                          className={styles.progress_fill}
-                          style={{ width: `${progress}%` }}
-                        />
-                      </div>
-                      <span className={styles.progress_text}>
-                        내 덕담 {p.my_deokdam_count} / {p.goal}
-                      </span>
-                    </div>
-                  </div>
+                  아직 참여한 주머니가 없어요
+                </p>
+                <Link
+                  href="/social"
+                  className={styles.logout_btn}
+                  style={{ marginTop: "0.8rem", display: "inline-block" }}
+                >
+                  주머니 만들러 가기 →
                 </Link>
-              );
-            })}
-          </div>
-        </section>
-
-        {/* 4) 최근 내가 쓴 덕담(3개) */}
-        <section className={styles.section}>
-          <div className={styles.section_header}>
-            <h2 className={styles.section_title}>최근 나의 활동</h2>
-            <Link href="/social" className={styles.section_link}>
-              더보기
-            </Link>
-          </div>
-
-          <div className={styles.activity_row}>
-            {recentActivities.slice(0, 3).map((activity) => (
-              <div key={activity.id} className={styles.activity_card}>
-                <div className={styles.activity_header}>
-                  <span className={styles.activity_badge}>
-                    {activity.category}
-                  </span>
-                  <span className={styles.activity_date}>
-                    {formatMonthDay(activity.date)}
-                  </span>
-                </div>
-                <p className={styles.activity_title}>{activity.title}</p>
-                <p className={styles.activity_subtitle}>{activity.subtitle}</p>
               </div>
-            ))}
+            ) : (
+              // 주머니 목록 표시 (최대 3개, 빈 공간은 placeholder로 채움)
+              <>
+                {pockets.slice(0, 3).map((p) => {
+                  const progress =
+                    p.goal > 0
+                      ? Math.min(
+                          Math.round((p.my_deokdam_count / p.goal) * 100),
+                          100
+                        )
+                      : 0;
+
+                  return (
+                    <Link
+                      key={p.pocket_uuid}
+                      href={`/pocket/${p.pocket_uuid}`}
+                      className={styles.pocket_card}
+                    >
+                      <div className={styles.pocket_top}>
+                        <div className={styles.pocket_icon}>
+                          <Image
+                            src={`/images/${p.icon}`}
+                            alt={p.name}
+                            width={32}
+                            height={32}
+                          />
+                        </div>
+                        <div className={styles.pocket_dday}>
+                          {calcDday(p.open_at)}
+                        </div>
+                      </div>
+
+                      <div className={styles.pocket_body}>
+                        <h3 className={styles.pocket_name}>{p.name}</h3>
+                        <p className={styles.pocket_meta}>
+                          오픈일 {formatMonthDay(p.open_at)} · {p.members_count}
+                          명
+                        </p>
+
+                        <div className={styles.pocket_progress_row}>
+                          <div className={styles.progress_bar} aria-hidden>
+                            <div
+                              className={styles.progress_fill}
+                              style={{ width: `${progress}%` }}
+                            />
+                          </div>
+                          <span className={styles.progress_text}>
+                            내 덕담 {p.my_deokdam_count} / {p.goal}
+                          </span>
+                        </div>
+                      </div>
+                    </Link>
+                  );
+                })}
+                {/* 빈 공간을 채우는 placeholder (최대 3개까지) */}
+                {Array.from({ length: Math.max(0, 3 - pockets.length) }).map(
+                  (_, idx) => (
+                    <div
+                      key={`placeholder-${idx}`}
+                      className={styles.pocket_card_placeholder}
+                      aria-hidden="true"
+                    />
+                  )
+                )}
+              </>
+            )}
           </div>
         </section>
 
-        {/* 5) 광고 + footer */}
+        {/* 4) 광고 + footer */}
         <div className={styles.ad_banner}>
           <AdComponent
             adSlot="7323782821"
@@ -466,9 +610,40 @@ export default function Home() {
               <button
                 type="button"
                 className={styles.modal_save_btn}
-                onClick={() => {}}
+                onClick={async () => {
+                  if (isSaving) return;
+
+                  setIsSaving(true);
+                  try {
+                    const response = await axios.patch("/api/user", {
+                      name: nicknameInput.trim(),
+                      email: emailInput.trim() || null,
+                    });
+
+                    if (response.status === 200) {
+                      // 사용자 정보 업데이트
+                      await useAuthStore.getState().refreshUser();
+                      setUsername(response.data.name || "");
+                      setToastMessage("설정이 저장되었습니다.");
+                      setToastType("success");
+                      setToastOpen(true);
+                      setIsSettingsOpen(false);
+                    }
+                  } catch (error: any) {
+                    console.error("Error saving settings:", error);
+                    const errorMessage =
+                      error.response?.data?.message ||
+                      "설정 저장에 실패했습니다.";
+                    setToastMessage(errorMessage);
+                    setToastType("error");
+                    setToastOpen(true);
+                  } finally {
+                    setIsSaving(false);
+                  }
+                }}
+                disabled={isSaving}
               >
-                저장
+                {isSaving ? "저장 중..." : "저장"}
               </button>
             </div>
           </div>

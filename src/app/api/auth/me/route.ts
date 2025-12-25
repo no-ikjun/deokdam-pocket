@@ -5,7 +5,7 @@ import { withAuthAndDb } from "@/utils/db";
 export async function GET() {
   return withAuthAndDb(async (user_uuid, client) => {
     const userData = await client.sql`
-      SELECT user_uuid, name FROM "user" WHERE user_uuid = ${user_uuid}
+      SELECT user_uuid, name, email FROM "user" WHERE user_uuid = ${user_uuid}
     `;
 
     if (userData.rowCount === 0) {
@@ -14,7 +14,11 @@ export async function GET() {
 
     const user = userData.rows[0];
     return NextResponse.json(
-      { user_uuid: user.user_uuid, name: user.name },
+      { 
+        user_uuid: user.user_uuid, 
+        name: user.name,
+        email: user.email || null
+      },
       { status: 200 }
     );
   });
