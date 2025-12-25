@@ -99,6 +99,24 @@ const PromoBanner: React.FC<PromoBannerProps> = ({
     );
   }
 
+  // 광고 클릭 시 로그 기록
+  const handleAdClick = async () => {
+    if (!selectedAd) return;
+
+    try {
+      await axios.post("/api/log", {
+        logType: "ad_click",
+        action: "promo_banner",
+        metadata: {
+          adId: selectedAd.id,
+        },
+      });
+    } catch (error) {
+      // 로그 기록 실패해도 사용자 경험에 영향 없도록 조용히 처리
+      console.error("Failed to log ad click:", error);
+    }
+  };
+
   if (!selectedAd) return null;
 
   return (
@@ -107,6 +125,7 @@ const PromoBanner: React.FC<PromoBannerProps> = ({
       target="_blank"
       rel="noopener noreferrer"
       className={styles.promo_banner}
+      onClick={handleAdClick}
     >
       <span className={styles.ad_badge}>Ad</span>
       <div className={styles.promo_content}>
