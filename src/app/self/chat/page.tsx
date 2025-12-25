@@ -294,10 +294,7 @@ export default function SelfChatPage() {
           );
           // Remove user message and assistant message on limit error
           setMessages((prev) =>
-            prev.filter(
-              (msg) =>
-                msg.id !== userMessage.id && msg.id !== assistantMessageId
-            )
+            prev.filter((msg) => msg.id !== userMessage.id)
           );
           return;
         }
@@ -312,6 +309,7 @@ export default function SelfChatPage() {
       const decoder = new TextDecoder();
       let buffer = "";
       let fullContent = "";
+      let actualMessageId = assistantMessageId;
 
       while (true) {
         const { done, value } = await reader.read();
@@ -328,13 +326,22 @@ export default function SelfChatPage() {
             const data = JSON.parse(line);
 
             if (data.type === "metadata") {
-              // 메타데이터는 필요시 사용 (컨텍스트 정보 등)
+              if (data.msgId) {
+                actualMessageId = data.msgId;
+                setMessages((prev) =>
+                  prev.map((msg) =>
+                    msg.id === assistantMessageId
+                      ? { ...msg, id: actualMessageId }
+                      : msg
+                  )
+                );
+              }
             } else if (data.type === "content" && data.delta) {
               fullContent += data.delta;
               setMessages((prev) =>
                 prev.map((msg) =>
-                  msg.id === assistantMessageId
-                    ? { ...msg, content: fullContent }
+                  msg.id === actualMessageId || msg.id === assistantMessageId
+                    ? { ...msg, id: actualMessageId, content: fullContent }
                     : msg
                 )
               );
@@ -342,8 +349,8 @@ export default function SelfChatPage() {
               // 토큰 사용량 정보는 필요시 사용 가능
               setMessages((prev) =>
                 prev.map((msg) =>
-                  msg.id === assistantMessageId
-                    ? { ...msg, status: "done" }
+                  msg.id === actualMessageId || msg.id === assistantMessageId
+                    ? { ...msg, id: actualMessageId, status: "done" }
                     : msg
                 )
               );
@@ -357,9 +364,10 @@ export default function SelfChatPage() {
       // 최종적으로 완료 상태로 설정
       setMessages((prev) =>
         prev.map((msg) =>
-          msg.id === assistantMessageId
+          msg.id === actualMessageId || msg.id === assistantMessageId
             ? {
                 ...msg,
+                id: actualMessageId,
                 content: fullContent.trim(),
                 status: "done",
                 createdAt: new Date().toISOString(),
@@ -378,7 +386,12 @@ export default function SelfChatPage() {
                 ? { ...message, status: "error" as const }
                 : message
             )
-            .filter((msg) => msg.id !== assistantMessageId) // 실패한 assistant 메시지 제거
+            .filter(
+              (msg) =>
+                msg.id !== assistantMessageId &&
+                msg.status !== "pending" &&
+                msg.role !== "assistant"
+            ) // 실패한 assistant 메시지 제거
       );
     } finally {
       setIsLoading(false);
