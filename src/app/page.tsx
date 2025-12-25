@@ -8,6 +8,7 @@ import { useAuthStore } from "@/stores/auth";
 import { useRouter } from "next/navigation";
 import Timer from "@/components/timer/timer";
 import AdComponent from "@/components/adsense/AdComponent";
+import PromoBanner from "@/components/promoBanner/promoBanner";
 import Modal from "@/components/modal/modal";
 import axios from "axios";
 import type { Pocket } from "@/types/pocket";
@@ -575,12 +576,7 @@ export default function Home() {
 
         {/* 4) 광고 + footer */}
         <div className={styles.ad_banner}>
-          <AdComponent
-            adSlot="7323782821"
-            style={{ display: "block" }}
-            adFormat="auto"
-            responsive={true}
-          />
+          <PromoBanner />
         </div>
 
         <footer className={styles.footer}>

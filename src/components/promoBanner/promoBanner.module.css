@@ -1,0 +1,157 @@
+.promo_banner {
+  position: relative;
+  width: 100%;
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  border-radius: 12px;
+  padding: 0.7rem 0.85rem;
+  background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.6),
+      rgba(255, 255, 255, 0.4)
+    ),
+    rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(8px) saturate(120%);
+  -webkit-backdrop-filter: blur(8px) saturate(120%);
+  border: 1px solid rgba(226, 232, 240, 0.5);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  transition: transform 0.12s ease, box-shadow 0.2s ease,
+    outline-color 0.2s ease, background 0.2s ease;
+  outline: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.promo_banner:hover {
+  transform: translateY(-1px);
+  outline-color: rgba(148, 163, 184, 0.2);
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.7),
+      rgba(255, 255, 255, 0.5)
+    ),
+    rgba(255, 255, 255, 0.4);
+}
+
+.ad_badge {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: #64748b;
+  background: rgba(241, 245, 249, 0.8);
+  box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.3);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  z-index: 1;
+}
+
+.promo_content {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.promo_image_wrapper {
+  width: 50px;
+  height: 50px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  background: rgba(241, 245, 249, 0.6);
+  box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.2);
+  flex-shrink: 0;
+}
+
+.promo_image {
+  object-fit: contain;
+  border-radius: 12px;
+}
+
+.promo_text {
+  display: grid;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.promo_title {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #64748b;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+}
+
+.promo_description {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #94a3b8;
+  line-height: 1.35;
+}
+
+.promo_cta {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #94a3b8;
+  margin-top: 0.15rem;
+  transition: transform 0.15s ease, color 0.2s ease;
+}
+
+.promo_banner:hover .promo_cta {
+  transform: translateX(1px);
+  color: #64748b;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 560px) {
+  .promo_banner {
+    padding: 0.65rem 0.75rem;
+  }
+
+  .promo_content {
+    gap: 0.6rem;
+  }
+
+  .promo_image_wrapper {
+    width: 45px;
+    height: 45px;
+  }
+
+  .promo_title {
+    font-size: 0.8rem;
+  }
+
+  .promo_description {
+    font-size: 0.7rem;
+  }
+
+  .promo_cta {
+    font-size: 0.68rem;
+  }
+
+  .ad_badge {
+    top: 0.4rem;
+    right: 0.4rem;
+    padding: 0.15rem 0.4rem;
+    font-size: 0.6rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .promo_banner {
+    transition: none !important;
+  }
+  .promo_cta {
+    transition: none !important;
+  }
+}
+
