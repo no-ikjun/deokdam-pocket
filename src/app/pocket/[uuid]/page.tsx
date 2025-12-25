@@ -11,6 +11,7 @@ import InviteModal from "@/app/social/component/invite_modal";
 import ToastPopup from "@/components/toastPopup/toastPopup";
 import DeokdamWriteModal from "../component/deokdam_write";
 import MyDeokdamModal from "../component/my_deokdam";
+import ReceivedDeokdamModal from "../component/received_deokdam";
 import { useAuthStore } from "@/stores/auth";
 import type { Pocket } from "@/types/pocket";
 
@@ -46,6 +47,7 @@ export default function PocketDetailPage() {
   const [autoJoinAttempted, setAutoJoinAttempted] = useState(false);
 
   const [myModalOpen, setMyModalOpen] = useState(false);
+  const [receivedModalOpen, setReceivedModalOpen] = useState(false);
 
   const fetchDetail = async () => {
     setLoading(true);
@@ -328,6 +330,25 @@ export default function PocketDetailPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [uuid, isInvite, authStatus, autoJoinAttempted]);
 
+  // 커스텀 이벤트 리스너: 받은 덕담 모달에서 액션 버튼 클릭 시
+  useEffect(() => {
+    const handleOpenWriteDeokdam = () => {
+      setWriteModalOpen(true);
+    };
+
+    const handleOpenInvite = () => {
+      setInviteModalOpen(true);
+    };
+
+    window.addEventListener("openWriteDeokdam", handleOpenWriteDeokdam);
+    window.addEventListener("openInvite", handleOpenInvite);
+
+    return () => {
+      window.removeEventListener("openWriteDeokdam", handleOpenWriteDeokdam);
+      window.removeEventListener("openInvite", handleOpenInvite);
+    };
+  }, []);
+
   const progress = useMemo(() => {
     const cur = currentCount;
     const goal = pocket?.goal ?? 1;
@@ -361,6 +382,15 @@ export default function PocketDetailPage() {
     if (diff < 0) return "오픈 완료";
     if (diff === 0) return "오늘 오픈";
     return `D-${diff}`;
+  }, [pocket]);
+
+  const isOpened = useMemo(() => {
+    if (!pocket) return false;
+    const open = new Date(pocket.open_at);
+    const today = new Date();
+    open.setHours(0, 0, 0, 0);
+    today.setHours(0, 0, 0, 0);
+    return open.getTime() <= today.getTime();
   }, [pocket]);
 
   const handleCopyCode = async () => {
@@ -436,6 +466,17 @@ export default function PocketDetailPage() {
         onClose={() => setMyModalOpen(false)}
         pocketUuid={pocket?.pocket_uuid ?? ""}
         members={members}
+      />
+      <ReceivedDeokdamModal
+        open={receivedModalOpen}
+        onClose={() => setReceivedModalOpen(false)}
+        pocketUuid={pocket?.pocket_uuid ?? ""}
+        members={members}
+        pocketName={pocket?.name}
+        pocketIcon={pocket?.icon}
+        myDeokdamCount={myDeokdamCount}
+        goal={pocket?.goal ?? 0}
+        totalCount={currentCount}
       />
       <div className={styles.back_button_div}>
         <span
@@ -582,20 +623,33 @@ export default function PocketDetailPage() {
           </div>
 
           <div className={styles.actions_block}>
+            {isOpened && (
+              <button
+                type="button"
+                className={styles.primary_action}
+                onClick={() => setReceivedModalOpen(true)}
+              >
+                <span className={styles.action_label}>받은 덕담 확인하기</span>
+              </button>
+            )}
             <button
               type="button"
-              className={styles.primary_action}
+              className={
+                isOpened ? styles.secondary_action : styles.primary_action
+              }
               onClick={() => setWriteModalOpen(true)}
             >
               <span className={styles.action_label}>덕담 남기기</span>
             </button>
-            <button
-              type="button"
-              className={styles.secondary_action}
-              onClick={() => setInviteModalOpen(true)}
-            >
-              <span className={styles.action_label}>초대하기</span>
-            </button>
+            {!isOpened && (
+              <button
+                type="button"
+                className={styles.secondary_action}
+                onClick={() => setInviteModalOpen(true)}
+              >
+                <span className={styles.action_label}>초대하기</span>
+              </button>
+            )}
           </div>
 
           <footer className={styles.info_footer}>

@@ -75,6 +75,8 @@
   cursor: pointer;
   transition: transform 0.12s ease, background 0.18s ease, color 0.18s ease,
     box-shadow 0.18s ease;
+  z-index: 1001;
+  pointer-events: auto;
 }
 
 .close:hover {
