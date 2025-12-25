@@ -12,6 +12,8 @@ import Modal from "@/components/modal/modal";
 import axios from "axios";
 import type { Pocket } from "@/types/pocket";
 import ToastPopup from "@/components/toastPopup/toastPopup";
+import { LoadingButton } from "@/components/loadingButton/loadingButton";
+import useCountNum from "@/hooks/countUp";
 
 type PocketCard = {
   pocket_uuid: string;
@@ -19,7 +21,7 @@ type PocketCard = {
   icon: string;
   open_at: string; // ISO
   members_count: number;
-  my_deokdam_count: number;
+  total_deokdam_count: number; // 주머니의 전체 덕담 수
   goal: number;
 };
 
@@ -92,7 +94,7 @@ export default function Home() {
 
   const lunarNewYearAt = "2026-02-17T00:00:00+09:00"; // 설날(예시)
 
-  // 주머니 목록 및 내 덕담 개수 가져오기
+  // 주머니 목록 및 전체 덕담 개수 가져오기
   useEffect(() => {
     let isMounted = true;
 
@@ -108,19 +110,19 @@ export default function Home() {
         if (response.status === 200 && response.data) {
           const pocketList = response.data;
 
-          // 각 주머니에 대해 내 덕담 개수 가져오기
+          // 각 주머니에 대해 전체 덕담 개수 가져오기
           const pocketsWithCounts = await Promise.all(
             pocketList.map(async (pocket) => {
               try {
                 const countResponse = await axios.get<{
-                  deokdam_count: string;
-                }>("/api/deokdam/mine/count", {
+                  ment_count: string;
+                }>("/api/pocket/info/count", {
                   params: { pocket_uuid: pocket.pocket_uuid },
                 });
 
-                const myDeokdamCount =
+                const totalDeokdamCount =
                   countResponse.status === 200
-                    ? Number(countResponse.data.deokdam_count) || 0
+                    ? Number(countResponse.data.ment_count) || 0
                     : 0;
 
                 return {
@@ -129,7 +131,7 @@ export default function Home() {
                   icon: pocket.icon,
                   open_at: pocket.open_at,
                   members_count: pocket.members?.length || 0,
-                  my_deokdam_count: myDeokdamCount,
+                  total_deokdam_count: totalDeokdamCount,
                   goal: pocket.goal || 0,
                 } as PocketCard;
               } catch (error) {
@@ -143,7 +145,7 @@ export default function Home() {
                   icon: pocket.icon,
                   open_at: pocket.open_at,
                   members_count: pocket.members?.length || 0,
-                  my_deokdam_count: 0,
+                  total_deokdam_count: 0,
                   goal: pocket.goal || 0,
                 } as PocketCard;
               }
@@ -160,11 +162,11 @@ export default function Home() {
             (sum, p) => sum + (p.goal || 0),
             0
           );
-          const totalMyDeokdam = pocketsWithCounts.reduce(
-            (sum, p) => sum + p.my_deokdam_count,
+          const totalDeokdam = pocketsWithCounts.reduce(
+            (sum, p) => sum + p.total_deokdam_count,
             0
           );
-          setTodayRemaining(Math.max(0, totalGoal - totalMyDeokdam));
+          setTodayRemaining(Math.max(0, totalGoal - totalDeokdam));
         }
       } catch (error) {
         console.error("Error fetching pockets:", error);
@@ -231,18 +233,75 @@ export default function Home() {
     setShowTimer(now < targetDate);
   }, []);
 
-  // 전체 작성한 덕담 개수 계산
-  const totalWrittenDeokdam = useMemo(() => {
-    return pockets.reduce((sum, p) => sum + p.my_deokdam_count, 0);
-  }, [pockets]);
+  // 전체 작성한 덕담 개수 계산 (별도로 가져오기)
+  const [totalWrittenDeokdam, setTotalWrittenDeokdam] = useState<number>(0);
+  const [deokdamCountLoading, setDeokdamCountLoading] =
+    useState<boolean>(false);
+
+  useEffect(() => {
+    const fetchMyDeokdamCount = async () => {
+      if (authStatus !== "authenticated" || pockets.length === 0) {
+        setTotalWrittenDeokdam(0);
+        setDeokdamCountLoading(false);
+        return;
+      }
+
+      setDeokdamCountLoading(true);
+      try {
+        const counts = await Promise.all(
+          pockets.map(async (pocket) => {
+            try {
+              const response = await axios.get<{
+                deokdam_count: string;
+              }>("/api/deokdam/mine/count", {
+                params: { pocket_uuid: pocket.pocket_uuid },
+              });
+              return response.status === 200
+                ? Number(response.data.deokdam_count) || 0
+                : 0;
+            } catch {
+              return 0;
+            }
+          })
+        );
+        setTotalWrittenDeokdam(counts.reduce((sum, count) => sum + count, 0));
+      } catch (error) {
+        console.error("Error fetching my deokdam count:", error);
+        setTotalWrittenDeokdam(0);
+      } finally {
+        setDeokdamCountLoading(false);
+      }
+    };
+
+    void fetchMyDeokdamCount();
+  }, [pockets, authStatus]);
+
+  // 카운트업 애니메이션 (로딩 완료 후에만 시작)
+  const shouldAnimate = !deokdamCountLoading && !pocketsLoading;
+  const animatedDeokdamCount = useCountNum(
+    totalWrittenDeokdam,
+    0,
+    shouldAnimate ? 1500 : 0
+  );
+  const animatedPocketCount = useCountNum(
+    activePocketCount,
+    0,
+    shouldAnimate ? 1500 : 0
+  );
 
   const topBadges = useMemo(
     () => [
       { label: "설날까지", value: calcDday(lunarNewYearAt) },
-      { label: "작성한 덕담", value: `${totalWrittenDeokdam}개` },
-      { label: "참여 중인 주머니", value: `${activePocketCount}개` },
+      {
+        label: "작성한 덕담",
+        value: `${animatedDeokdamCount}개`,
+      },
+      {
+        label: "참여 중인 주머니",
+        value: `${animatedPocketCount}개`,
+      },
     ],
-    [totalWrittenDeokdam, activePocketCount]
+    [animatedDeokdamCount, animatedPocketCount]
   );
 
   useEffect(() => {
@@ -302,6 +361,12 @@ export default function Home() {
 
   return (
     <main className={styles.page}>
+      <ToastPopup
+        open={toastOpen}
+        type={toastType}
+        message={toastMessage}
+        onClose={() => setToastOpen(false)}
+      />
       <div className={styles.shell}>
         {/* 1) 상단: Greeting + 상태 배지 */}
         <header className={styles.hero}>
@@ -395,10 +460,10 @@ export default function Home() {
           </div>
         </section>
 
-        {/* 3) 진행 중인 주머니 */}
+        {/* 3) 나의 덕담 주머니 */}
         <section className={styles.section}>
           <div className={styles.section_header}>
-            <h2 className={styles.section_title}>진행 중인 주머니</h2>
+            <h2 className={styles.section_title}>나의 덕담 주머니</h2>
             <Link href="/social" className={styles.section_link}>
               모두 보기
             </Link>
@@ -446,7 +511,7 @@ export default function Home() {
                   const progress =
                     p.goal > 0
                       ? Math.min(
-                          Math.round((p.my_deokdam_count / p.goal) * 100),
+                          Math.round((p.total_deokdam_count / p.goal) * 100),
                           100
                         )
                       : 0;
@@ -486,7 +551,7 @@ export default function Home() {
                             />
                           </div>
                           <span className={styles.progress_text}>
-                            내 덕담 {p.my_deokdam_count} / {p.goal}
+                            덕담 {p.total_deokdam_count} / {p.goal}
                           </span>
                         </div>
                       </div>
@@ -607,9 +672,11 @@ export default function Home() {
               >
                 로그아웃
               </button>
-              <button
-                type="button"
-                className={styles.modal_save_btn}
+              <LoadingButton
+                label="저장"
+                loadingLabel="저장 중..."
+                loading={isSaving}
+                disabled={isSaving}
                 onClick={async () => {
                   if (isSaving) return;
 
@@ -641,10 +708,9 @@ export default function Home() {
                     setIsSaving(false);
                   }
                 }}
-                disabled={isSaving}
-              >
-                {isSaving ? "저장 중..." : "저장"}
-              </button>
+                fontSize="0.95rem"
+                height={38}
+              />
             </div>
           </div>
         </Modal>

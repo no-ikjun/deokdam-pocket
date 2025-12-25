@@ -11,18 +11,14 @@ export async function PATCH(req: NextRequest) {
       const { name, email } = body;
 
       // name과 email 중 하나라도 제공되어야 함
-      if (!name && email === undefined) {
+      if (name === undefined && email === undefined) {
         return NextResponse.json(
           { message: "name or email is required" },
           { status: 400 }
         );
       }
 
-      // 업데이트할 필드 구성
-      const updates: string[] = [];
-      const values: any[] = [];
-      let paramIndex = 1;
-
+      // name 검증 및 처리
       if (name !== undefined) {
         if (typeof name !== "string" || name.trim().length === 0) {
           return NextResponse.json(
@@ -30,14 +26,13 @@ export async function PATCH(req: NextRequest) {
             { status: 400 }
           );
         }
-        updates.push(`name = $${paramIndex}`);
-        values.push(name.trim());
-        paramIndex++;
       }
 
+      // email 검증 및 처리
+      let emailValue: string | null = null;
       if (email !== undefined) {
         // email이 빈 문자열이면 null로 처리
-        const emailValue = email && email.trim().length > 0 ? email.trim() : null;
+        emailValue = email && email.trim().length > 0 ? email.trim() : null;
         
         // 이메일 형식 검증 (null이 아닌 경우)
         if (emailValue !== null) {
@@ -49,24 +44,35 @@ export async function PATCH(req: NextRequest) {
             );
           }
         }
-        
-        updates.push(`email = $${paramIndex}`);
-        values.push(emailValue);
-        paramIndex++;
       }
 
-      // user_uuid 추가
-      values.push(user_uuid);
-
-      // SQL 쿼리 실행
-      const query = `
-        UPDATE "user" 
-        SET ${updates.join(", ")}, updated_at = NOW()
-        WHERE user_uuid = $${paramIndex}
-        RETURNING user_uuid, name, email
-      `;
-
-      const result = await client.query(query, values);
+      // SQL 쿼리 실행 (client.sql 사용)
+      let result;
+      if (name !== undefined && email !== undefined) {
+        // 둘 다 업데이트
+        result = await client.sql`
+          UPDATE "user" 
+          SET name = ${name.trim()}, email = ${emailValue}
+          WHERE user_uuid = ${user_uuid}
+          RETURNING user_uuid, name, email
+        `;
+      } else if (name !== undefined) {
+        // name만 업데이트
+        result = await client.sql`
+          UPDATE "user" 
+          SET name = ${name.trim()}
+          WHERE user_uuid = ${user_uuid}
+          RETURNING user_uuid, name, email
+        `;
+      } else {
+        // email만 업데이트
+        result = await client.sql`
+          UPDATE "user" 
+          SET email = ${emailValue}
+          WHERE user_uuid = ${user_uuid}
+          RETURNING user_uuid, name, email
+        `;
+      }
 
       if (result.rowCount === 0) {
         return NextResponse.json(

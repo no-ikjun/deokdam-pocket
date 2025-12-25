@@ -735,7 +735,7 @@
 }
 
 .modal_save_btn {
-  padding: 0.55rem 0.9rem;
+  padding: 0.45rem 0.9rem;
   border-radius: 12px;
   border: none;
   cursor: pointer;
@@ -754,7 +754,7 @@
 }
 
 .modal_logout_btn {
-  padding: 0.55rem 0.9rem;
+  padding: 0.45rem 0.9rem;
   border-radius: 12px;
   border: none;
   cursor: pointer;
