@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import axios from "axios";
 import styles from "./promoBanner.module.css";
 
 export type PromoAd = {
@@ -14,38 +15,59 @@ export type PromoAd = {
   ctaText?: string;
 };
 
-// 더미 광고 데이터
-const DUMMY_ADS: PromoAd[] = [
-  {
-    id: "1",
-    title: "새로운 서비스를 만나보세요",
-    description: "더 나은 경험을 위한 혁신적인 솔루션",
-    imageUrl: "/images/pocket.png", // placeholder 이미지 사용
-    linkUrl: "https://example.com",
-    ctaText: "자세히 보기",
-  },
-  {
-    id: "2",
-    title: "특별한 혜택을 놓치지 마세요",
-    description: "지금 바로 시작하면 특별한 혜택을 받을 수 있습니다",
-    imageUrl: "/images/giftbox.png",
-    linkUrl: "https://example.com",
-    ctaText: "시작하기",
-  },
-];
-
 interface PromoBannerProps {
   ads?: PromoAd[];
   showRandom?: boolean;
 }
 
 const PromoBanner: React.FC<PromoBannerProps> = ({
-  ads = DUMMY_ADS,
+  ads: propAds,
   showRandom = true,
 }) => {
+  const [ads, setAds] = useState<PromoAd[]>(propAds || []);
   const [selectedAd, setSelectedAd] = useState<PromoAd | null>(null);
+  const [isLoading, setIsLoading] = useState(!propAds);
 
-  // 컴포넌트 마운트 시 한 번만 광고 선택
+  // DB에서 광고 데이터 가져오기
+  useEffect(() => {
+    // props로 ads가 전달된 경우 API 호출하지 않음
+    if (propAds) {
+      setAds(propAds);
+      setIsLoading(false);
+      return;
+    }
+
+    const fetchAds = async () => {
+      try {
+        const response = await axios.get<{ message: string; ads: PromoAd[] }>(
+          "/api/promo"
+        );
+
+        if (response.status === 200 && response.data.ads) {
+          const fetchedAds = response.data.ads;
+          if (fetchedAds.length > 0) {
+            setAds(fetchedAds);
+          } else {
+            // DB에 데이터가 없으면 더미 데이터 사용
+            setAds([]);
+          }
+        } else {
+          // API 오류 시 더미 데이터 사용
+          setAds([]);
+        }
+      } catch (error) {
+        console.error("Error fetching promo ads:", error);
+        // 에러 발생 시 더미 데이터 사용
+        setAds([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    void fetchAds();
+  }, [propAds]);
+
+  // 광고 선택 (컴포넌트 마운트 시 또는 ads 변경 시)
   useEffect(() => {
     if (ads.length === 0) {
       setSelectedAd(null);
@@ -58,7 +80,7 @@ const PromoBanner: React.FC<PromoBannerProps> = ({
     setSelectedAd(ad);
   }, [ads, showRandom]);
 
-  if (!selectedAd) return null;
+  if (isLoading || !selectedAd) return null;
 
   return (
     <Link
@@ -73,8 +95,8 @@ const PromoBanner: React.FC<PromoBannerProps> = ({
           <Image
             src={selectedAd.imageUrl}
             alt={selectedAd.title}
-            width={50}
-            height={50}
+            width={40}
+            height={40}
             className={styles.promo_image}
           />
         </div>
