@@ -81,6 +81,14 @@ export default function ReceivedDeokdamModal({
 
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
+  const activePointerIdRef = useRef<number | null>(null);
+  const dragOffsetRef = useRef(0);
+  const pointerStartRef = useRef<{
+    x: number;
+    y: number;
+    inScrollableMessage: boolean;
+    mode: "pending" | "swipe" | "scroll";
+  } | null>(null);
 
   const currentCard = useMemo(
     () => (list.length > 0 ? list[currentIndex] : null),
@@ -172,70 +180,135 @@ export default function ReceivedDeokdamModal({
     }
   };
 
-  // 마우스 드래그
-  const handleMouseDown = (e: React.MouseEvent) => {
-    setIsDragging(true);
+  const isInScrollableMessageArea = (target: EventTarget | null) => {
+    if (!target || !(target instanceof HTMLElement)) return false;
+    const el = target.closest(
+      `.${styles.card_message_section}`
+    ) as HTMLElement | null;
+    if (!el) return false;
+    // 실제로 스크롤이 필요한 경우에만(내용이 넘치는 경우) 스와이프를 막고 스크롤을 허용
+    return el.scrollHeight > el.clientHeight + 1;
+  };
+
+  // Pointer Events로 드래그/스와이프 통합
+  // - 본문(스크롤 영역)에서도 '가로로' 움직이면 스와이프
+  // - '세로로' 움직이면 스크롤
+  const handlePointerDown = (e: React.PointerEvent) => {
+    // 버튼 등 인터랙션 요소는 스와이프 시작하지 않도록
+    if ((e.target as HTMLElement | null)?.closest("button")) return;
+
+    activePointerIdRef.current = e.pointerId;
+    pointerStartRef.current = {
+      x: e.clientX,
+      y: e.clientY,
+      inScrollableMessage: isInScrollableMessageArea(e.target),
+      mode: "pending",
+    };
+    // 아직 스와이프인지 스크롤인지 결정 전이므로 드래그 시작하지 않음
+    setIsDragging(false);
     setDragStart(e.clientX);
+    setDragOffset(0);
+    dragOffsetRef.current = 0;
   };
 
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!isDragging) return;
-    const offset = e.clientX - dragStart;
-    setDragOffset(offset);
+  const handlePointerMove = (e: React.PointerEvent) => {
+    if (activePointerIdRef.current !== e.pointerId) return;
+    const start = pointerStartRef.current;
+    if (!start) return;
+
+    const dx = e.clientX - start.x;
+    const dy = e.clientY - start.y;
+
+    // 아직 방향 결정을 안 했으면, 작은 움직임은 무시
+    if (start.mode === "pending") {
+      const absX = Math.abs(dx);
+      const absY = Math.abs(dy);
+      if (absX < 6 && absY < 6) return;
+
+      // 스크롤 가능한 본문에서 시작했고, 세로 이동이 더 크면 스크롤 모드로 확정
+      if (start.inScrollableMessage && absY > absX) {
+        pointerStartRef.current = { ...start, mode: "scroll" };
+        return;
+      }
+
+      // 그 외에는 스와이프 모드로 확정
+      pointerStartRef.current = { ...start, mode: "swipe" };
+      setIsDragging(true);
+      setDragStart(start.x);
+      try {
+        containerRef.current?.setPointerCapture(e.pointerId);
+      } catch {
+        // ignore
+      }
+    }
+
+    // 스와이프 모드에서만 카드 이동
+    if (pointerStartRef.current?.mode !== "swipe") return;
+    if (e.cancelable) e.preventDefault();
+    setDragOffset(dx);
+    dragOffsetRef.current = dx;
   };
 
-  const handleMouseUp = () => {
+  const finishPointerGesture = () => {
     if (!isDragging) return;
     const threshold = 100;
-    if (dragOffset > threshold && currentIndex > 0) {
+    const dx = dragOffsetRef.current;
+    if (dx > threshold && currentIndex > 0) {
       setIsDragging(false);
       setDragOffset(0);
+      dragOffsetRef.current = 0;
       requestAnimationFrame(() => {
         setCurrentIndex(currentIndex - 1);
       });
-    } else if (dragOffset < -threshold && currentIndex < list.length - 1) {
+    } else if (dx < -threshold && currentIndex < list.length - 1) {
       setIsDragging(false);
       setDragOffset(0);
+      dragOffsetRef.current = 0;
       requestAnimationFrame(() => {
         setCurrentIndex(currentIndex + 1);
       });
     } else {
       setDragOffset(0);
       setIsDragging(false);
+      dragOffsetRef.current = 0;
     }
+    activePointerIdRef.current = null;
+    pointerStartRef.current = null;
   };
 
-  // 터치 스와이프
-  const handleTouchStart = (e: React.TouchEvent) => {
-    setIsDragging(true);
-    setDragStart(e.touches[0].clientX);
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (!isDragging) return;
-    const offset = e.touches[0].clientX - dragStart;
-    setDragOffset(offset);
-  };
-
-  const handleTouchEnd = () => {
-    if (!isDragging) return;
-    const threshold = 100;
-    if (dragOffset > threshold && currentIndex > 0) {
-      setIsDragging(false);
-      setDragOffset(0);
-      requestAnimationFrame(() => {
-        setCurrentIndex(currentIndex - 1);
-      });
-    } else if (dragOffset < -threshold && currentIndex < list.length - 1) {
-      setIsDragging(false);
-      setDragOffset(0);
-      requestAnimationFrame(() => {
-        setCurrentIndex(currentIndex + 1);
-      });
-    } else {
-      setDragOffset(0);
-      setIsDragging(false);
+  const handlePointerUp = (e: React.PointerEvent) => {
+    if (activePointerIdRef.current !== e.pointerId) return;
+    try {
+      containerRef.current?.releasePointerCapture(e.pointerId);
+    } catch {
+      // ignore
     }
+
+    // 스크롤 모드였다면 스와이프 처리 없이 종료
+    if (pointerStartRef.current?.mode !== "swipe") {
+      activePointerIdRef.current = null;
+      pointerStartRef.current = null;
+      setIsDragging(false);
+      setDragOffset(0);
+      dragOffsetRef.current = 0;
+      return;
+    }
+
+    finishPointerGesture();
+  };
+
+  const handlePointerCancel = (e: React.PointerEvent) => {
+    if (activePointerIdRef.current !== e.pointerId) return;
+    try {
+      containerRef.current?.releasePointerCapture(e.pointerId);
+    } catch {
+      // ignore
+    }
+    setDragOffset(0);
+    setIsDragging(false);
+    dragOffsetRef.current = 0;
+    activePointerIdRef.current = null;
+    pointerStartRef.current = null;
   };
 
   const handleExportImage = async () => {
@@ -244,12 +317,70 @@ export default function ReceivedDeokdamModal({
 
     setExporting(true);
 
+    const waitForImages = async (root: HTMLElement) => {
+      const imgs = Array.from(
+        root.querySelectorAll("img")
+      ) as HTMLImageElement[];
+      await Promise.all(
+        imgs.map(async (img) => {
+          // next/image는 srcset을 쓰는데, html-to-image에서 종종 누락되는 케이스가 있어
+          // 저장 시에는 단일 src로 고정하고 로드/디코드 완료를 기다린다.
+          const rawSrc = img.getAttribute("src") || "";
+          const absoluteSrc =
+            rawSrc.startsWith("/") && typeof window !== "undefined"
+              ? `${window.location.origin}${rawSrc}`
+              : rawSrc;
+
+          try {
+            img.crossOrigin = "anonymous";
+          } catch {
+            // ignore
+          }
+          img.decoding = "sync";
+          img.loading = "eager";
+
+          if (absoluteSrc && img.src !== absoluteSrc) {
+            img.src = absoluteSrc;
+          }
+          img.removeAttribute("srcset");
+          img.removeAttribute("sizes");
+
+          // decode가 지원되면 우선 사용, 아니면 onload로 대기
+          try {
+            if (!img.complete) {
+              await new Promise<void>((resolve) => {
+                const done = () => resolve();
+                img.onload = done;
+                img.onerror = done;
+              });
+            }
+            if ("decode" in img) {
+              await img.decode();
+            }
+          } catch {
+            // ignore
+          }
+        })
+      );
+    };
+
+    const pixelRatio = 3;
+    // offsetWidth/offsetHeight는 transform(scale 등) 적용 전 레이아웃 크기라서
+    // 저장 이미지에서 "오른쪽이 남는" 현상(폭 불일치)을 줄이는데 더 안정적
+    const exportWidth = Math.round(currentCardRef.offsetWidth);
+    const baseHeight = Math.round(currentCardRef.offsetHeight);
+    const computedRadiusStr =
+      typeof window !== "undefined"
+        ? window.getComputedStyle(currentCardRef).borderRadius
+        : "24px";
+    const computedRadius = Number.parseFloat(computedRadiusStr) || 24;
+
     // 임시 컨테이너 생성
     const tempContainer = document.createElement("div");
     tempContainer.style.position = "fixed";
     tempContainer.style.left = "-9999px";
     tempContainer.style.top = "0";
-    tempContainer.style.width = "500px";
+    tempContainer.style.width = `${exportWidth}px`;
     tempContainer.style.zIndex = "-1";
     document.body.appendChild(tempContainer);
 
@@ -262,33 +393,70 @@ export default function ReceivedDeokdamModal({
       // 카드 복제
       const clonedCard = currentCardRef.cloneNode(true) as HTMLElement;
 
-      // 원본 카드의 실제 높이 계산
-      const originalHeight = currentCardRef.offsetHeight;
-      const cardHeight = Math.max(400, originalHeight);
-
       // 복제된 카드의 스타일 초기화 (transform 제거)
       clonedCard.style.position = "relative";
       clonedCard.style.transform = "none";
       clonedCard.style.opacity = "1";
-      clonedCard.style.width = "500px";
-      clonedCard.style.height = `${cardHeight}px`;
-      clonedCard.style.minHeight = `${cardHeight}px`;
+      // 저장 이미지는 '현재 화면에서 보이는 카드 폭'과 동일하게 캡처해서 줄바꿈/레이아웃이 일치하도록
+      clonedCard.style.width = `${exportWidth}px`;
+      clonedCard.style.boxSizing = "border-box";
+      // 저장 이미지에서는 스크롤이 생겨도 전체 내용이 다 보이도록 카드 높이를 자동 확장
+      clonedCard.style.height = "auto";
+      clonedCard.style.minHeight = `${baseHeight}px`;
       clonedCard.style.margin = "0";
-      clonedCard.style.borderRadius = "24px";
-      clonedCard.style.overflow = "visible";
+      clonedCard.style.borderRadius = `${computedRadius}px`;
+      // 카드 디자인(둥근 모서리)을 유지하기 위해 overflow는 hidden 유지
+      clonedCard.style.overflow = "hidden";
 
       tempContainer.appendChild(clonedCard);
+
+      // 저장 이미지에서는 덕담 영역의 스크롤을 제거(전체 내용 표시)
+      const messageSection = clonedCard.querySelector(
+        `.${styles.card_message_section}`
+      ) as HTMLElement | null;
+      if (messageSection) {
+        messageSection.style.overflow = "visible";
+        messageSection.style.overflowY = "visible";
+        messageSection.style.maxHeight = "none";
+      }
 
       // 약간의 지연으로 렌더링 완료 대기
       await new Promise((resolve) => setTimeout(resolve, 100));
 
+      // 아이콘/이미지(특히 next/image)가 캡처 전에 로드되지 않아 누락되는 버그 방지
+      await waitForImages(clonedCard);
+
+      // html-to-image가 filter/box-shadow를 간헐적으로 "사각 잔상"으로 렌더링하는 케이스 방지
+      // (특히 좌측 하단 주머니 정보 박스 주변에서 자주 발생)
+      const pocketInfoEl = clonedCard.querySelector(
+        `.${styles.pocket_info}`
+      ) as HTMLElement | null;
+      if (pocketInfoEl) {
+        pocketInfoEl.style.boxShadow = "none";
+        pocketInfoEl.style.filter = "none";
+        pocketInfoEl.style.backdropFilter = "none";
+        (pocketInfoEl.style as any).webkitBackdropFilter = "none";
+      }
+
+      const serviceLogoEl = clonedCard.querySelector(
+        `.${styles.service_logo}`
+      ) as HTMLElement | null;
+      if (serviceLogoEl) {
+        serviceLogoEl.style.filter = "none";
+      }
+
+      // 렌더 후 실제 필요한 높이 계산 (스크롤 포함 전체)
+      const cardHeight = Math.max(baseHeight, clonedCard.scrollHeight);
+      clonedCard.style.height = `${cardHeight}px`;
+
       // 먼저 이미지 생성
       const tempDataUrl = await toPng(clonedCard, {
         quality: 0.95,
-        pixelRatio: 3,
+        pixelRatio,
         backgroundColor: "#ffffff",
-        width: 500,
+        width: exportWidth,
         height: cardHeight,
+        cacheBust: true,
       });
 
       // 캔버스로 border-radius 적용
@@ -301,13 +469,13 @@ export default function ReceivedDeokdamModal({
       });
 
       const canvas = document.createElement("canvas");
-      canvas.width = 500 * 3; // pixelRatio 3
-      canvas.height = cardHeight * 3;
+      canvas.width = exportWidth * pixelRatio;
+      canvas.height = cardHeight * pixelRatio;
       const ctx = canvas.getContext("2d");
 
       if (ctx) {
         // border-radius 적용
-        const radius = 36 * 3; // pixelRatio 3 (36px radius)
+        const radius = computedRadius * pixelRatio;
         ctx.beginPath();
         ctx.moveTo(radius, 0);
         ctx.lineTo(canvas.width - radius, 0);
@@ -439,13 +607,10 @@ export default function ReceivedDeokdamModal({
                       <div
                         ref={containerRef}
                         className={styles.card_stack}
-                        onMouseDown={handleMouseDown}
-                        onMouseMove={handleMouseMove}
-                        onMouseUp={handleMouseUp}
-                        onMouseLeave={handleMouseUp}
-                        onTouchStart={handleTouchStart}
-                        onTouchMove={handleTouchMove}
-                        onTouchEnd={handleTouchEnd}
+                        onPointerDown={handlePointerDown}
+                        onPointerMove={handlePointerMove}
+                        onPointerUp={handlePointerUp}
+                        onPointerCancel={handlePointerCancel}
                       >
                         {/* 좌측 화살표 버튼 */}
                         {currentIndex > 0 && (

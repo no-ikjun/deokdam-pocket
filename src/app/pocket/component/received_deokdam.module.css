@@ -195,6 +195,7 @@
 .card_stack {
   position: relative;
   width: 100%;
+  height: 450px;
   min-height: 450px;
   display: flex;
   align-items: center;
@@ -205,7 +206,7 @@
   user-select: none;
   touch-action: pan-y;
   overflow: visible;
-  padding: 2rem 0;
+  padding: 0;
 }
 
 .card_stack:active {
@@ -235,6 +236,16 @@
   pointer-events: auto;
   opacity: 0.7;
   padding: 0;
+}
+
+@media (max-width: 640px) {
+  /* 모바일에서 버튼이 카드와 겹치지 않도록 더 바깥쪽으로 */
+  .card_nav_btn_left {
+    left: 0.4rem !important;
+  }
+  .card_nav_btn_right {
+    right: 0.4rem !important;
+  }
 }
 
 .card_nav_btn:hover {
@@ -272,6 +283,7 @@
   position: absolute;
   width: min(90%, 500px);
   max-width: 500px;
+  height: 400px;
   min-height: 400px;
   padding: 1.5rem 1.8rem;
   border-radius: 24px;
@@ -279,6 +291,7 @@
   grid-template-rows: auto auto 1fr auto;
   gap: 0.8rem;
   transform-origin: center center;
+  overflow: hidden;
 
   /* 이전 스타일 유지 */
   background: linear-gradient(
@@ -436,6 +449,9 @@
   flex-direction: column;
   padding: 0.5rem 0;
   min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
 .message_content {
@@ -575,22 +591,18 @@
     rgba(255, 255, 255, 0.9),
     rgba(255, 255, 255, 0.7)
   );
-  box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.35);
   cursor: pointer;
-  transition: transform 0.1s ease, box-shadow 0.2s ease, color 0.2s ease;
+  transition: transform 0.1s ease, color 0.2s ease;
   user-select: none;
 }
 
 .export_btn:hover {
   transform: translateY(-1px);
-  box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.45),
-    0 2px 8px rgba(148, 163, 184, 0.2);
   color: #0f172a;
 }
 
 .export_btn:active {
   transform: translateY(0);
-  box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.5);
 }
 
 .export_btn[aria-disabled="true"] {
@@ -610,21 +622,18 @@
   font-weight: 700;
   color: #ffffff;
   background: linear-gradient(145deg, #f97373, #ef4444);
-  box-shadow: 0 4px 12px rgba(229, 87, 87, 0.3);
   cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.2s ease;
+  transition: transform 0.15s ease;
   user-select: none;
   white-space: nowrap;
 }
 
 .close_btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(231, 102, 102, 0.4);
 }
 
 .close_btn:active {
   transform: translateY(0);
-  box-shadow: 0 4px 12px rgba(229, 87, 87, 0.3);
 }
 
 /* 덕담이 없을 때 단독 닫기 버튼 */
@@ -639,34 +648,37 @@
   font-weight: 700;
   color: #ffffff;
   background: linear-gradient(145deg, #f97373, #ef4444);
-  box-shadow: 0 4px 12px rgba(229, 87, 87, 0.3);
   cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.2s ease;
+  transition: transform 0.15s ease;
   z-index: 100;
   user-select: none;
 }
 
 .close_btn_only:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(231, 102, 102, 0.4);
 }
 
 .close_btn_only:active {
   transform: translateY(0);
-  box-shadow: 0 4px 12px rgba(229, 87, 87, 0.3);
 }
 
 /* 모바일 대응 */
 @media (max-width: 640px) {
   .card_stack {
-    min-height: 380px;
+    height: 360px;
+    min-height: 360px;
+    /* 좌우 버튼 공간 확보 */
+    padding: 0 2.25rem;
+    /* 모달 밖으로 그림자가 튀는 체감 완화 */
+    overflow: hidden;
   }
 
   .card {
-    width: 92%;
-    max-width: 92%;
-    min-height: 340px;
-    padding: 1.2rem 1.3rem;
+    width: 100%;
+    max-width: 100%;
+    height: 300px;
+    min-height: 300px;
+    padding: 1rem 1.05rem;
     gap: 0.6rem;
   }
 
@@ -679,7 +691,7 @@
   }
 
   .from_name {
-    font-size: 1rem;
+    font-size: 0.95rem;
   }
 
   .anonymous_badge {
@@ -692,8 +704,8 @@
   }
 
   .card_message {
-    font-size: 0.9rem;
-    line-height: 1.6;
+    font-size: 0.85rem;
+    line-height: 1.55;
   }
 
   .card_to_section {
@@ -701,7 +713,7 @@
   }
 
   .pocket_info {
-    padding: 0.35rem 0.7rem;
+    padding: 0.3rem 0.6rem;
   }
 
   .service_logo {
@@ -722,7 +734,7 @@
   }
 
   .to_name {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
   }
 
   .to_date {
@@ -730,16 +742,12 @@
   }
 
   .card_nav_btn {
-    width: 28px;
-    height: 28px;
+    width: 26px;
+    height: 26px;
   }
 
   .arrow_icon {
     width: 12px;
     height: 12px;
-  }
-
-  .card_message {
-    font-size: 1rem;
   }
 }

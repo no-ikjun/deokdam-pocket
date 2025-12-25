@@ -654,7 +654,9 @@ export default function PocketDetailPage() {
 
           <footer className={styles.info_footer}>
             <p className={styles.info_footer_text}>
-              모든 덕담은 오픈일에 한꺼번에 공개돼요. 그때까지 기다려 주세요!
+              {isOpened
+                ? "덕담 주머니가 열렸어요! 나에게 온 덕담을 확인해 보세요!"
+                : "모든 덕담은 오픈일에 한꺼번에 공개돼요. 그때까지 기다려 주세요!"}
             </p>
           </footer>
         </section>
