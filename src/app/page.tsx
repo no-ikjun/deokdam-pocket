@@ -485,7 +485,7 @@ export default function Home() {
                 style={{
                   gridColumn: "1 / -1",
                   textAlign: "center",
-                  padding: "2rem",
+                  padding: "3rem",
                 }}
               >
                 <p
@@ -610,6 +610,7 @@ export default function Home() {
                   type="text"
                   className={styles.modal_input}
                   value={nicknameInput}
+                  maxLength={10}
                   onChange={(e) => setNicknameInput(e.target.value)}
                 />
               </div>
