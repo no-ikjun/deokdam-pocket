@@ -50,15 +50,15 @@ export async function GET() {
             <img
               src={pocketImageUrl}
               alt="pocket"
-              width={80}
-              height={80}
+              width={100}
+              height={100}
               style={{
                 display: "flex",
               }}
             />
             <div
               style={{
-                fontSize: "72px",
+                fontSize: "96px",
                 fontWeight: "900",
                 lineHeight: "1.2",
                 letterSpacing: "-0.02em",
@@ -71,7 +71,7 @@ export async function GET() {
           </div>
           <div
             style={{
-              fontSize: "28px",
+              fontSize: "36px",
               fontWeight: "700",
               color: "#475569",
               lineHeight: "1.5",
@@ -95,8 +95,8 @@ export async function GET() {
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
-              gap: "8px",
-              padding: "20px 24px",
+              gap: "10px",
+              padding: "24px 28px",
               borderRadius: "18px",
               background: "rgba(255, 255, 255, 0.85)",
               border: "1px solid rgba(255, 255, 255, 0.9)",
@@ -105,8 +105,8 @@ export async function GET() {
           >
             <div
               style={{
-                fontSize: "20px",
-                fontWeight: "800",
+                fontSize: "28px",
+                fontWeight: "900",
                 color: "#f95050",
                 display: "flex",
               }}
@@ -115,7 +115,7 @@ export async function GET() {
             </div>
             <div
               style={{
-                fontSize: "14px",
+                fontSize: "18px",
                 fontWeight: "700",
                 color: "#475569",
                 display: "flex",
@@ -130,8 +130,8 @@ export async function GET() {
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
-              gap: "8px",
-              padding: "20px 24px",
+              gap: "10px",
+              padding: "24px 28px",
               borderRadius: "18px",
               background: "rgba(255, 255, 255, 0.85)",
               border: "1px solid rgba(255, 255, 255, 0.9)",
@@ -140,8 +140,8 @@ export async function GET() {
           >
             <div
               style={{
-                fontSize: "20px",
-                fontWeight: "800",
+                fontSize: "28px",
+                fontWeight: "900",
                 color: "#f95050",
                 display: "flex",
               }}
@@ -150,7 +150,7 @@ export async function GET() {
             </div>
             <div
               style={{
-                fontSize: "14px",
+                fontSize: "18px",
                 fontWeight: "700",
                 color: "#475569",
                 display: "flex",
@@ -164,10 +164,10 @@ export async function GET() {
         {/* 하단 문구 */}
         <div
           style={{
-            fontSize: "18px",
+            fontSize: "24px",
             fontWeight: "700",
             color: "#6b7280",
-            marginTop: "16px",
+            marginTop: "20px",
             display: "flex",
           }}
         >

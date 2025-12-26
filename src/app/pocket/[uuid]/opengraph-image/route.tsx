@@ -61,15 +61,15 @@ export async function GET(
           <img
             src={pocketImageUrl}
             alt="pocket"
-            width={80}
-            height={80}
+            width={100}
+            height={100}
             style={{
               display: "flex",
             }}
           />
           <div
             style={{
-              fontSize: "72px",
+              fontSize: "96px",
               fontWeight: "900",
               color: "#f95050",
               display: "flex",
@@ -107,7 +107,8 @@ export async function GET(
         background:
           "linear-gradient(120deg, #fff8f9 0%, #ffeef3 50%, #ffffff 100%)",
         padding: "80px",
-        fontFamily: '"Pretendard"',
+        fontFamily:
+          'system-ui, -apple-system, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif',
       }}
     >
       <div
@@ -140,15 +141,15 @@ export async function GET(
             <img
               src={pocketImageUrl}
               alt="pocket"
-              width={70}
-              height={70}
+              width={90}
+              height={90}
               style={{
                 display: "flex",
               }}
             />
             <div
               style={{
-                fontSize: "64px",
+                fontSize: "84px",
                 fontWeight: "900",
                 lineHeight: "1.2",
                 letterSpacing: "-0.02em",
@@ -163,7 +164,7 @@ export async function GET(
           {pocket.desc && (
             <div
               style={{
-                fontSize: "24px",
+                fontSize: "32px",
                 fontWeight: "700",
                 color: "#475569",
                 lineHeight: "1.5",
@@ -189,8 +190,8 @@ export async function GET(
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
-              gap: "8px",
-              padding: "16px 20px",
+              gap: "10px",
+              padding: "20px 24px",
               borderRadius: "18px",
               background: "rgba(255, 255, 255, 0.85)",
               border: "1px solid rgba(255, 255, 255, 0.9)",
@@ -199,8 +200,8 @@ export async function GET(
           >
             <div
               style={{
-                fontSize: "16px",
-                fontWeight: "800",
+                fontSize: "22px",
+                fontWeight: "900",
                 color: "#b42323",
                 display: "flex",
               }}
@@ -209,7 +210,7 @@ export async function GET(
             </div>
             <div
               style={{
-                fontSize: "18px",
+                fontSize: "24px",
                 fontWeight: "700",
                 color: "#0b1b3a",
                 display: "flex",
@@ -225,8 +226,8 @@ export async function GET(
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
-                gap: "8px",
-                padding: "16px 20px",
+                gap: "10px",
+                padding: "20px 24px",
                 borderRadius: "18px",
                 background: "rgba(255, 255, 255, 0.85)",
                 border: "1px solid rgba(255, 255, 255, 0.9)",
@@ -235,8 +236,8 @@ export async function GET(
             >
               <div
                 style={{
-                  fontSize: "16px",
-                  fontWeight: "800",
+                  fontSize: "22px",
+                  fontWeight: "900",
                   color: "#b42323",
                   display: "flex",
                 }}
@@ -245,7 +246,7 @@ export async function GET(
               </div>
               <div
                 style={{
-                  fontSize: "18px",
+                  fontSize: "24px",
                   fontWeight: "700",
                   color: "#0b1b3a",
                   display: "flex",
@@ -260,10 +261,10 @@ export async function GET(
         {/* 하단 문구 */}
         <div
           style={{
-            fontSize: "18px",
+            fontSize: "24px",
             fontWeight: "700",
             color: "#6b7280",
-            marginTop: "16px",
+            marginTop: "20px",
             display: "flex",
           }}
         >
