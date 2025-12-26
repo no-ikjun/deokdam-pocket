@@ -8,6 +8,7 @@ import axios from "axios";
 import LoadingIndicator from "@/components/loadingIndicator/loadingIndicator";
 import ToastPopup from "@/components/toastPopup/toastPopup";
 import { LoadingButton } from "@/components/loadingButton/loadingButton";
+import Footer from "@/components/footer/footer";
 
 type OpenMode = "seollal" | "custom";
 
@@ -293,11 +294,7 @@ export default function NewPouchPage() {
         </div>
       </form>
 
-      <footer className={styles.footer}>
-        <p className={styles.footer_text}>
-          ⓒ 2024 덕담 주머니 · 아이콘: flaticon.com
-        </p>
-      </footer>
+      <Footer showButtons={false} usingIcons={true} />
     </main>
   );
 }

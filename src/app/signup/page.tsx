@@ -6,6 +6,7 @@ import Image from "next/image";
 import styles from "./page.module.css";
 import Link from "next/link";
 import { useAuthStore } from "@/stores/auth";
+import Footer from "@/components/footer/footer";
 
 function LoginPageContent() {
   const searchParams = useSearchParams();
@@ -157,30 +158,7 @@ function LoginPageContent() {
         </div>
       </div>
 
-      <footer className={styles.footer}>
-        <Link
-          href="https://ikjun.notion.site/148ee261b89580ac9ad5defe33a92f65?pvs=4"
-          className={styles.info_ment}
-          target="_blank"
-        >
-          덕담 주머니란?
-        </Link>
-
-        <div className={styles.footerContent}>
-          <p className={styles.copyright}>
-            ⓒ 2024 덕담 주머니. All rights reserved.
-          </p>
-          <p className={styles.contact}>
-            문의 :{" "}
-            <a
-              href="mailto:deokdam@ikjun.com"
-              style={{ textDecoration: "none", color: "inherit", margin: 0 }}
-            >
-              deokdam@ikjun.com
-            </a>
-          </p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

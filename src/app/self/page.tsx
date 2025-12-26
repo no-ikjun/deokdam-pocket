@@ -9,6 +9,7 @@ import Modal from "@/components/modal/modal";
 import LoadingIndicator from "@/components/loadingIndicator/loadingIndicator";
 import ToastPopup from "@/components/toastPopup/toastPopup";
 import { LoadingButton } from "@/components/loadingButton/loadingButton";
+import Footer from "@/components/footer/footer";
 
 type UsedState = {
   goals: boolean;
@@ -607,13 +608,7 @@ export default function SelfPage() {
         </div>
       </Modal>
 
-      <footer className={styles.footer}>
-        <div className={styles.footerContent}>
-          <p className={styles.copyright}>
-            ⓒ 2024 덕담 주머니. All rights reserved.
-          </p>
-        </div>
-      </footer>
+      <Footer showButtons={false} />
     </main>
   );
 }

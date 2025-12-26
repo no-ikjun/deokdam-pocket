@@ -12,6 +12,7 @@ import InviteModal from "./component/invite_modal";
 import ToastPopup from "@/components/toastPopup/toastPopup";
 import { LoadingButton } from "@/components/loadingButton/loadingButton";
 import type { Pocket } from "@/types/pocket";
+import Footer from "@/components/footer/footer";
 
 export default function SocialPage() {
   const [code, setCode] = useState("");
@@ -212,11 +213,7 @@ export default function SocialPage() {
           )}
         </section>
 
-        <footer className={styles.footer}>
-          <p className={styles.footer_note}>
-            ⓒ 2024 덕담 주머니 · 아이콘: flaticon.com
-          </p>
-        </footer>
+        <Footer showButtons={false} usingIcons={true} />
       </div>
     </main>
   );

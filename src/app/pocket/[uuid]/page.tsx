@@ -16,6 +16,7 @@ import PocketOpenedModal from "../component/pocket_opened_modal";
 import ConfettiEffect from "@/components/confetti/ConfettiEffect";
 import { useAuthStore } from "@/stores/auth";
 import type { Pocket } from "@/types/pocket";
+import Footer from "@/components/footer/footer";
 
 const formatDate = (iso: string, showYear?: boolean) => {
   const d = new Date(iso);
@@ -743,11 +744,7 @@ export default function PocketDetailPage() {
         </section>
       </div>
 
-      <footer className={styles.page_footer}>
-        <p className={styles.footer_note}>
-          ⓒ 2024 덕담 주머니 · 함께 나누는 말 한마디가 큰 힘이 돼요.
-        </p>
-      </footer>
+      <Footer showButtons={false} usingIcons={true} />
     </main>
   );
 }
