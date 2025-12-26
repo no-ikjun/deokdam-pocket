@@ -6,7 +6,8 @@ export async function generateMetadata({
   params: Promise<{ uuid: string }>;
 }): Promise<Metadata> {
   const { uuid } = await params;
-  const ogImageUrl = `/pocket/${uuid}/opengraph-image`;
+  const baseUrl = "https://deokdam.app";
+  const ogImageUrl = `${baseUrl}/pocket/${uuid}/opengraph-image`;
 
   return {
     robots: {
