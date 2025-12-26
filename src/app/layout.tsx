@@ -44,7 +44,7 @@ export const metadata: Metadata = {
     description: "덕담 주머니를 만들고 새해 덕담을 모아 보세요!",
     images: [
       {
-        url: "https://d3ob3cint7tr3s.cloudfront.net/deokdam_pocket.png",
+        url: "https://deokdam.app/opengraph-image",
         width: 1200,
         height: 630,
         alt: "덕담 주머니",
@@ -55,7 +55,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "덕담 주머니",
     description: "덕담 주머니를 만들고 새해 덕담을 모아 보세요!",
-    images: ["https://d3ob3cint7tr3s.cloudfront.net/deokdam_pocket.png"],
+    images: ["https://deokdam.app/opengraph-image"],
   },
   alternates: {
     canonical: "https://deokdam.app",
