@@ -10,6 +10,9 @@ export async function GET(
 ) {
   const { uuid } = await params;
 
+  // pocket.png 이미지 URL
+  const pocketImageUrl = "https://deokdam.app/images/pocket.png";
+
   // 주머니 정보 가져오기
   let pocket = null;
   try {
@@ -31,30 +34,56 @@ export async function GET(
 
   // 기본 이미지 (주머니 정보가 없을 때)
   if (!pocket) {
-    return new ImageResponse(
-      (
+    const defaultImage = (
+      <div
+        style={{
+          width: "100%",
+          height: "100%",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          background:
+            "linear-gradient(120deg, #fff8f9 0%, #ffeef3 50%, #ffffff 100%)",
+          padding: "80px",
+          fontFamily:
+            'system-ui, -apple-system, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif',
+        }}
+      >
         <div
           style={{
-            fontSize: 60,
-            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-            width: "100%",
-            height: "100%",
             display: "flex",
-            flexDirection: "column",
+            flexDirection: "row",
             alignItems: "center",
-            justifyContent: "center",
-            color: "white",
-            fontFamily: "system-ui",
+            gap: "20px",
           }}
         >
-          <div>덕담 주머니</div>
+          <img
+            src={pocketImageUrl}
+            alt="pocket"
+            width={80}
+            height={80}
+            style={{
+              display: "flex",
+            }}
+          />
+          <div
+            style={{
+              fontSize: "72px",
+              fontWeight: "900",
+              color: "#f95050",
+              display: "flex",
+            }}
+          >
+            덕담 주머니
+          </div>
         </div>
-      ),
-      {
-        width: 1200,
-        height: 630,
-      }
+      </div>
     );
+    return new ImageResponse(defaultImage, {
+      width: 1200,
+      height: 630,
+    });
   }
 
   // 주머니 정보가 있을 때 커스텀 이미지
@@ -66,81 +95,186 @@ export async function GET(
     return `${month}월 ${day}일`;
   };
 
-  return new ImageResponse(
-    (
+  const customImage = (
+    <div
+      style={{
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        background:
+          "linear-gradient(120deg, #fff8f9 0%, #ffeef3 50%, #ffffff 100%)",
+        padding: "80px",
+        fontFamily: '"Pretendard"',
+      }}
+    >
       <div
         style={{
-          fontSize: 60,
-          background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-          width: "100%",
-          height: "100%",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          justifyContent: "center",
-          color: "white",
-          fontFamily: "system-ui",
-          padding: "80px",
+          gap: "32px",
+          textAlign: "center",
+          maxWidth: "900px",
         }}
       >
+        {/* 주머니 이름 */}
         <div
           style={{
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            gap: "40px",
-            textAlign: "center",
+            gap: "16px",
           }}
         >
           <div
             style={{
-              fontSize: 72,
-              fontWeight: "bold",
-              lineHeight: "1.2",
-              maxWidth: "1000px",
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              gap: "20px",
             }}
           >
-            {pocket.name}
+            <img
+              src={pocketImageUrl}
+              alt="pocket"
+              width={70}
+              height={70}
+              style={{
+                display: "flex",
+              }}
+            />
+            <div
+              style={{
+                fontSize: "64px",
+                fontWeight: "900",
+                lineHeight: "1.2",
+                letterSpacing: "-0.02em",
+                color: "#f95050",
+                display: "flex",
+                maxWidth: "1000px",
+              }}
+            >
+              {pocket.name}
+            </div>
           </div>
           {pocket.desc && (
             <div
               style={{
-                fontSize: 36,
-                opacity: 0.9,
-                textAlign: "center",
+                fontSize: "24px",
+                fontWeight: "700",
+                color: "#475569",
+                lineHeight: "1.5",
+                display: "flex",
                 maxWidth: "900px",
-                lineHeight: "1.4",
               }}
             >
               {pocket.desc}
             </div>
           )}
+        </div>
+
+        {/* 정보 카드 */}
+        <div
+          style={{
+            display: "flex",
+            gap: "24px",
+            marginTop: "8px",
+          }}
+        >
           <div
             style={{
               display: "flex",
-              gap: "60px",
-              fontSize: 32,
-              marginTop: "40px",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: "8px",
+              padding: "16px 20px",
+              borderRadius: "18px",
+              background: "rgba(255, 255, 255, 0.85)",
+              border: "1px solid rgba(255, 255, 255, 0.9)",
+              boxShadow: "0 10px 26px rgba(15, 23, 42, 0.08)",
             }}
           >
-            <div>오픈일: {formatDate(pocket.open_at)}</div>
-            {pocket.goal > 0 && <div>목표: {pocket.goal}개</div>}
+            <div
+              style={{
+                fontSize: "16px",
+                fontWeight: "800",
+                color: "#b42323",
+                display: "flex",
+              }}
+            >
+              오픈일
+            </div>
+            <div
+              style={{
+                fontSize: "18px",
+                fontWeight: "700",
+                color: "#0b1b3a",
+                display: "flex",
+              }}
+            >
+              {formatDate(pocket.open_at)}
+            </div>
           </div>
-          <div
-            style={{
-              fontSize: 28,
-              marginTop: "60px",
-              opacity: 0.8,
-            }}
-          >
-            덕담 주머니에서 함께해요
-          </div>
+
+          {pocket.goal > 0 && (
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: "8px",
+                padding: "16px 20px",
+                borderRadius: "18px",
+                background: "rgba(255, 255, 255, 0.85)",
+                border: "1px solid rgba(255, 255, 255, 0.9)",
+                boxShadow: "0 10px 26px rgba(15, 23, 42, 0.08)",
+              }}
+            >
+              <div
+                style={{
+                  fontSize: "16px",
+                  fontWeight: "800",
+                  color: "#b42323",
+                  display: "flex",
+                }}
+              >
+                목표
+              </div>
+              <div
+                style={{
+                  fontSize: "18px",
+                  fontWeight: "700",
+                  color: "#0b1b3a",
+                  display: "flex",
+                }}
+              >
+                {pocket.goal}개
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* 하단 문구 */}
+        <div
+          style={{
+            fontSize: "18px",
+            fontWeight: "700",
+            color: "#6b7280",
+            marginTop: "16px",
+            display: "flex",
+          }}
+        >
+          덕담 주머니에서 함께해요
         </div>
       </div>
-    ),
-    {
-      width: 1200,
-      height: 630,
-    }
+    </div>
   );
+
+  return new ImageResponse(customImage, {
+    width: 1200,
+    height: 630,
+  });
 }
