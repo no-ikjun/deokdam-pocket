@@ -14,10 +14,7 @@ const AuthBootstrap = dynamic(() => import("@/components/auth/AuthBootstrap"), {
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://deokdam.app"),
-  title: {
-    default: "덕담 주머니",
-    template: "%s | 덕담 주머니",
-  },
+  title: "덕담 주머니",
   description: "덕담 주머니를 만들고 새해 덕담을 모아 보세요!",
   keywords: [
     "을사년",
