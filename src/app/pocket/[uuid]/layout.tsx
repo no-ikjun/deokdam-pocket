@@ -51,7 +51,7 @@ export async function generateMetadata({
 
   const baseUrl = "https://deokdam.app";
   const pocketUrl = `${baseUrl}/pocket/${uuid}`;
-  const ogImageUrl = `https://d3ob3cint7tr3s.cloudfront.net/deokdam_pocket.png`;
+  const ogImageUrl = `${baseUrl}/pocket/${uuid}/opengraph-image`;
 
   const title = `${pocket.name} | 덕담 주머니`;
   const description = pocket.desc
