@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { withDbClient } from "@/utils/db";
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(req: NextRequest) {
   return withDbClient(async (client) => {
     const { searchParams } = req.nextUrl;
