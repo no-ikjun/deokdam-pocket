@@ -3,6 +3,7 @@
 import Link from "next/link";
 import styles from "./footer.module.css";
 import { useAuthStore } from "@/stores/auth";
+import { logoutAndRedirect } from "@/utils/logout";
 
 interface FooterProps {
   showButtons?: boolean;
@@ -35,10 +36,7 @@ export default function Footer({
             <button
               type="button"
               className={styles.info_ment_btn}
-              onClick={async () => {
-                await useAuthStore.getState().logout();
-                window.location.href = "/";
-              }}
+              onClick={() => logoutAndRedirect("/")}
             >
               로그아웃
             </button>

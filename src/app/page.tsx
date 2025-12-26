@@ -11,6 +11,7 @@ import AdComponent from "@/components/adsense/AdComponent";
 import PromoBanner from "@/components/promoBanner/promoBanner";
 import Modal from "@/components/modal/modal";
 import axios from "axios";
+import { logoutAndRedirect } from "@/utils/logout";
 import type { Pocket } from "@/types/pocket";
 import ToastPopup from "@/components/toastPopup/toastPopup";
 import { LoadingButton } from "@/components/loadingButton/loadingButton";
@@ -632,10 +633,7 @@ export default function Home() {
               <button
                 type="button"
                 className={styles.modal_logout_btn}
-                onClick={async () => {
-                  await useAuthStore.getState().logout();
-                  window.location.href = "/";
-                }}
+                onClick={() => logoutAndRedirect("/")}
               >
                 로그아웃
               </button>

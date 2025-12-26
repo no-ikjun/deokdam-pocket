@@ -127,6 +127,13 @@ export const useAuthStore = create<AuthState>()(
         } catch {
           // ignore
         } finally {
+          try {
+            if (typeof window !== "undefined") {
+              localStorage.clear();
+            }
+          } catch {
+            // ignore storage errors
+          }
           set({ status: "unauthenticated", user: null, error: null });
         }
       },
