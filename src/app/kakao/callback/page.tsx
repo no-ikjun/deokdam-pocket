@@ -107,7 +107,7 @@ export default function KakaoCallbackPage() {
     <>
       {isLoading && (
         <LoadingIndicator
-          text="로그인 중입니다..."
+          text="로그인 중입니다"
           subText="잠시만 기다려주세요..."
         />
       )}
