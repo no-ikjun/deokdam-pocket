@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { db } from "@vercel/postgres";
 import { withAuthAndDb } from "@/utils/db";
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   return withAuthAndDb(async (user_uuid, client) => {
     const userData = await client.sql`

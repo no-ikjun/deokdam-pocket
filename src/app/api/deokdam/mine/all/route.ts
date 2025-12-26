@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { withAuthAndDb } from "@/utils/db";
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(req: Request) {
   return withAuthAndDb(async (user_uuid, client) => {
     const { rows } =
