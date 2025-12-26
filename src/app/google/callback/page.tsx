@@ -2,9 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
-import styles from "./page.module.css";
 import { useAuthStore } from "@/stores/auth";
+import LoadingIndicator from "@/components/loadingIndicator/loadingIndicator";
 
 export default function GoogleCallbackPage() {
   const router = useRouter();
@@ -69,16 +68,10 @@ export default function GoogleCallbackPage() {
   return (
     <>
       {isLoading && (
-        <div className={styles.sending_div}>
-          <Image
-            src="/images/kite_icon.png"
-            alt="kite"
-            width={100}
-            height={100}
-            className={styles.sending_icon}
-          />
-          <p className={styles.sending_ment}>로그인 중입니다...</p>
-        </div>
+        <LoadingIndicator
+          text="로그인 중입니다..."
+          subText="잠시만 기다려주세요..."
+        />
       )}
     </>
   );
