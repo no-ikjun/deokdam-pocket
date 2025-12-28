@@ -7,7 +7,7 @@ import axios from "axios";
 import styles from "./page.module.css";
 import LoadingIndicator from "@/components/loadingIndicator/loadingIndicator";
 import Modal from "@/components/modal/modal";
-import InviteModal from "@/app/social/component/invite_modal";
+import InviteModal from "@/app/social/components/invite_modal";
 import ToastPopup from "@/components/toastPopup/toastPopup";
 import EmailInputModal from "@/components/emailInputModal/emailInputModal";
 import DeokdamWriteModal from "../components/deokdamWrite";

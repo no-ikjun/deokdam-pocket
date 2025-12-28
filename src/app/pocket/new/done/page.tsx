@@ -4,7 +4,7 @@ import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import styles from "./page.module.css";
 import Image from "next/image";
-import InviteModal from "@/app/social/component/invite_modal";
+import InviteModal from "@/app/social/components/invite_modal";
 import Modal from "@/components/modal/modal";
 import ToastPopup from "@/components/toastPopup/toastPopup";
 import ConfettiEffect from "@/components/confetti/ConfettiEffect";
@@ -60,59 +60,59 @@ function CompletePageContent() {
         </Modal>
         <div className={styles.bg} aria-hidden />
 
-      {/* 글래스 카드 */}
-      <section className={styles.card}>
-        <Image
-          src="/images/pocket.png"
-          alt=""
-          width={40}
-          height={40}
-          className={styles.card_icon}
-        />
-        <h1 className={styles.title}>덕담 주머니가 만들어졌어요!</h1>
-        <p className={styles.subtitle}>
-          이제 친구들에게 링크를 공유하거나 코드를 보내 초대해보세요.
-        </p>
+        {/* 글래스 카드 */}
+        <section className={styles.card}>
+          <Image
+            src="/images/pocket.png"
+            alt=""
+            width={40}
+            height={40}
+            className={styles.card_icon}
+          />
+          <h1 className={styles.title}>덕담 주머니가 만들어졌어요!</h1>
+          <p className={styles.subtitle}>
+            이제 친구들에게 링크를 공유하거나 코드를 보내 초대해보세요.
+          </p>
 
-        <div className={styles.info_box}>
-          <span className={styles.code_label}>참여 코드</span>
-          <div className={styles.code_row}>
-            <code className={styles.code}>{pocketCode}</code>
-            <div
-              role="button"
-              className={styles.copy_btn}
-              onClick={() => copyText(pocketCode, "코드를 복사했어요!")}
-            >
-              복사
+          <div className={styles.info_box}>
+            <span className={styles.code_label}>참여 코드</span>
+            <div className={styles.code_row}>
+              <code className={styles.code}>{pocketCode}</code>
+              <div
+                role="button"
+                className={styles.copy_btn}
+                onClick={() => copyText(pocketCode, "코드를 복사했어요!")}
+              >
+                복사
+              </div>
             </div>
           </div>
-        </div>
-        <div className={styles.btn_group}>
-          <div
-            role="button"
-            tabIndex={0}
-            className={`${styles.btn} ${styles.primary_btn}`}
-            onClick={() => setModalOpen(true)}
-            onKeyDown={onKey(() => setModalOpen(true))}
-          >
-            초대하기
+          <div className={styles.btn_group}>
+            <div
+              role="button"
+              tabIndex={0}
+              className={`${styles.btn} ${styles.primary_btn}`}
+              onClick={() => setModalOpen(true)}
+              onKeyDown={onKey(() => setModalOpen(true))}
+            >
+              초대하기
+            </div>
+
+            <div
+              role="button"
+              tabIndex={0}
+              className={`${styles.btn} ${styles.ghost_btn}`}
+              onClick={goHome}
+              onKeyDown={onKey(goHome)}
+            >
+              홈으로
+            </div>
           </div>
 
-          <div
-            role="button"
-            tabIndex={0}
-            className={`${styles.btn} ${styles.ghost_btn}`}
-            onClick={goHome}
-            onKeyDown={onKey(goHome)}
-          >
-            홈으로
-          </div>
-        </div>
-
-        <p className={styles.hint}>
-          초대받은 사람들은 링크 또는 코드를 입력해 참여할 수 있어요 💌
-        </p>
-      </section>
+          <p className={styles.hint}>
+            초대받은 사람들은 링크 또는 코드를 입력해 참여할 수 있어요 💌
+          </p>
+        </section>
       </main>
     </ConfettiEffect>
   );
