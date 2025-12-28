@@ -1,0 +1,303 @@
+/**
+ * 리마인드 처리 API
+ * Self 리마인드를 처리하여 오늘 날짜의 리마인드에 해당하는 이메일을 발송합니다.
+ * Cron job이나 스케줄러에서 호출됩니다.
+ */
+
+import { NextResponse } from "next/server";
+import { withDbClient } from "@/utils/db";
+import { sendSelfReminderEmail } from "@/utils/email";
+
+export const dynamic = "force-dynamic";
+
+interface RemindAtData {
+  timestamp: string; // ISO date string
+  timing: string; // "1주 후", "1개월 후" 등
+  method: string; // "goal_check", "progress_check" 등
+}
+
+// Self 타입별 레이블 매핑
+const SELF_TYPE_LABELS: Record<string, string> = {
+  GOALS: "올해 목표",
+  ONEYEAR: "1년 남은 나에게",
+  RETROSPECT: "지난 1년 되돌아보기",
+};
+
+// Method별 레이블 매핑
+const METHOD_LABELS: Record<string, string> = {
+  goal_check: "목표 재확인",
+  progress_check: "진행 상황 점검",
+  motivation: "동기부여 메시지",
+  priority_check: "우선순위 재확인",
+  meaning_revisit: "의미 재발견",
+  quiet_reminder: "조용한 상기",
+  growth_check: "성장 확인",
+  gratitude_revisit: "감사 재확인",
+  past_present_compare: "과거와 현재 비교",
+};
+
+/**
+ * 오늘 날짜가 리마인드 날짜인지 확인
+ * 날짜만 비교 (시간 제외)
+ */
+function isToday(dateString: string): boolean {
+  const today = new Date();
+  const targetDate = new Date(dateString);
+
+  return (
+    today.getFullYear() === targetDate.getFullYear() &&
+    today.getMonth() === targetDate.getMonth() &&
+    today.getDate() === targetDate.getDate()
+  );
+}
+
+/**
+ * Self 리마인드 처리
+ */
+export async function POST(req: Request) {
+  return withDbClient(async (client) => {
+    try {
+      // 1. 오늘 날짜에 리마인드가 설정된 Self 찾기
+      const today = new Date();
+      const todayStart = new Date(today);
+      todayStart.setHours(0, 0, 0, 0);
+      const todayEnd = new Date(today);
+      todayEnd.setHours(23, 59, 59, 999);
+
+      const selfReminders = await client.sql`
+        SELECT 
+          s.self_uuid,
+          s.self_type,
+          s.user_uuid,
+          s.remind_at,
+          u.email,
+          u.name
+        FROM self s
+        INNER JOIN "user" u ON s.user_uuid = u.user_uuid
+        WHERE s.remind = true
+          AND s.remind_at IS NOT NULL
+          AND u.email IS NOT NULL
+      `;
+
+      const remindersToSend: Array<{
+        selfUuid: string;
+        selfType: string;
+        userUuid: string;
+        email: string;
+        userName: string;
+        timing: string;
+        method: string;
+        methodLabel: string;
+        selfTypeLabel: string;
+        remindAtData: RemindAtData;
+      }> = [];
+
+      // 2. remind_at JSON 파싱 및 오늘 날짜 확인
+      for (const row of selfReminders.rows) {
+        try {
+          const remindAtData: RemindAtData = row.remind_at;
+          const reminderDate = new Date(remindAtData.timestamp);
+
+          // 오늘 날짜인지 확인 (날짜만 비교)
+          if (isToday(remindAtData.timestamp)) {
+            // 이미 오늘 발송했는지 확인
+            const existingLog = await client.sql`
+              SELECT reminder_id FROM reminder_log
+              WHERE reminder_type = 'self'
+                AND target_id = ${row.self_uuid}
+                AND DATE(sent_at) = DATE(${today.toISOString()})
+                AND status = 'sent'
+              LIMIT 1
+            `;
+
+            // 오늘 이미 발송하지 않았다면 추가
+            if (existingLog.rows.length === 0) {
+              remindersToSend.push({
+                selfUuid: row.self_uuid,
+                selfType: row.self_type,
+                userUuid: row.user_uuid,
+                email: row.email,
+                userName: row.name,
+                timing: remindAtData.timing,
+                method: remindAtData.method,
+                methodLabel:
+                  METHOD_LABELS[remindAtData.method] || remindAtData.method,
+                selfTypeLabel: SELF_TYPE_LABELS[row.self_type] || row.self_type,
+                remindAtData,
+              });
+            }
+          }
+        } catch (error) {
+          console.error(
+            `[reminder/process] Failed to parse remind_at for self_uuid ${row.self_uuid}:`,
+            error
+          );
+        }
+      }
+
+      // 3. 이메일 발송 및 로그 저장
+      const results = {
+        processed: remindersToSend.length,
+        succeeded: 0,
+        failed: 0,
+        errors: [] as Array<{ selfUuid: string; error: string }>,
+      };
+
+      for (const reminder of remindersToSend) {
+        try {
+          // 이메일 발송
+          const viewUrl = `https://deokdam.app/self?type=${reminder.selfType.toLowerCase()}`;
+          const result = await sendSelfReminderEmail({
+            email: reminder.email,
+            userName: reminder.userName,
+            selfType: reminder.selfType as "GOALS" | "ONEYEAR" | "RETROSPECT",
+            selfTypeLabel: reminder.selfTypeLabel,
+            timing: reminder.timing,
+            method: reminder.method,
+            methodLabel: reminder.methodLabel,
+            viewUrl,
+          });
+
+          // 로그 저장
+          const reminderDate = new Date(reminder.remindAtData.timestamp);
+          await client.sql`
+            INSERT INTO reminder_log (
+              user_uuid,
+              reminder_type,
+              target_id,
+              remind_at,
+              sent_at,
+              status,
+              error_message
+            ) VALUES (
+              ${reminder.userUuid},
+              'self',
+              ${reminder.selfUuid},
+              ${reminderDate.toISOString()},
+              ${new Date().toISOString()},
+              ${result.success ? "sent" : "failed"},
+              ${result.error || null}
+            )
+          `;
+
+          if (result.success) {
+            results.succeeded++;
+          } else {
+            results.failed++;
+            results.errors.push({
+              selfUuid: reminder.selfUuid,
+              error: result.error || "Unknown error",
+            });
+          }
+        } catch (error) {
+          results.failed++;
+          const errorMessage =
+            error instanceof Error ? error.message : String(error);
+          results.errors.push({
+            selfUuid: reminder.selfUuid,
+            error: errorMessage,
+          });
+
+          // 실패 로그도 저장
+          const reminderDate = new Date(reminder.remindAtData.timestamp);
+          await client.sql`
+            INSERT INTO reminder_log (
+              user_uuid,
+              reminder_type,
+              target_id,
+              remind_at,
+              sent_at,
+              status,
+              error_message
+            ) VALUES (
+              ${reminder.userUuid},
+              'self',
+              ${reminder.selfUuid},
+              ${reminderDate.toISOString()},
+              ${new Date().toISOString()},
+              'failed',
+              ${errorMessage}
+            )
+          `;
+
+          console.error(
+            `[reminder/process] Failed to send reminder for self_uuid ${reminder.selfUuid}:`,
+            error
+          );
+        }
+      }
+
+      return NextResponse.json(
+        {
+          success: true,
+          message: `처리 완료: ${results.processed}개 중 ${results.succeeded}개 성공, ${results.failed}개 실패`,
+          results,
+        },
+        { status: 200 }
+      );
+    } catch (error) {
+      console.error("[reminder/process] 처리 중 오류:", error);
+      return NextResponse.json(
+        {
+          success: false,
+          error:
+            error instanceof Error
+              ? error.message
+              : "알 수 없는 오류가 발생했습니다.",
+        },
+        { status: 500 }
+      );
+    }
+  });
+}
+
+/**
+ * GET: 상태 확인용 (선택적)
+ */
+export async function GET() {
+  return withDbClient(async (client) => {
+    const today = new Date();
+    const todayStart = new Date(today);
+    todayStart.setHours(0, 0, 0, 0);
+    const todayEnd = new Date(today);
+    todayEnd.setHours(23, 59, 59, 999);
+
+    // 오늘 발송할 리마인드 개수 확인
+    const pendingReminders = await client.sql`
+      SELECT 
+        s.self_uuid,
+        s.self_type,
+        u.name,
+        u.email,
+        s.remind_at
+      FROM self s
+      INNER JOIN "user" u ON s.user_uuid = u.user_uuid
+      WHERE s.remind = true
+        AND s.remind_at IS NOT NULL
+        AND u.email IS NOT NULL
+    `;
+
+    const todayReminders: any[] = [];
+    for (const row of pendingReminders.rows) {
+      try {
+        if (isToday(row.remind_at.timestamp)) {
+          todayReminders.push({
+            selfUuid: row.self_uuid,
+            selfType: row.self_type,
+            userName: row.name,
+            email: row.email,
+            timing: row.remind_at.timing,
+          });
+        }
+      } catch (error) {
+        // 파싱 실패는 무시
+      }
+    }
+
+    return NextResponse.json({
+      today: today.toISOString().split("T")[0],
+      pendingCount: todayReminders.length,
+      reminders: todayReminders,
+    });
+  });
+}
