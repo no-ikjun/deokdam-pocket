@@ -39,9 +39,6 @@ export default function SocialPage() {
       setLoading(false);
     }
   };
-  useEffect(() => {
-    void fetchMyPockets();
-  }, []);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();

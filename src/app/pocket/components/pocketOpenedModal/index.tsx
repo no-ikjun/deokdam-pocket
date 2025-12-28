@@ -1,6 +1,6 @@
 "use client";
 
-import styles from "./pocket_opened_modal.module.css";
+import styles from "./pocketOpenedModal.module.css";
 import { LoadingButton } from "@/components/loadingButton/loadingButton";
 
 type Props = {

@@ -1,6 +1,6 @@
 "use client";
 
-import styles from "./delete_pocket_modal.module.css";
+import styles from "./deletePocketModal.module.css";
 import { LoadingButton } from "@/components/loadingButton/loadingButton";
 
 type Props = {

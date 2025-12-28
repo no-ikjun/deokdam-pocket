@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import useCountNum from "@/hooks/countUp";
 import ConfettiEffect from "@/components/confetti/ConfettiEffect";
-import styles from "./received_deokdam_recap.module.css";
+import styles from "./receivedDeokdamRecap.module.css";
 
 type RecapProps = {
   myDeokdamCount: number;

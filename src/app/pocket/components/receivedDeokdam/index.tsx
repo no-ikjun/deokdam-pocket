@@ -6,10 +6,10 @@ import axios from "axios";
 import Modal from "@/components/modal/modal";
 import LoadingIndicator from "@/components/loadingIndicator/loadingIndicator";
 import ConfettiEffect from "@/components/confetti/ConfettiEffect";
-import ReceivedDeokdamRecap from "./received_deokdam_recap";
+import ReceivedDeokdamRecap from "../receivedDeokdamRecap";
 import { toPng } from "html-to-image";
 import { useAuthStore } from "@/stores/auth";
-import styles from "./received_deokdam.module.css";
+import styles from "./receivedDeokdam.module.css";
 
 // 불규칙한 카드 배치를 위한 랜덤 오프셋 생성 함수
 const generateCardOffsets = (count: number) => {

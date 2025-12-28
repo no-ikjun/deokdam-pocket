@@ -1,6 +1,6 @@
 "use client";
 
-import styles from "./leave_pocket_modal.module.css";
+import styles from "./leavePocketModal.module.css";
 import { LoadingButton } from "@/components/loadingButton/loadingButton";
 
 type Props = {

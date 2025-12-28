@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import Modal from "@/components/modal/modal";
 import LoadingIndicator from "@/components/loadingIndicator/loadingIndicator";
-import styles from "./my_deokdam.module.css";
+import styles from "./myDeokdam.module.css";
 import { LoadingButton } from "@/components/loadingButton/loadingButton";
 
 type Member = {

@@ -10,12 +10,13 @@ import Modal from "@/components/modal/modal";
 import InviteModal from "@/app/social/component/invite_modal";
 import ToastPopup from "@/components/toastPopup/toastPopup";
 import EmailInputModal from "@/components/emailInputModal/emailInputModal";
-import DeokdamWriteModal from "../component/deokdam_write";
-import MyDeokdamModal from "../component/my_deokdam";
-import ReceivedDeokdamModal from "../component/received_deokdam";
-import PocketOpenedModal from "../component/pocket_opened_modal";
-import LeavePocketModal from "../component/leave_pocket_modal";
-import DeletePocketModal from "../component/delete_pocket_modal";
+import DeokdamWriteModal from "../components/deokdamWrite";
+import MyDeokdamModal from "../components/myDeokdam";
+import ReceivedDeokdamModal from "../components/receivedDeokdam";
+import PocketOpenedModal from "../components/pocketOpenedModal";
+import LeavePocketModal from "../components/leavePocketModal";
+import DeletePocketModal from "../components/deletePocketModal";
+import EditPocketModal from "../components/editPocketModal";
 import ConfettiEffect from "@/components/confetti/ConfettiEffect";
 import { useAuthStore } from "@/stores/auth";
 import type { Pocket } from "@/types/pocket";
@@ -62,6 +63,8 @@ export default function PocketDetailPage() {
   const [leaving, setLeaving] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [editing, setEditing] = useState(false);
 
   const isCreator = useMemo(() => {
     return pocket && authUser && pocket.made_by === authUser.user_uuid;
@@ -671,6 +674,64 @@ export default function PocketDetailPage() {
           loading={deleting}
         />
       </Modal>
+      <Modal
+        isOpen={editModalOpen}
+        onClose={() => {
+          if (!editing) {
+            setEditModalOpen(false);
+          }
+        }}
+        ariaTitle="덕담 주머니 정보 수정"
+      >
+        <EditPocketModal
+          onClose={() => {
+            if (!editing) {
+              setEditModalOpen(false);
+            }
+          }}
+          initialData={{
+            name: pocket?.name || "",
+            desc: pocket?.desc || "",
+            maxMembers: pocket?.limit || 0,
+            goalCount: pocket?.goal || 0,
+          }}
+          onConfirm={async (data) => {
+            if (!pocket) return;
+            setEditing(true);
+            try {
+              // 오픈일은 기존 값 유지
+              const openDate = new Date(pocket.open_at)
+                .toISOString()
+                .split("T")[0];
+              const response = await axios.patch("/api/pocket", {
+                pocket_uuid: pocket.pocket_uuid,
+                name: data.name,
+                desc: data.desc,
+                icon: pocket.icon, // 아이콘은 변경하지 않음
+                maxMembers: data.maxMembers,
+                goalCount: data.goalCount,
+                openDate: openDate,
+              });
+              if (response.status === 200) {
+                setToastType("success");
+                setToastMessage("덕담 주머니 정보가 수정되었어요");
+                setToastOpen(true);
+                setEditModalOpen(false);
+                // 주머니 정보 새로고침
+                await fetchDetail();
+              }
+            } catch (error: any) {
+              const errorMessage =
+                error.response?.data?.message || "수정에 실패했어요";
+              setToastType("error");
+              setToastMessage(errorMessage);
+              setToastOpen(true);
+              setEditing(false);
+            }
+          }}
+          loading={editing}
+        />
+      </Modal>
       <ReceivedDeokdamModal
         open={receivedModalOpen}
         onClose={() => setReceivedModalOpen(false)}
@@ -820,16 +881,29 @@ export default function PocketDetailPage() {
                       />
                       <div className={styles.menu_dropdown}>
                         {isCreator ? (
-                          <button
-                            type="button"
-                            className={styles.menu_item}
-                            onClick={() => {
-                              setMenuOpen(false);
-                              setDeleteModalOpen(true);
-                            }}
-                          >
-                            덕담 주머니 삭제하기
-                          </button>
+                          <>
+                            <button
+                              type="button"
+                              className={styles.menu_item}
+                              onClick={() => {
+                                setMenuOpen(false);
+                                setEditModalOpen(true);
+                              }}
+                            >
+                              정보 수정하기
+                            </button>
+                            <button
+                              type="button"
+                              className={styles.menu_item}
+                              style={{ color: "#ef4444" }}
+                              onClick={() => {
+                                setMenuOpen(false);
+                                setDeleteModalOpen(true);
+                              }}
+                            >
+                              덕담 주머니 삭제하기
+                            </button>
+                          </>
                         ) : (
                           <button
                             type="button"

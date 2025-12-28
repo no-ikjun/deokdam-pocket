@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import styles from "./deokdam_write.module.css";
+import styles from "./deokdamWrite.module.css";
 import ToastPopup from "@/components/toastPopup/toastPopup";
 import Image from "next/image";
 import { LoadingButton } from "@/components/loadingButton/loadingButton";
