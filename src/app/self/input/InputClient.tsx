@@ -6,6 +6,7 @@ import Link from "next/link";
 import styles from "./page.module.css";
 import LoadingIndicator from "@/components/loadingIndicator/loadingIndicator";
 import ToastPopup from "@/components/toastPopup/toastPopup";
+import EmailInputModal from "@/components/emailInputModal/emailInputModal";
 import { FORM_SCHEMAS, type Q } from "./questions";
 
 export type InputType = "goals" | "oneyear" | "retrospect";
@@ -110,6 +111,10 @@ export default function InputPage() {
     remindConfig.defaultMethod
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [emailModalOpen, setEmailModalOpen] = useState(false);
+  const [pendingRemindEnabled, setPendingRemindEnabled] = useState<
+    boolean | null
+  >(null);
   const q = schema.qs[index];
 
   // draft 키
@@ -215,6 +220,34 @@ export default function InputPage() {
     loadData();
   }, [typeParam, draftKey, remindConfig, schema.qs]);
 
+  // 처음 진입 시 리마인드가 켜져 있으면 이메일 체크
+  useEffect(() => {
+    if (loadingData) return;
+    if (!remindEnabled) return;
+
+    const checkEmailOnLoad = async () => {
+      try {
+        const response = await fetch("/api/auth/me");
+        if (response.ok) {
+          const data = await response.json();
+          if (!data.email) {
+            // 이메일이 없으면 모달 표시
+            setEmailModalOpen(true);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to check email:", error);
+      }
+    };
+
+    // 약간의 지연을 두어 다른 초기화가 완료된 후 체크
+    const timer = setTimeout(() => {
+      checkEmailOnLoad();
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [loadingData, remindEnabled]);
+
   // 자동 저장
   useEffect(() => {
     const payload = JSON.stringify({
@@ -233,7 +266,7 @@ export default function InputPage() {
 
   // 입력 핸들러
   const val = answers[q?.id] || "";
-  const max = q?.type === "text" ? q.max ?? 200 : undefined;
+  const max = q?.type === "text" ? (q.max ?? 200) : undefined;
   const otherInputKey = q?.type === "choice" ? `${q.id}_other` : null;
   const otherInputValue = otherInputKey ? answers[otherInputKey] || "" : "";
 
@@ -447,6 +480,43 @@ export default function InputPage() {
         duration={3000}
         onClose={() => setToast({ ...toast, open: false })}
       />
+      <EmailInputModal
+        isOpen={emailModalOpen}
+        onClose={() => {
+          setEmailModalOpen(false);
+          setPendingRemindEnabled(null);
+        }}
+        onCancel={() => {
+          // 취소 시 리마인드를 false로 설정
+          setRemindEnabled(false);
+          setPendingRemindEnabled(null);
+        }}
+        onSubmit={async (email) => {
+          const response = await fetch("/api/user", {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ email }),
+          });
+          if (!response.ok) {
+            throw new Error("이메일 저장에 실패했습니다.");
+          }
+          // 이메일 저장 성공 후 pending 상태 적용
+          if (pendingRemindEnabled !== null) {
+            setRemindEnabled(pendingRemindEnabled);
+            setPendingRemindEnabled(null);
+          }
+          // 성공 토스트 표시
+          setToast({
+            open: true,
+            message: "이메일이 저장되었습니다.",
+            type: "success",
+          });
+        }}
+        title="리마인드 알림 받기"
+        message=" 이메일로 리마인드를 받기위해 이메일 주소를 입력해주세요."
+      />
       {/* 헤더 */}
       <header className={styles.header}>
         <span
@@ -618,7 +688,27 @@ export default function InputPage() {
               <input
                 type="checkbox"
                 checked={remindEnabled}
-                onChange={(e) => setRemindEnabled(e.target.checked)}
+                onChange={async (e) => {
+                  const newValue = e.target.checked;
+                  if (newValue) {
+                    // 리마인드를 켤 때 이메일 확인
+                    try {
+                      const response = await fetch("/api/auth/me");
+                      if (response.ok) {
+                        const data = await response.json();
+                        if (!data.email) {
+                          // 이메일이 없으면 모달 표시
+                          setPendingRemindEnabled(newValue);
+                          setEmailModalOpen(true);
+                          return;
+                        }
+                      }
+                    } catch (error) {
+                      console.error("Failed to check email:", error);
+                    }
+                  }
+                  setRemindEnabled(newValue);
+                }}
               />
               <span className={styles.slider}></span>
             </label>
