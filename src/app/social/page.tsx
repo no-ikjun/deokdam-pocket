@@ -40,6 +40,10 @@ export default function SocialPage() {
     }
   };
 
+  useEffect(() => {
+    void fetchMyPockets();
+  }, []);
+
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return myPockets;
