@@ -83,6 +83,7 @@ async function processReminders(client: VercelPoolClient) {
         WHERE s.remind = true
           AND s.remind_at IS NOT NULL
           AND u.email IS NOT NULL
+          AND TRIM(u.email) != ''
       `;
 
   const remindersToSend: Array<{
@@ -185,6 +186,7 @@ async function processReminders(client: VercelPoolClient) {
             FROM "user"
             WHERE user_uuid = ${memberUuid}
               AND email IS NOT NULL
+              AND TRIM(email) != ''
             LIMIT 1
           `;
 
