@@ -53,6 +53,13 @@ function isToday(dateString: string): boolean {
 }
 
 /**
+ * 딜레이 헬퍼 함수 (Rate limit 방지)
+ */
+function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/**
  * 리마인드 처리 로직 (공통 함수)
  */
 async function processReminders(client: VercelPoolClient) {
@@ -215,7 +222,13 @@ async function processReminders(client: VercelPoolClient) {
     errors: [] as Array<{ selfUuid: string; error: string }>,
   };
 
-  for (const reminder of remindersToSend) {
+  for (let i = 0; i < remindersToSend.length; i++) {
+    const reminder = remindersToSend[i];
+
+    // Rate limit 방지: 첫 번째 요청이 아니면 딜레이 추가
+    if (i > 0) {
+      await delay(600); // 0.6초 딜레이 (초당 2개 = 500ms 간격, 여유를 두고 600ms)
+    }
     try {
       // 이메일 발송
       const viewUrl = `https://deokdam.app/self?type=${reminder.selfType.toLowerCase()}`;
@@ -311,7 +324,14 @@ async function processReminders(client: VercelPoolClient) {
     }>,
   };
 
-  for (const reminder of pocketRemindersToSend) {
+  for (let i = 0; i < pocketRemindersToSend.length; i++) {
+    const reminder = pocketRemindersToSend[i];
+
+    // Rate limit 방지: 첫 번째 요청이 아니면 딜레이 추가
+    // Self와 Pocket을 합쳐서 카운트 (연속된 요청이므로)
+    if (i > 0 || remindersToSend.length > 0) {
+      await delay(600);
+    }
     try {
       // 이메일 발송
       const viewUrl = `https://deokdam.app/pocket/${reminder.pocketUuid}`;
