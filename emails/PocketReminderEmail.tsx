@@ -11,7 +11,8 @@ import {
 } from "@react-email/components";
 import * as React from "react";
 
-interface PocketReminderEmailProps {
+export interface PocketReminderEmailProps {
+  email: string;
   userName: string;
   pocketName: string;
   pocketOpenDate: string;

@@ -11,7 +11,8 @@ import {
 } from "@react-email/components";
 import * as React from "react";
 
-interface SelfReminderEmailProps {
+export interface SelfReminderEmailProps {
+  email: string;
   userName: string;
   selfType: "GOALS" | "ONEYEAR" | "RETROSPECT";
   selfTypeLabel: string;
