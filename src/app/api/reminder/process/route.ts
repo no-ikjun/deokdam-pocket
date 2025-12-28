@@ -260,7 +260,7 @@ export async function POST(req: Request) {
 }
 
 /**
- * GET: Cron job에서 호출 (실제 처리 수행)
+ * GET: Cron job 호출 (자동 호출용)
  */
 export async function GET() {
   return withDbClient(async (client) => {
