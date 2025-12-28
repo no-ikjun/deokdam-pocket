@@ -21,7 +21,8 @@ export async function GET(req: Request) {
         type, 
         created_at
       FROM pocket 
-      WHERE pocket_uuid = ${pocket_uuid};
+      WHERE pocket_uuid = ${pocket_uuid}
+        AND (disabled IS NULL OR disabled = false);
     `;
 
     // 1. 내가 작성한 덕담 정보

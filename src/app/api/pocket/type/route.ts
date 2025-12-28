@@ -39,7 +39,7 @@ export async function GET(req: Request) {
     }
 
     const pocket =
-      await client.sql`SELECT type FROM pocket WHERE pocket_uuid = ${pocket_uuid};`;
+      await client.sql`SELECT type FROM pocket WHERE pocket_uuid = ${pocket_uuid} AND (disabled IS NULL OR disabled = false);`;
 
     if (pocket.rows.length === 0) {
       return NextResponse.json({ message: "Not Found" }, { status: 400 });

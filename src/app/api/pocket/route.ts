@@ -46,7 +46,11 @@ export async function POST(req: Request) {
 export async function GET(req: Request) {
   return withAuthAndDb(async (user_uuid, client) => {
     const pockets = await client.sql`
-      SELECT pocket_uuid, name, icon, "limit", goal, members, open_at, code, "desc" FROM pocket WHERE ${user_uuid} = ANY(members);`;
+      SELECT pocket_uuid, name, icon, "limit", goal, members, open_at, code, "desc" 
+      FROM pocket 
+      WHERE ${user_uuid} = ANY(members)
+        AND (disabled IS NULL OR disabled = false);
+    `;
 
     return NextResponse.json({ pockets: pockets.rows }, { status: 200 });
   });
@@ -82,7 +86,7 @@ export async function PATCH(req: Request) {
     }
 
     const pocketCheck =
-      await client.sql`SELECT made_by FROM pocket WHERE pocket_uuid = ${pocket_uuid}`;
+      await client.sql`SELECT made_by FROM pocket WHERE pocket_uuid = ${pocket_uuid} AND (disabled IS NULL OR disabled = false)`;
     if (pocketCheck.rows.length === 0) {
       return NextResponse.json(
         { message: "Pocket not found" },
@@ -117,7 +121,13 @@ export async function DELETE(req: Request) {
       );
     }
 
-    await client.sql`DELETE FROM pocket WHERE pocket_uuid = ${pocket_uuid} AND made_by = ${user_uuid};`;
+    // 실제 삭제 대신 soft delete (disabled = true, deleted_at 설정)
+    const deletedAt = new Date().toISOString();
+    await client.sql`
+      UPDATE pocket 
+      SET disabled = true, deleted_at = ${deletedAt}
+      WHERE pocket_uuid = ${pocket_uuid} AND made_by = ${user_uuid};
+    `;
 
     return NextResponse.json({ message: "success" }, { status: 200 });
   });

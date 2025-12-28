@@ -9,7 +9,8 @@ export async function POST(req: Request) {
     const pocketResult = await client.sql`
       SELECT pocket_uuid, members, "limit"
       FROM pocket
-      WHERE code = ${pocket_code};
+      WHERE code = ${pocket_code}
+        AND (disabled IS NULL OR disabled = false);
     `;
 
     if (pocketResult.rowCount === 0) {

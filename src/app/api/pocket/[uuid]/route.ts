@@ -34,6 +34,7 @@ export async function GET(req: Request, { params }: RouteParams) {
           FROM pocket
           WHERE pocket_uuid = ${uuid}
             AND ${user_uuid} = ANY(members)
+            AND (disabled IS NULL OR disabled = false)
           LIMIT 1;
         `;
 
@@ -58,6 +59,7 @@ export async function GET(req: Request, { params }: RouteParams) {
             code
           FROM pocket
           WHERE pocket_uuid = ${uuid}
+            AND (disabled IS NULL OR disabled = false)
           LIMIT 1;
         `;
 
@@ -91,6 +93,7 @@ export async function GET(req: Request, { params }: RouteParams) {
       FROM pocket
       WHERE pocket_uuid = ${uuid}
         AND ${user_uuid} = ANY(members)
+        AND (disabled IS NULL OR disabled = false)
       LIMIT 1;
     `;
 

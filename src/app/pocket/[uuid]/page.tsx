@@ -14,6 +14,8 @@ import DeokdamWriteModal from "../component/deokdam_write";
 import MyDeokdamModal from "../component/my_deokdam";
 import ReceivedDeokdamModal from "../component/received_deokdam";
 import PocketOpenedModal from "../component/pocket_opened_modal";
+import LeavePocketModal from "../component/leave_pocket_modal";
+import DeletePocketModal from "../component/delete_pocket_modal";
 import ConfettiEffect from "@/components/confetti/ConfettiEffect";
 import { useAuthStore } from "@/stores/auth";
 import type { Pocket } from "@/types/pocket";
@@ -55,6 +57,15 @@ export default function PocketDetailPage() {
   const [openedModalOpen, setOpenedModalOpen] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const [emailModalOpen, setEmailModalOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [leaveModalOpen, setLeaveModalOpen] = useState(false);
+  const [leaving, setLeaving] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  const isCreator = useMemo(() => {
+    return pocket && authUser && pocket.made_by === authUser.user_uuid;
+  }, [pocket, authUser]);
 
   const fetchDetail = async () => {
     setLoading(true);
@@ -366,6 +377,19 @@ export default function PocketDetailPage() {
     };
   }, []);
 
+  // 메뉴 외부 클릭 시 닫기
+  useEffect(() => {
+    if (!menuOpen) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest(`.${styles.menu_container}`)) {
+        setMenuOpen(false);
+      }
+    };
+    window.addEventListener("click", handleClickOutside);
+    return () => window.removeEventListener("click", handleClickOutside);
+  }, [menuOpen]);
+
   // 오픈 상태일 때 컨페티와 안내 모달 띄우기
   useEffect(() => {
     if (!pocket || loading) return;
@@ -561,6 +585,92 @@ export default function PocketDetailPage() {
         pocketUuid={pocket?.pocket_uuid ?? ""}
         members={members}
       />
+      <Modal
+        isOpen={leaveModalOpen}
+        onClose={() => {
+          if (!leaving) {
+            setLeaveModalOpen(false);
+          }
+        }}
+        ariaTitle="덕담 주머니 나가기"
+      >
+        <LeavePocketModal
+          onClose={() => {
+            if (!leaving) {
+              setLeaveModalOpen(false);
+            }
+          }}
+          onConfirm={async () => {
+            if (!pocket) return;
+            setLeaving(true);
+            try {
+              const response = await axios.post("/api/pocket/leave", {
+                pocket_uuid: pocket.pocket_uuid,
+              });
+              if (response.status === 200) {
+                setToastType("success");
+                setToastMessage("덕담 주머니에서 나갔어요");
+                setToastOpen(true);
+                setLeaveModalOpen(false);
+                setTimeout(() => {
+                  router.push("/social");
+                }, 1000);
+              }
+            } catch (error: any) {
+              const errorMessage =
+                error.response?.data?.message || "나가기에 실패했어요";
+              setToastType("error");
+              setToastMessage(errorMessage);
+              setToastOpen(true);
+              setLeaving(false);
+            }
+          }}
+          loading={leaving}
+        />
+      </Modal>
+      <Modal
+        isOpen={deleteModalOpen}
+        onClose={() => {
+          if (!deleting) {
+            setDeleteModalOpen(false);
+          }
+        }}
+        ariaTitle="덕담 주머니 삭제하기"
+      >
+        <DeletePocketModal
+          onClose={() => {
+            if (!deleting) {
+              setDeleteModalOpen(false);
+            }
+          }}
+          onConfirm={async () => {
+            if (!pocket) return;
+            setDeleting(true);
+            try {
+              const response = await axios.delete("/api/pocket", {
+                data: { pocket_uuid: pocket.pocket_uuid },
+              });
+              if (response.status === 200) {
+                setToastType("success");
+                setToastMessage("덕담 주머니가 삭제되었어요");
+                setToastOpen(true);
+                setDeleteModalOpen(false);
+                setTimeout(() => {
+                  router.push("/social");
+                }, 1000);
+              }
+            } catch (error: any) {
+              const errorMessage =
+                error.response?.data?.message || "삭제에 실패했어요";
+              setToastType("error");
+              setToastMessage(errorMessage);
+              setToastOpen(true);
+              setDeleting(false);
+            }
+          }}
+          loading={deleting}
+        />
+      </Modal>
       <ReceivedDeokdamModal
         open={receivedModalOpen}
         onClose={() => setReceivedModalOpen(false)}
@@ -671,14 +781,72 @@ export default function PocketDetailPage() {
           <header className={styles.info_header}>
             <span className={styles.year_badge}>덕담 주머니 정보</span>
             {pocket?.code && (
-              <button
-                type="button"
-                className={styles.code_chip}
-                onClick={handleCopyCode}
-              >
-                <span className={styles.code_label}>참여 코드</span>
-                <span className={styles.code_value}>{pocket.code}</span>
-              </button>
+              <div className={styles.code_wrapper}>
+                <button
+                  type="button"
+                  className={styles.code_chip}
+                  onClick={handleCopyCode}
+                >
+                  <span className={styles.code_label}>참여 코드</span>
+                  <span className={styles.code_value}>{pocket.code}</span>
+                </button>
+                <div className={styles.menu_container}>
+                  <button
+                    type="button"
+                    className={styles.menu_button}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setMenuOpen(!menuOpen);
+                    }}
+                    aria-label="메뉴"
+                  >
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <circle cx="8" cy="4" r="1.5" fill="currentColor" />
+                      <circle cx="8" cy="8" r="1.5" fill="currentColor" />
+                      <circle cx="8" cy="12" r="1.5" fill="currentColor" />
+                    </svg>
+                  </button>
+                  {menuOpen && (
+                    <>
+                      <div
+                        className={styles.menu_overlay}
+                        onClick={() => setMenuOpen(false)}
+                      />
+                      <div className={styles.menu_dropdown}>
+                        {isCreator ? (
+                          <button
+                            type="button"
+                            className={styles.menu_item}
+                            onClick={() => {
+                              setMenuOpen(false);
+                              setDeleteModalOpen(true);
+                            }}
+                          >
+                            덕담 주머니 삭제하기
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            className={styles.menu_item}
+                            onClick={() => {
+                              setMenuOpen(false);
+                              setLeaveModalOpen(true);
+                            }}
+                          >
+                            덕담 주머니에서 나가기
+                          </button>
+                        )}
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
             )}
           </header>
 

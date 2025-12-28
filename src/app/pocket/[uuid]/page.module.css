@@ -48,7 +48,8 @@
   grid-template-rows: auto auto auto;
   gap: 1.2rem;
 
-  background: linear-gradient(
+  background:
+    linear-gradient(
       135deg,
       rgba(248, 113, 113, 0.08),
       rgba(251, 113, 133, 0.12)
@@ -142,7 +143,8 @@
 
   background: rgba(255, 255, 255, 0.96);
   border: 1px solid rgba(255, 255, 255, 0.95);
-  box-shadow: 0 10px 26px rgba(248, 113, 113, 0.16),
+  box-shadow:
+    0 10px 26px rgba(248, 113, 113, 0.16),
     inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
@@ -230,7 +232,8 @@
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.96);
   border: 1px solid rgba(255, 255, 255, 0.95);
-  box-shadow: 0 10px 26px rgba(248, 113, 113, 0.14),
+  box-shadow:
+    0 10px 26px rgba(248, 113, 113, 0.14),
     inset 0 1px 0 rgba(255, 255, 255, 0.9);
   min-height: 62px;
 }
@@ -286,23 +289,29 @@
   font-weight: 700;
   color: #b42323;
   background: rgba(254, 226, 226, 0.85);
-  box-shadow: inset 0 0 0 1px rgba(248, 113, 113, 0.4),
+  box-shadow:
+    inset 0 0 0 1px rgba(248, 113, 113, 0.4),
     0 6px 16px rgba(248, 113, 113, 0.2);
   cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    background 0.15s ease;
 }
 
 .mydeokdam_button:hover {
   transform: translateY(-1px);
   background: rgba(254, 226, 226, 0.95);
-  box-shadow: inset 0 0 0 1px rgba(248, 113, 113, 0.5),
+  box-shadow:
+    inset 0 0 0 1px rgba(248, 113, 113, 0.5),
     0 10px 20px rgba(248, 113, 113, 0.24);
 }
 
 .mydeokdam_button:active {
   transform: translateY(0);
   background: rgba(254, 226, 226, 0.9);
-  box-shadow: inset 0 0 0 1px rgba(248, 113, 113, 0.55),
+  box-shadow:
+    inset 0 0 0 1px rgba(248, 113, 113, 0.55),
     0 6px 14px rgba(248, 113, 113, 0.2);
 }
 
@@ -348,16 +357,20 @@
   border-radius: 10px;
   border: none;
   background: rgba(255, 255, 255, 0.85);
-  box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.35),
+  box-shadow:
+    inset 0 0 0 1px rgba(148, 163, 184, 0.35),
     0 8px 18px rgba(148, 163, 184, 0.18);
   color: #0b1b3a;
   cursor: pointer;
-  transition: transform 0.12s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.12s ease,
+    box-shadow 0.2s ease;
 }
 
 .back_link:hover {
   transform: translateY(-1px);
-  box-shadow: inset 0 0 0 1px rgba(249, 80, 80, 0.6),
+  box-shadow:
+    inset 0 0 0 1px rgba(249, 80, 80, 0.6),
     0 10px 20px rgba(249, 80, 80, 0.18);
   color: #f95050;
 }
@@ -377,6 +390,13 @@
   box-shadow: inset 0 0 0 1px rgba(248, 113, 113, 0.45);
 }
 
+.code_wrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  position: relative;
+}
+
 .code_chip {
   display: inline-flex;
   align-items: center;
@@ -387,7 +407,10 @@
   cursor: pointer;
   background: rgba(248, 250, 252, 0.98);
   box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.5);
-  transition: background 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
+  transition:
+    background 0.15s ease,
+    transform 0.1s ease,
+    box-shadow 0.15s ease;
 }
 
 .code_chip:hover {
@@ -407,6 +430,97 @@
   font-weight: 900;
   letter-spacing: 0.08em;
   color: #0b1b3a;
+}
+
+.menu_container {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.menu_button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(248, 250, 252, 0.98);
+  box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.5);
+  cursor: pointer;
+  color: #64748b;
+  transition:
+    background 0.15s ease,
+    transform 0.1s ease,
+    box-shadow 0.15s ease,
+    color 0.15s ease;
+  padding: 0;
+}
+
+.menu_button:hover {
+  background: rgba(248, 113, 113, 0.06);
+  box-shadow: inset 0 0 0 1px rgba(248, 113, 113, 0.7);
+  color: #ef4444;
+  transform: translateY(-1px);
+}
+
+.menu_button:active {
+  transform: translateY(0);
+}
+
+.menu_overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 998;
+  background: transparent;
+}
+
+.menu_dropdown {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  z-index: 999;
+  min-width: 180px;
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 12px;
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.12),
+    0 2px 8px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  padding: 0.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.menu_item {
+  display: flex;
+  align-items: center;
+  padding: 0.65rem 0.9rem;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #ef4444;
+  cursor: pointer;
+  text-align: left;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+.menu_item:hover {
+  background: rgba(254, 226, 226, 0.6);
+  color: #b42323;
+}
+
+.menu_item:active {
+  background: rgba(254, 226, 226, 0.8);
 }
 
 .title_block {
@@ -478,7 +592,10 @@
   cursor: pointer;
   border: none;
   outline: none;
-  transition: transform 0.12s ease, box-shadow 0.2s ease, color 0.2s ease,
+  transition:
+    transform 0.12s ease,
+    box-shadow 0.2s ease,
+    color 0.2s ease,
     background 0.2s ease;
 }
 
@@ -509,18 +626,54 @@
     rgba(255, 255, 255, 0.98),
     rgba(255, 255, 255, 0.9)
   );
-  box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.4),
+  box-shadow:
+    inset 0 0 0 1px rgba(148, 163, 184, 0.4),
     0 4px 14px rgba(148, 163, 184, 0.18);
 }
 .secondary_action:hover {
   transform: translateY(-1px);
   color: #f95050;
-  box-shadow: inset 0 0 0 1px rgba(249, 80, 80, 0.6),
+  box-shadow:
+    inset 0 0 0 1px rgba(249, 80, 80, 0.6),
     0 6px 16px rgba(249, 80, 80, 0.18);
 }
 
-.info_footer {
+.leave_section {
   text-align: center;
+  margin: 0;
+}
+
+.leave_button {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #9ca3af;
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 3px;
+  transition:
+    color 0.2s ease,
+    text-decoration-color 0.2s ease;
+}
+
+.leave_button:hover {
+  color: #6b7280;
+  text-decoration-color: #9ca3af;
+}
+
+.leave_button:active {
+  color: #4b5563;
+}
+
+.info_footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
 }
 
 .info_footer_text {

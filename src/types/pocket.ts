@@ -13,6 +13,8 @@ export type Pocket = {
   code: string;
   open_at: string;
   created_at: string;
+  disabled?: boolean;
+  deleted_at?: string;
 };
 
 /**
