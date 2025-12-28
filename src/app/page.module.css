@@ -134,9 +134,13 @@
   color: #0b1b3a;
 
   background: rgba(255, 255, 255, 0.92);
-  box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.35),
+  box-shadow:
+    inset 0 0 0 1px rgba(148, 163, 184, 0.35),
     0 6px 14px rgba(15, 23, 42, 0.06);
-  transition: transform 0.1s ease, box-shadow 0.2s ease, color 0.2s ease,
+  transition:
+    transform 0.1s ease,
+    box-shadow 0.2s ease,
+    color 0.2s ease,
     background 0.2s ease;
 }
 
@@ -144,7 +148,8 @@
   transform: translateY(-1px);
   color: #d63b3b;
   background: rgba(255, 255, 255, 0.98);
-  box-shadow: inset 0 0 0 1px rgba(214, 59, 59, 0.4),
+  box-shadow:
+    inset 0 0 0 1px rgba(214, 59, 59, 0.4),
     0 10px 18px rgba(214, 59, 59, 0.12);
 }
 
@@ -166,19 +171,22 @@
 }
 
 .badge_primary {
-  background: linear-gradient(
+  background:
+    linear-gradient(
       180deg,
       rgba(255, 241, 242, 0.92),
       rgba(255, 228, 232, 0.82)
     ),
     rgba(255, 241, 242, 0.92);
-  box-shadow: inset 0 0 0 1px rgba(249, 80, 80, 0.3),
+  box-shadow:
+    inset 0 0 0 1px rgba(249, 80, 80, 0.3),
     0 6px 14px rgba(249, 80, 80, 0.12);
 }
 
 .badge_muted {
   background: rgba(255, 255, 255, 0.95);
-  box-shadow: inset 0 0 0 1px rgba(226, 232, 240, 0.72),
+  box-shadow:
+    inset 0 0 0 1px rgba(226, 232, 240, 0.72),
     0 2px 6px rgba(148, 163, 184, 0.12);
 }
 
@@ -207,7 +215,8 @@
   background: linear-gradient(120deg, #fff8f9 0%, #ffeef3 50%, #ffffff 100%);
   background-size: 220% 220%;
   animation: ctaGradientFloat 9s ease-in-out infinite alternate;
-  box-shadow: 0 12px 26px rgba(249, 80, 80, 0.12),
+  box-shadow:
+    0 12px 26px rgba(249, 80, 80, 0.12),
     inset 0 1px 0 rgba(255, 255, 255, 0.78);
   border: 1px solid rgba(249, 80, 80, 0.16);
   display: grid;
@@ -253,7 +262,8 @@
   padding: 1.05rem 1.15rem;
   text-decoration: none;
 
-  background: linear-gradient(
+  background:
+    linear-gradient(
       180deg,
       rgba(255, 255, 255, 0.72),
       rgba(255, 255, 255, 0.28)
@@ -265,16 +275,21 @@
   outline: 1px solid rgba(249, 80, 80, 0.18);
 
   box-shadow: 0 10px 26px rgba(15, 23, 42, 0.08);
-  transition: transform 0.12s ease, box-shadow 0.2s ease,
-    outline-color 0.2s ease, background 0.2s ease;
+  transition:
+    transform 0.12s ease,
+    box-shadow 0.2s ease,
+    outline-color 0.2s ease,
+    background 0.2s ease;
 }
 
 .cta_card:hover {
   transform: translateY(-2px);
   outline-color: rgba(249, 80, 80, 0.4);
-  box-shadow: 0 14px 30px rgba(249, 80, 80, 0.14),
+  box-shadow:
+    0 14px 30px rgba(249, 80, 80, 0.14),
     inset 0 1px 0 rgba(255, 255, 255, 0.55);
-  background: linear-gradient(
+  background:
+    linear-gradient(
       180deg,
       rgba(255, 255, 255, 0.9),
       rgba(255, 255, 255, 0.55)
@@ -303,7 +318,8 @@
   display: grid;
   place-items: center;
 
-  background: radial-gradient(
+  background:
+    radial-gradient(
       circle at 40% 35%,
       rgba(254, 226, 226, 0.95),
       rgba(255, 255, 255, 0.7) 65%
@@ -342,7 +358,9 @@
   font-size: 1.2rem;
   font-weight: 800;
   color: rgba(11, 27, 58, 0.55);
-  transition: transform 0.15s ease, color 0.2s ease;
+  transition:
+    transform 0.15s ease,
+    color 0.2s ease;
 }
 .cta_card:hover .cta_arrow {
   transform: translateX(2px);
@@ -357,7 +375,8 @@
   border-radius: 18px;
   padding: 1.05rem 1.15rem 1.1rem;
 
-  background: linear-gradient(
+  background:
+    linear-gradient(
       180deg,
       rgba(255, 255, 255, 0.85),
       rgba(255, 255, 255, 0.55)
@@ -419,27 +438,33 @@
   border-radius: 16px;
   padding: 0.95rem 0.95rem;
 
-  background: linear-gradient(
+  background:
+    linear-gradient(
       180deg,
       rgba(255, 255, 255, 0.95),
       rgba(255, 255, 255, 0.7)
     ),
     rgba(248, 250, 252, 0.7);
   outline: 1px solid rgba(249, 80, 80, 0.14);
-  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08),
+  box-shadow:
+    0 12px 24px rgba(15, 23, 42, 0.08),
     inset 0 1px 0 rgba(255, 255, 255, 0.65);
 
   display: grid;
   gap: 0.7rem;
-  transition: transform 0.12s ease, box-shadow 0.2s ease,
+  transition:
+    transform 0.12s ease,
+    box-shadow 0.2s ease,
     outline-color 0.2s ease;
 }
 
 .pocket_card:hover {
   transform: translateY(-2px);
   outline-color: rgba(249, 80, 80, 0.38);
-  box-shadow: 0 16px 28px rgba(15, 23, 42, 0.12),
-    0 0 0 1px rgba(249, 80, 80, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  box-shadow:
+    0 16px 28px rgba(15, 23, 42, 0.12),
+    0 0 0 1px rgba(249, 80, 80, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
 }
 
 .pocket_top {
@@ -540,7 +565,8 @@
   border-radius: 14px;
   padding: 0.9rem;
   background: rgba(255, 255, 255, 0.9);
-  box-shadow: inset 0 0 0 1px rgba(226, 232, 240, 0.9),
+  box-shadow:
+    inset 0 0 0 1px rgba(226, 232, 240, 0.9),
     0 8px 18px rgba(15, 23, 42, 0.06);
   display: grid;
   gap: 0.35rem;
@@ -642,7 +668,8 @@
   border-radius: 14px;
 
   border: 1px solid rgba(148, 163, 184, 0.35);
-  background: linear-gradient(
+  background:
+    linear-gradient(
       180deg,
       rgba(255, 255, 255, 0.92),
       rgba(255, 255, 255, 0.72)
@@ -650,12 +677,15 @@
     rgba(255, 255, 255, 0.55);
 
   font-size: 0.95rem;
-  font-weight: 700;
+  font-weight: 500;
   color: #0b1b3a;
 
   outline: none;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.12s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.12s ease;
 }
 
 .modal_input::placeholder {
@@ -665,7 +695,8 @@
 
 .modal_input:focus {
   border-color: rgba(249, 80, 80, 0.55);
-  box-shadow: 0 0 0 3px rgba(249, 80, 80, 0.18),
+  box-shadow:
+    0 0 0 3px rgba(249, 80, 80, 0.18),
     inset 0 1px 0 rgba(255, 255, 255, 0.7);
 }
 
@@ -688,7 +719,9 @@
 
   background: linear-gradient(145deg, #f97373, #ef4444);
   box-shadow: 0 8px 18px rgba(231, 102, 102, 0.25);
-  transition: transform 0.1s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.1s ease,
+    box-shadow 0.2s ease;
 }
 
 .modal_save_btn:hover {
@@ -707,13 +740,17 @@
   color: #0b1b3a;
 
   background: rgba(255, 255, 255, 0.92);
-  box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.35),
+  box-shadow:
+    inset 0 0 0 1px rgba(148, 163, 184, 0.35),
     0 6px 14px rgba(15, 23, 42, 0.06);
-  transition: transform 0.1s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.1s ease,
+    box-shadow 0.2s ease;
 }
 .modal_logout_btn:hover {
   background: rgba(255, 255, 255, 0.98);
-  box-shadow: inset 0 0 0 1px rgba(214, 59, 59, 0.4),
+  box-shadow:
+    inset 0 0 0 1px rgba(214, 59, 59, 0.4),
     0 10px 18px rgba(214, 59, 59, 0.12);
 }
 
@@ -795,7 +832,8 @@
   padding: 1rem;
   border-radius: 16px;
   background: rgba(255, 255, 255, 0.85);
-  box-shadow: inset 0 0 0 1px rgba(226, 232, 240, 0.9),
+  box-shadow:
+    inset 0 0 0 1px rgba(226, 232, 240, 0.9),
     0 8px 18px rgba(15, 23, 42, 0.06);
   display: grid;
   gap: 0.7rem;

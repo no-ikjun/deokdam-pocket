@@ -10,6 +10,7 @@ import PocketCard from "./component/pocket_card";
 import Modal from "@/components/modal/modal";
 import InviteModal from "./component/invite_modal";
 import ToastPopup from "@/components/toastPopup/toastPopup";
+import EmailInputModal from "@/components/emailInputModal/emailInputModal";
 import { LoadingButton } from "@/components/loadingButton/loadingButton";
 import type { Pocket } from "@/types/pocket";
 import Footer from "@/components/footer/footer";
@@ -22,6 +23,7 @@ export default function SocialPage() {
   const [toastOpen, setToastOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [myPockets, setMyPockets] = useState<Pocket[]>([]);
+  const [emailModalOpen, setEmailModalOpen] = useState(false);
 
   const fetchMyPockets = async () => {
     setLoading(true);
@@ -66,6 +68,16 @@ export default function SocialPage() {
         setToastMessage("덕담 주머니 참여 성공!");
         setToastOpen(true);
         void fetchMyPockets();
+        // 이메일 확인
+        try {
+          const emailResponse = await axios.get("/api/auth/me");
+          if (emailResponse.status === 200 && !emailResponse.data.email) {
+            // 이메일이 없으면 모달 표시
+            setEmailModalOpen(true);
+          }
+        } catch (error) {
+          console.error("Failed to check email:", error);
+        }
       }
     } catch (error) {
       setToastMessage("참여 실패. 다시 시도해 주세요.");
@@ -215,6 +227,21 @@ export default function SocialPage() {
 
         <Footer showButtons={false} usingIcons={true} />
       </div>
+      <EmailInputModal
+        isOpen={emailModalOpen}
+        onClose={() => setEmailModalOpen(false)}
+        onSubmit={async (email) => {
+          const response = await axios.patch("/api/user", { email });
+          if (response.status !== 200) {
+            throw new Error("이메일 저장에 실패했습니다.");
+          }
+          // 성공 토스트 표시
+          setToastMessage("이메일이 저장되었습니다.");
+          setToastOpen(true);
+        }}
+        title="덕담 주머니 최신 소식 받기"
+        message="이 덕담 주머니의 최신 소식을 받기위해 이메일 주소를 입력해주세요."
+      />
     </main>
   );
 }

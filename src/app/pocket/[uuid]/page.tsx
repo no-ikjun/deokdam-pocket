@@ -9,6 +9,7 @@ import LoadingIndicator from "@/components/loadingIndicator/loadingIndicator";
 import Modal from "@/components/modal/modal";
 import InviteModal from "@/app/social/component/invite_modal";
 import ToastPopup from "@/components/toastPopup/toastPopup";
+import EmailInputModal from "@/components/emailInputModal/emailInputModal";
 import DeokdamWriteModal from "../component/deokdam_write";
 import MyDeokdamModal from "../component/my_deokdam";
 import ReceivedDeokdamModal from "../component/received_deokdam";
@@ -53,6 +54,7 @@ export default function PocketDetailPage() {
   const [receivedModalOpen, setReceivedModalOpen] = useState(false);
   const [openedModalOpen, setOpenedModalOpen] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
+  const [emailModalOpen, setEmailModalOpen] = useState(false);
 
   const fetchDetail = async () => {
     setLoading(true);
@@ -237,6 +239,16 @@ export default function PocketDetailPage() {
         setToastOpen(true);
         // 주머니 정보 새로고침 (이제 멤버이므로 정상적으로 로드됨)
         await fetchDetail();
+        // 이메일 확인
+        try {
+          const emailResponse = await axios.get("/api/auth/me");
+          if (emailResponse.status === 200 && !emailResponse.data.email) {
+            // 이메일이 없으면 모달 표시
+            setEmailModalOpen(true);
+          }
+        } catch (error) {
+          console.error("Failed to check email:", error);
+        }
       }
     } catch (error: any) {
       console.error("Auto join error:", error);
@@ -424,7 +436,7 @@ export default function PocketDetailPage() {
     () =>
       ({
         "--progress-width": `${progress}%`,
-      } as CSSProperties),
+      }) as CSSProperties,
     [progress]
   );
 
@@ -744,6 +756,22 @@ export default function PocketDetailPage() {
         </section>
       </div>
 
+      <EmailInputModal
+        isOpen={emailModalOpen}
+        onClose={() => setEmailModalOpen(false)}
+        onSubmit={async (email) => {
+          const response = await axios.patch("/api/user", { email });
+          if (response.status !== 200) {
+            throw new Error("이메일 저장에 실패했습니다.");
+          }
+          // 성공 토스트 표시
+          setToastType("success");
+          setToastMessage("이메일이 저장되었습니다.");
+          setToastOpen(true);
+        }}
+        title="덕담 주머니의 최신 소식 받기"
+        message="이 덕담 주머니의 최신 소식을 받기위해 이메일 주소를 입력해주세요."
+      />
       <Footer showButtons={false} usingIcons={true} />
     </main>
   );
