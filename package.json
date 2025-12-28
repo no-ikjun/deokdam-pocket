@@ -32,11 +32,15 @@
     "zustand": "^4.5.7"
   },
   "devDependencies": {
+    "@react-email/components": "^1.0.2",
+    "@react-email/preview-server": "^5.1.0",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "esbuild": "^0.27.2",
     "eslint": "^8",
     "eslint-config-next": "14.0.4",
+    "react-email": "^5.1.0",
     "typescript": "^5"
   }
 }
