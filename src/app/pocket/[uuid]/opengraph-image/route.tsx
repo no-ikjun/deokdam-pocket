@@ -24,7 +24,7 @@ export async function GET(
     const client = await db.connect();
     try {
       const result = await client.sql`
-        SELECT name, "desc", icon, open_at, goal
+        SELECT name, "desc", icon, open_at, goal, members
         FROM pocket
         WHERE pocket_uuid = ${uuid}
         LIMIT 1;
@@ -120,6 +120,22 @@ export async function GET(
           {pocket.name}
         </div>
 
+        {/* 참여 인원 및 목표 덕담 */}
+        <div
+          style={{
+            fontSize: "28px",
+            fontWeight: "400",
+            lineHeight: "1.5",
+            display: "flex",
+            fontFamily: "Cafe24Ssurround",
+            color: "#6b7280",
+          }}
+        >
+          <span style={{ color: "#FF606B" }}>참여 인원 {pocket.members?.length || 0}명</span>
+          <span style={{ margin: "0 12px", color: "#6b7280" }}>·</span>
+          <span style={{ color: "#FF606B" }}>목표 덕담 {pocket.goal || 0}개</span>
+        </div>
+
         {/* 안내 문구 */}
         <div
           style={{
@@ -138,8 +154,8 @@ export async function GET(
         <img
           src={logoImageUrl}
           alt="덕담 주머니"
-          width={120}
-          height={120}
+          width={360}
+          height={360}
           style={{
             display: "flex",
           }}

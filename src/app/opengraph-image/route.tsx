@@ -39,8 +39,8 @@ export async function GET() {
         <img
           src={logoImageUrl}
           alt="덕담 주머니"
-          width={300}
-          height={300}
+          width={380}
+          height={380}
           style={{
             display: "flex",
           }}
@@ -57,20 +57,20 @@ export async function GET() {
         >
           <div
             style={{
-              fontSize: "36px",
+              fontSize: "44px",
               fontWeight: "400",
-              color: "#1e293b",
               lineHeight: "1.5",
               letterSpacing: "-0.01em",
               display: "flex",
               fontFamily: "Cafe24Ssurround",
             }}
           >
-            새해 응원의 마음을
+            <span style={{ color: "#1e293b" }}>새해 </span>
+            <span style={{ color: "#FF606B" }}>응원의 마음을</span>
           </div>
           <div
             style={{
-              fontSize: "36px",
+              fontSize: "44px",
               fontWeight: "400",
               color: "#1e293b",
               lineHeight: "1.5",
