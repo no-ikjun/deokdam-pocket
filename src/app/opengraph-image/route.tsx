@@ -40,7 +40,7 @@ export async function GET() {
           src={logoImageUrl}
           alt="덕담 주머니"
           width={380}
-          height={380}
+          height={190}
           style={{
             display: "flex",
           }}

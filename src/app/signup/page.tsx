@@ -71,19 +71,19 @@ function LoginPageContent() {
     <div className={styles.container}>
       <div className={styles.main}>
         <div className={styles.titleContainer}>
-          <Image 
-            src="/images/deokdam_logo_crop.png" 
-            alt="덕담 주머니" 
-            width={200} 
-            height={200} 
+          <Image
+            src="/images/deokdam_logo_crop.png"
+            alt="덕담 주머니"
+            width={160}
+            height={80}
           />
         </div>
 
         <Image
           src="/images/3d_pocket.png"
           alt="pocket"
-          width={200}
-          height={200}
+          width={180}
+          height={180}
         />
 
         <h2 className={styles.loginTitle}>

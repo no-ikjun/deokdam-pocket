@@ -58,7 +58,7 @@ export async function GET(
           src={logoImageUrl}
           alt="덕담 주머니"
           width={600}
-          height={600}
+          height={300}
           style={{
             display: "flex",
           }}
@@ -161,7 +161,7 @@ export async function GET(
           src={logoImageUrl}
           alt="덕담 주머니"
           width={240}
-          height={240}
+          height={120}
           style={{
             display: "flex",
           }}

@@ -102,7 +102,7 @@ export const SelfReminderEmail = ({
               src="https://deokdam.app/images/deokdam_logo_crop.png"
               alt="덕담 주머니"
               width={120}
-              height={120}
+              height={60}
               style={logo}
             />
           </Section>
