@@ -65,8 +65,10 @@ export async function GET() {
               fontFamily: "Cafe24Ssurround",
             }}
           >
-            <span style={{ color: "#1e293b" }}>새해 </span>
-            <span style={{ color: "#FF606B" }}>응원의 마음을</span>
+            <span style={{ color: "#1e293b" }}>새해</span>
+            <span style={{ color: "#FF606B", margin: "0 8px" }}>
+              응원의 마음을
+            </span>
           </div>
           <div
             style={{

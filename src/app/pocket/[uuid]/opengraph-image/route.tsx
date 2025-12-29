@@ -57,8 +57,8 @@ export async function GET(
         <img
           src={logoImageUrl}
           alt="덕담 주머니"
-          width={200}
-          height={200}
+          width={600}
+          height={600}
           style={{
             display: "flex",
           }}
@@ -91,7 +91,7 @@ export async function GET(
         justifyContent: "center",
         background:
           "linear-gradient(120deg, #fff8f9 0%, #ffeef3 50%, #ffffff 100%)",
-        padding: "80px",
+        padding: "60px 80px",
         fontFamily: "Cafe24Ssurround",
       }}
     >
@@ -100,16 +100,16 @@ export async function GET(
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          gap: "40px",
+          gap: "24px",
           textAlign: "center",
         }}
       >
         {/* 주머니 이름 */}
         <div
           style={{
-            fontSize: "72px",
+            fontSize: "64px",
             fontWeight: "400",
-            lineHeight: "1.2",
+            lineHeight: "1.1",
             letterSpacing: "-0.02em",
             color: "#f95050",
             display: "flex",
@@ -123,26 +123,32 @@ export async function GET(
         {/* 참여 인원 및 목표 덕담 */}
         <div
           style={{
-            fontSize: "28px",
+            fontSize: "26px",
             fontWeight: "400",
-            lineHeight: "1.5",
+            lineHeight: "1.4",
             display: "flex",
             fontFamily: "Cafe24Ssurround",
             color: "#6b7280",
           }}
         >
-          <span style={{ color: "#FF606B" }}>참여 인원 {pocket.members?.length || 0}명</span>
-          <span style={{ margin: "0 12px", color: "#6b7280" }}>·</span>
-          <span style={{ color: "#FF606B" }}>목표 덕담 {pocket.goal || 0}개</span>
+          <span style={{ color: "#FF606B" }}>참여 인원</span>{" "}
+          <span style={{ color: "#6b7280", margin: "0 4px" }}>
+            {pocket.members?.length || 0}명
+          </span>
+          <span style={{ margin: "0 4px", color: "#6b7280" }}>·</span>
+          <span style={{ color: "#FF606B" }}>목표 덕담</span>{" "}
+          <span style={{ color: "#6b7280", margin: "0 4px" }}>
+            {pocket.goal || 0}개
+          </span>
         </div>
 
         {/* 안내 문구 */}
         <div
           style={{
-            fontSize: "28px",
+            fontSize: "26px",
             fontWeight: "400",
             color: "#6b7280",
-            lineHeight: "1.5",
+            lineHeight: "1.4",
             display: "flex",
             fontFamily: "Cafe24Ssurround",
           }}
@@ -154,8 +160,8 @@ export async function GET(
         <img
           src={logoImageUrl}
           alt="덕담 주머니"
-          width={360}
-          height={360}
+          width={240}
+          height={240}
           style={{
             display: "flex",
           }}
