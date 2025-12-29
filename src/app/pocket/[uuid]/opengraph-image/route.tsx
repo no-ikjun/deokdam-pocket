@@ -10,8 +10,8 @@ export async function GET(
 ) {
   const { uuid } = await params;
 
-  // pocket.png 이미지 URL
-  const pocketImageUrl = "https://deokdam.app/images/pocket.png";
+  // 로고 이미지 URL
+  const logoImageUrl = "https://deokdam.app/images/deokdam_logo.png";
 
   // 주머니 정보 가져오기
   let pocket = null;
@@ -59,24 +59,14 @@ export async function GET(
           }}
         >
           <img
-            src={pocketImageUrl}
-            alt="pocket"
-            width={100}
-            height={100}
+            src={logoImageUrl}
+            alt="덕담 주머니"
+            width={150}
+            height={150}
             style={{
               display: "flex",
             }}
           />
-          <div
-            style={{
-              fontSize: "96px",
-              fontWeight: "900",
-              color: "#f95050",
-              display: "flex",
-            }}
-          >
-            덕담 주머니
-          </div>
         </div>
       </div>
     );
@@ -139,10 +129,10 @@ export async function GET(
             }}
           >
             <img
-              src={pocketImageUrl}
-              alt="pocket"
-              width={90}
-              height={90}
+              src={logoImageUrl}
+              alt="덕담 주머니"
+              width={120}
+              height={120}
               style={{
                 display: "flex",
               }}

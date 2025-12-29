@@ -4,6 +4,7 @@ import {
   Head,
   Heading,
   Html,
+  Img,
   Link,
   Preview,
   Section,
@@ -34,7 +35,6 @@ export const PocketReminderEmail = ({
       <Body style={main}>
         <Container style={container}>
           <Section style={header}>
-            <Heading style={h1}>덕담 주머니</Heading>
             <Heading style={h2}>덕담 주머니 오픈 알림</Heading>
           </Section>
           <Section style={content}>
@@ -66,6 +66,13 @@ export const PocketReminderEmail = ({
             <Text style={footerText}>
               덕담 주머니(deokdam.app)에서 발송되었습니다.
             </Text>
+            <Img
+              src="https://deokdam.app/images/deokdam_logo.png"
+              alt="덕담 주머니"
+              width={120}
+              height={120}
+              style={logo}
+            />
           </Section>
         </Container>
       </Body>
@@ -111,13 +118,9 @@ const header = {
   boxShadow: "inset 0 1px 0 rgba(255, 255, 255, 0.3)",
 };
 
-const h1 = {
-  color: "#ffffff",
-  fontSize: "32px",
-  fontWeight: "bold",
-  margin: "0 0 8px 0",
-  textAlign: "center" as const,
-  textShadow: "0 1px 2px rgba(0, 0, 0, 0.1)",
+const logo = {
+  display: "block",
+  margin: "24px auto 0",
 };
 
 const h2 = {
