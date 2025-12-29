@@ -131,13 +131,13 @@ export async function GET(
             color: "#6b7280",
           }}
         >
-          <span style={{ color: "#FF606B" }}>참여 인원</span>{" "}
-          <span style={{ color: "#6b7280", margin: "0 4px" }}>
+          <span style={{ color: "#6b7280" }}>참여 인원</span>{" "}
+          <span style={{ color: "#FF606B", margin: "0 6px" }}>
             {pocket.members?.length || 0}명
           </span>
-          <span style={{ margin: "0 4px", color: "#6b7280" }}>·</span>
-          <span style={{ color: "#FF606B" }}>목표 덕담</span>{" "}
-          <span style={{ color: "#6b7280", margin: "0 4px" }}>
+          <span style={{ margin: "0 6px", color: "#6b7280" }}>·</span>
+          <span style={{ color: "#6b7280" }}>목표 덕담</span>{" "}
+          <span style={{ color: "#FF606B", margin: "0 6px" }}>
             {pocket.goal || 0}개
           </span>
         </div>
