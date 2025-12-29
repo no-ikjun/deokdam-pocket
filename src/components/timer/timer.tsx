@@ -130,7 +130,7 @@ const Timer = ({ hideTimer }: TimerProps) => {
     <div className={_.main}>
       <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
         <div className={_.modal_div}>
-          <Image src="/images/pocket.png" alt="pocket" width={35} height={35} />
+          <Image src="/images/deokdam_logo_crop.png" alt="덕담 주머니" width={80} height={80} />
           <p className={_.modal_title}>덕담 주머니 소식 받기</p>
           <p className={_.modal_ment}>
             이메일 주소를 입력하면

@@ -71,12 +71,12 @@ function LoginPageContent() {
     <div className={styles.container}>
       <div className={styles.main}>
         <div className={styles.titleContainer}>
-          <Image src="/images/pocket.png" alt="pocket" width={50} height={50} />
-          <div className={styles.logoText}>
-            <h1 className={styles.title}>덕담 주머니</h1>
-            <p className={styles.subtitle}>for 2026 병오년</p>
-          </div>
-          <Image src="/images/pocket.png" alt="pocket" width={50} height={50} />
+          <Image 
+            src="/images/deokdam_logo_crop.png" 
+            alt="덕담 주머니" 
+            width={200} 
+            height={200} 
+          />
         </div>
 
         <Image
