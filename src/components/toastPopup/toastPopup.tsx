@@ -188,6 +188,11 @@ export default function ToastPopup({
 
   const liveMode = type === "error" ? "assertive" : "polite";
 
+  // message가 비어있거나 공백만 있으면 렌더링하지 않음
+  if (!message || !message.trim()) {
+    return null;
+  }
+
   const node = (
     <div
       ref={rootRef}
