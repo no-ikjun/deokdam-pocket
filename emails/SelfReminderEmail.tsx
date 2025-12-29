@@ -99,7 +99,7 @@ export const SelfReminderEmail = ({
               덕담 주머니(deokdam.app)에서 발송되었습니다.
             </Text>
             <Img
-              src="https://deokdam.app/images/deokdam_logo.png"
+              src="https://deokdam.app/images/deokdam_logo_crop.png"
               alt="덕담 주머니"
               width={120}
               height={120}

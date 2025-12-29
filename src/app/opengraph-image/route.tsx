@@ -4,7 +4,7 @@ export const runtime = "edge";
 
 export async function GET() {
   // 로고 이미지 URL
-  const logoImageUrl = "https://deokdam.app/images/deokdam_logo.png";
+  const logoImageUrl = "https://deokdam.app/images/deokdam_logo_crop.png";
 
   // 폰트 파일 로드
   const fontData = await fetch(
