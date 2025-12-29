@@ -6,6 +6,11 @@ export async function GET() {
   // 로고 이미지 URL
   const logoImageUrl = "https://deokdam.app/images/deokdam_logo.png";
 
+  // 폰트 파일 로드
+  const fontData = await fetch(
+    "https://deokdam.app/fonts/Cafe24Ssurround.ttf"
+  ).then((res) => res.arrayBuffer());
+
   const imageElement = (
     <div
       style={{
@@ -18,8 +23,7 @@ export async function GET() {
         background:
           "linear-gradient(120deg, #fff8f9 0%, #ffeef3 50%, #ffffff 100%)",
         padding: "80px",
-        fontFamily:
-          'system-ui, -apple-system, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif',
+        fontFamily: "Cafe24Ssurround",
       }}
     >
       <div
@@ -45,14 +49,38 @@ export async function GET() {
         {/* 하단 문구 */}
         <div
           style={{
-            fontSize: "32px",
-            fontWeight: "700",
-            color: "#475569",
-            lineHeight: "1.5",
             display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: "8px",
           }}
         >
-          새해 응원의 다음을 담아두는 곳
+          <div
+            style={{
+              fontSize: "36px",
+              fontWeight: "400",
+              color: "#1e293b",
+              lineHeight: "1.5",
+              letterSpacing: "-0.01em",
+              display: "flex",
+              fontFamily: "Cafe24Ssurround",
+            }}
+          >
+            새해 응원의 마음을
+          </div>
+          <div
+            style={{
+              fontSize: "36px",
+              fontWeight: "400",
+              color: "#1e293b",
+              lineHeight: "1.5",
+              letterSpacing: "-0.01em",
+              display: "flex",
+              fontFamily: "Cafe24Ssurround",
+            }}
+          >
+            담아두는 곳
+          </div>
         </div>
       </div>
     </div>
@@ -61,5 +89,13 @@ export async function GET() {
   return new ImageResponse(imageElement, {
     width: 1200,
     height: 630,
+    fonts: [
+      {
+        name: "Cafe24Ssurround",
+        data: fontData,
+        style: "normal",
+        weight: 400,
+      },
+    ],
   });
 }
