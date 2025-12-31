@@ -17,6 +17,7 @@ import ToastPopup from "@/components/toastPopup/toastPopup";
 import { LoadingButton } from "@/components/loadingButton/loadingButton";
 import useCountNum from "@/hooks/countUp";
 import Footer from "@/components/footer/footer";
+import WithdrawModal from "@/components/withdrawModal/withdrawModal";
 
 type PocketCard = {
   pocket_uuid: string;
@@ -82,6 +83,7 @@ export default function Home() {
   const [isTyping, setIsTyping] = useState(false);
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isWithdrawOpen, setIsWithdrawOpen] = useState(false);
   const [nicknameInput, setNicknameInput] = useState("");
   const [emailInput, setEmailInput] = useState("");
   const [isSaving, setIsSaving] = useState(false);
@@ -629,6 +631,22 @@ export default function Home() {
                 />
               </div>
             </div>
+            <div className={styles.modal_section}>
+              <h3 className={styles.modal_section_title}>계정 관리</h3>
+              <button
+                type="button"
+                className={styles.modal_withdraw_btn}
+                onClick={() => {
+                  setIsSettingsOpen(false);
+                  setIsWithdrawOpen(true);
+                }}
+              >
+                회원 탈퇴
+              </button>
+              <p className={styles.modal_hint}>
+                * 탈퇴 시 모든 데이터가 즉시 삭제되며 복구할 수 없습니다.
+              </p>
+            </div>
             <div className={styles.modal_footer}>
               <button
                 type="button"
@@ -680,6 +698,26 @@ export default function Home() {
           </div>
         </Modal>
       )}
+
+      <WithdrawModal
+        isOpen={isWithdrawOpen}
+        onClose={() => setIsWithdrawOpen(false)}
+        onSuccess={async () => {
+          // 탈퇴 성공 시 로그아웃 및 리다이렉트
+          try {
+            await logoutAndRedirect("/signup");
+          } catch (error) {
+            console.error("Error during logout after withdrawal:", error);
+            // 로그아웃 실패해도 리다이렉트는 진행
+            window.location.href = "/signup";
+          }
+        }}
+        onError={(errorMessage) => {
+          setToastMessage(errorMessage);
+          setToastType("error");
+          setToastOpen(true);
+        }}
+      />
     </main>
   );
 }
