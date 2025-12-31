@@ -181,6 +181,86 @@ export default function SelfPage() {
           ))
         ) : (
           <>
+            {/* 회고 */}
+            <Link
+              href="/self/input?type=retrospect"
+              className={`${styles.action_card} ${styles.compact_card} ${
+                retrospectDisabled ? styles.card_disabled : ""
+              }`}
+              aria-label="올해 되돌아보기 작성하기"
+              aria-disabled={retrospectDisabled}
+              onClick={(e) => {
+                preventIfDisabled(e, retrospectDisabled);
+              }}
+            >
+              <div className={styles.card_icon}>
+                <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden>
+                  <path
+                    d="M12 5v14M5 12h14"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                    strokeLinecap="round"
+                  />
+                  <circle
+                    cx="12"
+                    cy="12"
+                    r="9"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                    opacity=".45"
+                  />
+                </svg>
+              </div>
+              <div className={styles.card_body}>
+                <span className={styles.overline}>2025년 되돌아보기</span>
+                <h3 className={styles.card_title}>2025년은 어떤 해였나요?</h3>
+                <p className={styles.card_desc}>
+                  2025년을 되돌아보며 무엇을 잘했고, 무엇을 못했는지
+                  고민해보세요
+                </p>
+                <div className={styles.card_meta}>
+                  <span className={styles.chip}>질문 6개</span>
+                  <span className={styles.chip}>소요 3~4분</span>
+                </div>
+              </div>
+              <svg
+                className={styles.chevron}
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                aria-hidden
+              >
+                <path
+                  d="M9 6l6 6-6 6"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+
+              {used.retrospect && (
+                <div className={styles.lock_badge} aria-hidden>
+                  <span className={styles.lock_dot} />
+                  완료됨
+                  <button
+                    type="button"
+                    className={styles.reset_btn}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      localStorage.removeItem("self_retrospect_done");
+                      setUsed((p) => ({ ...p, retrospect: false }));
+                    }}
+                  >
+                    다시 작성
+                  </button>
+                </div>
+              )}
+            </Link>
+
             {/* 새해 목표 */}
             <Link
               href="/self/input?type=goals"
@@ -221,12 +301,12 @@ export default function SelfPage() {
                 </svg>
               </div>
               <div className={styles.card_body}>
-                <span className={styles.overline}>
-                  직접 생각해보는 미래의 나
-                </span>
-                <h3 className={styles.card_title}>새해 목표 세우기</h3>
+                <span className={styles.overline}>2026년 새해 목표</span>
+                <h3 className={styles.card_title}>
+                  2026년을 어떻게 보내고 싶나요?
+                </h3>
                 <p className={styles.card_desc}>
-                  어떤 해로 남기고 싶은지 생각해봐요
+                  새해 목표를 세우고 리마인드 알림을 받아보세요
                 </p>
                 <div className={styles.card_meta}>
                   <span className={styles.chip}>질문 5개</span>
@@ -302,14 +382,15 @@ export default function SelfPage() {
                 </svg>
               </div>
               <div className={styles.card_body}>
-                <span className={styles.overline}>만약 시간이 1년뿐이라면</span>
-                <h3 className={styles.card_title}>가장 중요한 것</h3>
+                <span className={styles.overline}>마지막 1년 계획하기</span>
+                <h3 className={styles.card_title}>1년 뒤 지구가 멸망한다면?</h3>
                 <p className={styles.card_desc}>
-                  내려놓을 것과 끝까지 지키고 싶은 것들
+                  내가 하고싶은 일들을 생각해보며 소중한 것이 무엇인지
+                  고민해보세요
                 </p>
                 <div className={styles.card_meta}>
-                  <span className={styles.chip}>질문 4개</span>
-                  <span className={styles.chip}>소요 2분</span>
+                  <span className={styles.chip}>질문 5개</span>
+                  <span className={styles.chip}>소요 3~4분</span>
                 </div>
               </div>
               <svg
@@ -348,85 +429,6 @@ export default function SelfPage() {
                 </div>
               )}
             </Link>
-
-            {/* 회고 */}
-            <Link
-              href="/self/input?type=retrospect"
-              className={`${styles.action_card} ${styles.compact_card} ${
-                retrospectDisabled ? styles.card_disabled : ""
-              }`}
-              aria-label="올해 되돌아보기 작성하기"
-              aria-disabled={retrospectDisabled}
-              onClick={(e) => {
-                preventIfDisabled(e, retrospectDisabled);
-              }}
-            >
-              <div className={styles.card_icon}>
-                <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden>
-                  <path
-                    d="M12 5v14M5 12h14"
-                    stroke="currentColor"
-                    strokeWidth="1.6"
-                    strokeLinecap="round"
-                  />
-                  <circle
-                    cx="12"
-                    cy="12"
-                    r="9"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.6"
-                    opacity=".45"
-                  />
-                </svg>
-              </div>
-              <div className={styles.card_body}>
-                <span className={styles.overline}>올해를 지나온 나에게</span>
-                <h3 className={styles.card_title}>감사 · 성장 · 다짐</h3>
-                <p className={styles.card_desc}>
-                  잘한 것보다, 버텨낸 나를 기록하는 시간
-                </p>
-                <div className={styles.card_meta}>
-                  <span className={styles.chip}>섹션 3개</span>
-                  <span className={styles.chip}>소요 3~4분</span>
-                </div>
-              </div>
-              <svg
-                className={styles.chevron}
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                aria-hidden
-              >
-                <path
-                  d="M9 6l6 6-6 6"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-
-              {used.retrospect && (
-                <div className={styles.lock_badge} aria-hidden>
-                  <span className={styles.lock_dot} />
-                  완료됨
-                  <button
-                    type="button"
-                    className={styles.reset_btn}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      localStorage.removeItem("self_retrospect_done");
-                      setUsed((p) => ({ ...p, retrospect: false }));
-                    }}
-                  >
-                    다시 작성
-                  </button>
-                </div>
-              )}
-            </Link>
           </>
         )}
       </section>
@@ -441,7 +443,7 @@ export default function SelfPage() {
             </span>
             <h3 className={styles.future_title}>1년 뒤의 나와 대화하기</h3>
             <p className={styles.future_desc}>
-              내가 이용한 서비스 데이터를 바탕으로 AI가 1년 뒤의 나를 예측하고
+              내가 입력한 정보를 바탕으로 AI가 1년 뒤 나의 모습을 예측하고
               대화할 수 있어요.
             </p>
           </div>

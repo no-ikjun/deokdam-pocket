@@ -258,6 +258,99 @@
   background: rgba(255, 255, 255, 1);
 }
 
+/* 리스트 타입 질문 영역 */
+.list_area {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.list_items {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.list_item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.list_input {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.45);
+  background: rgba(255, 255, 255, 0.9);
+  font-size: 0.95rem;
+  color: #0b1b3a;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.list_input:focus {
+  outline: none;
+  border-color: rgba(249, 80, 80, 0.5);
+  box-shadow: 0 0 0 3px rgba(249, 80, 80, 0.1);
+  background: rgba(255, 255, 255, 1);
+}
+
+.list_remove_btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: rgba(255, 255, 255, 0.9);
+  color: #64748b;
+  font-size: 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.list_remove_btn:hover {
+  background: rgba(254, 226, 226, 0.95);
+  border-color: rgba(249, 80, 80, 0.5);
+  color: #f95050;
+  transform: scale(1.05);
+}
+
+.list_add_btn {
+  padding: 0.7rem 1rem;
+  border-radius: 10px;
+  border: 1.5px dashed rgba(148, 163, 184, 0.5);
+  background: rgba(255, 255, 255, 0.6);
+  color: #64748b;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+.list_add_btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(249, 80, 80, 0.5);
+  color: #f95050;
+  border-style: solid;
+}
+
+.list_add_btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.list_counter {
+  text-align: right;
+  font-size: 0.82rem;
+  color: #64748b;
+}
+
 /* 리마인드 */
 .remind_section {
   width: 100%;

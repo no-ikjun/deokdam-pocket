@@ -161,6 +161,24 @@ export default function InputPage() {
                       loadedAnswers[question.id] = "기타";
                       loadedAnswers[`${question.id}_other`] = answerData.answer;
                     }
+                  } else if (question.type === "list") {
+                    // list 타입: JSON 배열로 저장된 경우 그대로 사용, 문자열인 경우 파싱 시도
+                    try {
+                      const parsed = JSON.parse(answerData.answer);
+                      if (Array.isArray(parsed)) {
+                        loadedAnswers[question.id] = answerData.answer;
+                      } else {
+                        // 배열이 아니면 단일 문자열을 배열로 변환
+                        loadedAnswers[question.id] = JSON.stringify([
+                          answerData.answer,
+                        ]);
+                      }
+                    } catch {
+                      // 파싱 실패 시 단일 문자열을 배열로 변환
+                      loadedAnswers[question.id] = JSON.stringify([
+                        answerData.answer,
+                      ]);
+                    }
                   } else {
                     loadedAnswers[question.id] = answerData.answer;
                   }
@@ -270,6 +288,18 @@ export default function InputPage() {
   const otherInputKey = q?.type === "choice" ? `${q.id}_other` : null;
   const otherInputValue = otherInputKey ? answers[otherInputKey] || "" : "";
 
+  // list 타입 데이터 파싱
+  const listItems: string[] = useMemo(() => {
+    if (q?.type === "list") {
+      try {
+        return val ? JSON.parse(val) : [];
+      } catch {
+        return [];
+      }
+    }
+    return [];
+  }, [q?.type, val]);
+
   const setVal = (next: string) => {
     if (q?.type === "text" && max && next.length > max) {
       next = next.slice(0, max);
@@ -281,6 +311,55 @@ export default function InputPage() {
     if (otherInputKey) {
       setAnswers((prev) => ({ ...prev, [otherInputKey]: next }));
     }
+  };
+
+  // list 타입 핸들러
+  const addListItem = () => {
+    if (q?.type !== "list") return;
+    const maxCount = q.max;
+    if (maxCount && listItems.length >= maxCount) return;
+
+    setAnswers((prev) => {
+      const current = prev[q.id] || "[]";
+      let items: string[] = [];
+      try {
+        items = JSON.parse(current);
+      } catch {
+        items = [];
+      }
+      items.push("");
+      return { ...prev, [q.id]: JSON.stringify(items) };
+    });
+  };
+
+  const updateListItem = (index: number, value: string) => {
+    if (q?.type !== "list") return;
+    setAnswers((prev) => {
+      const current = prev[q.id] || "[]";
+      let items: string[] = [];
+      try {
+        items = JSON.parse(current);
+      } catch {
+        items = [];
+      }
+      items[index] = value;
+      return { ...prev, [q.id]: JSON.stringify(items) };
+    });
+  };
+
+  const removeListItem = (index: number) => {
+    if (q?.type !== "list") return;
+    setAnswers((prev) => {
+      const current = prev[q.id] || "[]";
+      let items: string[] = [];
+      try {
+        items = JSON.parse(current);
+      } catch {
+        items = [];
+      }
+      items.splice(index, 1);
+      return { ...prev, [q.id]: JSON.stringify(items) };
+    });
   };
 
   // 질문에 답변이 있는지 확인하는 헬퍼 함수
@@ -310,6 +389,9 @@ export default function InputPage() {
         }
         return val.trim().length > 0;
       }
+    } else if (q.type === "list") {
+      // list 타입: 최소 하나 이상의 항목이 비어있지 않아야 함
+      return listItems.some((item) => item.trim().length > 0);
     }
     return false;
   };
@@ -421,6 +503,27 @@ export default function InputPage() {
                     answer: answers[`${question.id}_other`].trim(),
                   };
                 }
+              }
+            }
+            if (question.type === "list") {
+              // list 타입: JSON 배열을 그대로 저장
+              try {
+                const items: string[] = answer ? JSON.parse(answer) : [];
+                // 빈 항목 제거
+                const filteredItems = items.filter(
+                  (item) => item.trim().length > 0
+                );
+                return {
+                  id: question.id,
+                  label: question.label,
+                  answer: JSON.stringify(filteredItems),
+                };
+              } catch {
+                return {
+                  id: question.id,
+                  label: question.label,
+                  answer: "[]",
+                };
               }
             }
             return {
@@ -572,6 +675,44 @@ export default function InputPage() {
             <div className={styles.counter}>
               {val.length} / {max}자
             </div>
+          </div>
+        ) : q.type === "list" ? (
+          <div className={styles.list_area}>
+            <div className={styles.list_items}>
+              {listItems.map((item, idx) => (
+                <div key={idx} className={styles.list_item}>
+                  <input
+                    type="text"
+                    className={styles.list_input}
+                    placeholder={q.placeholder || "한 문장씩 입력하세요"}
+                    value={item}
+                    onChange={(e) => updateListItem(idx, e.target.value)}
+                    autoFocus={idx === listItems.length - 1 && item === ""}
+                  />
+                  <button
+                    type="button"
+                    className={styles.list_remove_btn}
+                    onClick={() => removeListItem(idx)}
+                    aria-label="삭제"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+            </div>
+            <button
+              type="button"
+              className={styles.list_add_btn}
+              onClick={addListItem}
+              disabled={q.max !== undefined && listItems.length >= q.max}
+            >
+              + 추가하기
+            </button>
+            {q.max && (
+              <div className={styles.list_counter}>
+                {listItems.length} / {q.max}개
+              </div>
+            )}
           </div>
         ) : (
           <div className={styles.choice_area}>
