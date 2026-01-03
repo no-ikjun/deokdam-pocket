@@ -48,6 +48,29 @@ export async function POST(req: Request) {
       WHERE pocket_uuid = ${pocket.pocket_uuid};
     `;
 
+    // 향후 참여자용 덕담 조회 및 새 참여자를 destination에 추가
+    const futureDeokdamsResult = await client.sql`
+      SELECT deokdam_uuid, destination 
+      FROM deokdam 
+      WHERE pocket = ${pocket.pocket_uuid} 
+        AND COALESCE(for_future_members, false) = true;
+    `;
+
+    // 각 덕담의 destination에 새 참여자 추가 (중복 방지)
+    for (const deokdam of futureDeokdamsResult.rows) {
+      const currentDest: string[] = deokdam.destination || [];
+      // 이미 포함되어 있지 않은 경우에만 추가
+      if (!currentDest.includes(user_uuid)) {
+        const updatedDest = [...currentDest, user_uuid];
+        const updatedDestPgArray = toPgArray(updatedDest);
+        await client.sql`
+          UPDATE deokdam 
+          SET destination = ${updatedDestPgArray}::text[]
+          WHERE deokdam_uuid = ${deokdam.deokdam_uuid};
+        `;
+      }
+    }
+
     return NextResponse.json({ message: "Joined pocket successfully" });
   });
 }

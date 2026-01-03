@@ -6,11 +6,12 @@ import { toPgArray } from "@/utils/pgArray";
 export async function POST(req: Request) {
   return withAuthAndDb(async (user_uuid, client) => {
     const request = await req.json();
-    const { destination, pocket, desc, isAnonymous } = request as {
+    const { destination, pocket, desc, isAnonymous, forFutureMembers } = request as {
       destination: string[];
       pocket: string;
       desc: string;
       isAnonymous: boolean;
+      forFutureMembers?: boolean;
     };
 
     if (!destination || !pocket || !desc) {
@@ -22,7 +23,9 @@ export async function POST(req: Request) {
 
     const deokdamUUID = uuidv4();
     const pgArray = toPgArray(destination);
-    await client.sql`INSERT INTO deokdam (deokdam_uuid, "from", destination, pocket, "desc", is_anony) VALUES (${deokdamUUID}, ${user_uuid}, ${pgArray}, ${pocket}, ${desc}, ${isAnonymous});`;
+    const forFutureMembersValue = forFutureMembers ?? false;
+    
+    await client.sql`INSERT INTO deokdam (deokdam_uuid, "from", destination, pocket, "desc", is_anony, for_future_members) VALUES (${deokdamUUID}, ${user_uuid}, ${pgArray}, ${pocket}, ${desc}, ${isAnonymous}, ${forFutureMembersValue});`;
 
     return NextResponse.json(
       { message: "success", deokdam_uuid: deokdamUUID },

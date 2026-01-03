@@ -565,6 +565,7 @@ export default function PocketDetailPage() {
               pocket: uuid,
               desc: data.message,
               isAnonymous: data.anonymous,
+              forFutureMembers: data.forFutureMembers,
             });
             if (response.status === 201) {
               console.log(

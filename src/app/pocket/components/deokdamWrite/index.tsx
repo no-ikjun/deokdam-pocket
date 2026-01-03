@@ -12,6 +12,7 @@ type WriteModalProps = {
     receivers: string[];
     message: string;
     anonymous: boolean;
+    forFutureMembers: boolean;
   }) => void | Promise<void>;
 };
 
@@ -22,6 +23,7 @@ export default function DeokdamWriteModal({
   const [selected, setSelected] = useState<string[]>([]);
   const [message, setMessage] = useState("");
   const [anonymous, setAnonymous] = useState(false);
+  const [forFutureMembers, setForFutureMembers] = useState(false);
 
   const [loading, setLoading] = useState(false);
 
@@ -38,6 +40,14 @@ export default function DeokdamWriteModal({
     if (selected.length === members.length) {
       setSelected([]);
     } else {
+      setSelected(members.map((m) => m.id));
+    }
+  };
+
+  const handleForFutureMembersChange = (checked: boolean) => {
+    setForFutureMembers(checked);
+    // 선택 시 현재 멤버 전체 자동 선택
+    if (checked && selected.length !== members.length) {
       setSelected(members.map((m) => m.id));
     }
   };
@@ -61,6 +71,7 @@ export default function DeokdamWriteModal({
           receivers: selected,
           message,
           anonymous,
+          forFutureMembers,
         })
       );
     } catch (err) {
@@ -153,6 +164,24 @@ export default function DeokdamWriteModal({
           })}
         </ul>
 
+        {/* 참여하는 모든 사람에게 남기기 - 멤버 선택 관련 옵션 */}
+        <div className={styles.future_members_option}>
+          <div className={styles.future_members_content}>
+            <div className={styles.future_members_text}>
+              <span className={styles.future_members_label}>참여하는 모든 사람에게 남기기</span>
+              <span className={styles.future_members_hint}>나중에 참여하는 사람도 덕담을 받을 수 있어요</span>
+            </div>
+            <label className={styles.toggle_switch}>
+              <input
+                type="checkbox"
+                checked={forFutureMembers}
+                onChange={(e) => handleForFutureMembersChange(e.target.checked)}
+              />
+              <span className={styles.slider}></span>
+            </label>
+          </div>
+        </div>
+
         {/* 메시지 입력 */}
         <div className={styles.text_area_wrap}>
           <textarea
@@ -178,6 +207,7 @@ export default function DeokdamWriteModal({
             <span className={styles.slider}></span>
           </label>
         </div>
+
 
         {/* 제출 버튼 */}
         <LoadingButton

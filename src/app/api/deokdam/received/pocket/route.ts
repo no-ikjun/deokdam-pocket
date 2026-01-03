@@ -16,9 +16,10 @@ export async function GET(req: Request) {
     }
 
     // destination 배열에 현재 사용자 UUID가 포함된 덕담 조회
+    // 또는 for_future_members = true이고 현재 사용자가 해당 주머니의 멤버인 덕담 조회
     // 익명이 아닌 경우에만 보낸 사람 정보와 이름 포함
     const { rows } = await client.sql`
-      SELECT 
+      SELECT DISTINCT
         d.deokdam_uuid,
         d."desc",
         d.is_anony,
@@ -33,8 +34,12 @@ export async function GET(req: Request) {
         d.created_at
       FROM deokdam d
       LEFT JOIN "user" u ON d."from" = u.user_uuid AND d.is_anony = false
-      WHERE ${user_uuid} = ANY(d.destination)
-        AND d.pocket = ${pocket_uuid}
+      LEFT JOIN pocket p ON d.pocket = p.pocket_uuid
+      WHERE d.pocket = ${pocket_uuid}
+        AND (
+          ${user_uuid} = ANY(d.destination)
+          OR (COALESCE(d.for_future_members, false) = true AND ${user_uuid} = ANY(p.members))
+        )
       ORDER BY d.created_at DESC;
     `;
 
