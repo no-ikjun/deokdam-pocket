@@ -5,7 +5,9 @@ import styles from "./page.module.css";
 export default function PolicyPage() {
   return (
     <div className={styles.policy_container}>
-      <h1 className={styles.policy_title}>개인정보 처리방침</h1>
+      <h1 className={styles.policy_title}>
+        개인정보 처리방침 및 서비스 이용약관
+      </h1>
       <section className={styles.policy_section}>
         <p>
           덕담 주머니(&quot;회사&quot; 또는 &quot;서비스&quot;)는 개인정보보호법
