@@ -33,8 +33,8 @@ function formatContextRow(row: any) {
   const createdYM = row.created_at_inferred
     ? row.created_at_inferred
     : row.created_at
-    ? new Date(row.created_at).toISOString().slice(0, 7)
-    : "unknown";
+      ? new Date(row.created_at).toISOString().slice(0, 7)
+      : "unknown";
 
   const topic = Array.isArray(row.topic) ? row.topic.join("/") : row.topic;
 
@@ -102,47 +102,52 @@ export async function POST(req: Request) {
   if (summary == null) {
     const s2 =
       await sql`SELECT summary FROM chat_state WHERE user_id=${user_uuid}::uuid`;
-    summary = s2.rowCount ? s2.rows[0].summary ?? "" : "";
+    summary = s2.rowCount ? (s2.rows[0].summary ?? "") : "";
   }
 
   // Check daily message limit (KST timezone)
-  // Calculate today's start time in KST (00:00:00 Asia/Seoul)
-  const nowKST = new Date(
-    new Date().toLocaleString("en-US", { timeZone: "Asia/Seoul" })
-  );
-  const todayStartKST = new Date(nowKST);
-  todayStartKST.setHours(0, 0, 0, 0);
-  const todayStartISO = todayStartKST.toISOString();
+  // Skip limit check in development/debug mode
+  const isDebugMode = process.env.NODE_ENV === "development";
 
-  const countResult = await sql`
-    SELECT COUNT(*)::int as count
-    FROM messages
-    WHERE user_id = ${user_uuid}::uuid
-      AND role = 'user'
-      AND created_at >= ${todayStartISO}
-  `;
-  const todayCount = countResult.rows[0]?.count ?? 0;
-
-  if (todayCount >= DAILY_CHAT_LIMIT) {
-    // Calculate next reset time (next day 00:00:00 KST)
-    const now = new Date();
-    const kstNow = new Date(
-      now.toLocaleString("en-US", { timeZone: "Asia/Seoul" })
+  if (!isDebugMode) {
+    // Calculate today's start time in KST (00:00:00 Asia/Seoul)
+    const nowKST = new Date(
+      new Date().toLocaleString("en-US", { timeZone: "Asia/Seoul" })
     );
-    const nextReset = new Date(kstNow);
-    nextReset.setDate(nextReset.getDate() + 1);
-    nextReset.setHours(0, 0, 0, 0);
-    const resetAtISO = nextReset.toISOString();
+    const todayStartKST = new Date(nowKST);
+    todayStartKST.setHours(0, 0, 0, 0);
+    const todayStartISO = todayStartKST.toISOString();
 
-    return NextResponse.json(
-      {
-        error: "일일 대화 횟수 제한에 도달했습니다.",
-        limit: DAILY_CHAT_LIMIT,
-        used: todayCount,
-        resetAt: resetAtISO,
-      },
-      { status: 429 }
-    );
+    const countResult = await sql`
+      SELECT COUNT(*)::int as count
+      FROM messages
+      WHERE user_id = ${user_uuid}::uuid
+        AND role = 'user'
+        AND created_at >= ${todayStartISO}
+    `;
+    const todayCount = countResult.rows[0]?.count ?? 0;
+
+    if (todayCount >= DAILY_CHAT_LIMIT) {
+      // Calculate next reset time (next day 00:00:00 KST)
+      const now = new Date();
+      const kstNow = new Date(
+        now.toLocaleString("en-US", { timeZone: "Asia/Seoul" })
+      );
+      const nextReset = new Date(kstNow);
+      nextReset.setDate(nextReset.getDate() + 1);
+      nextReset.setHours(0, 0, 0, 0);
+      const resetAtISO = nextReset.toISOString();
+
+      return NextResponse.json(
+        {
+          error: "일일 대화 횟수 제한에 도달했습니다.",
+          limit: DAILY_CHAT_LIMIT,
+          used: todayCount,
+          resetAt: resetAtISO,
+        },
+        { status: 429 }
+      );
+    }
   }
 
   // Save user message (pre-save)

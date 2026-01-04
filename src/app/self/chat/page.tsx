@@ -612,7 +612,7 @@ export default function SelfChatPage() {
             </div>
           </form>
           <p className={styles.helper_text}>
-            Enter로 전송 · Shift + Enter로 줄 바꿈
+            AI가 생성한 답변은 참고용이며, 정확하지 않을 수 있습니다.
           </p>
         </section>
 
