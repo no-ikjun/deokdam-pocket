@@ -46,14 +46,15 @@ export default function DeokdamWriteModal({
 
   const handleForFutureMembersChange = (checked: boolean) => {
     setForFutureMembers(checked);
-    // 선택 시 현재 멤버 전체 자동 선택
-    if (checked && selected.length !== members.length) {
+    // 선택 시 현재 멤버가 있으면 전체 자동 선택
+    if (checked && members.length > 0 && selected.length !== members.length) {
       setSelected(members.map((m) => m.id));
     }
   };
 
   const handleSubmit = async () => {
-    if (selected.length === 0) {
+    // 참여하는 모든 사람에게 남기기가 선택되어 있으면 현재 멤버 선택이 없어도 가능
+    if (!forFutureMembers && selected.length === 0) {
       setToastMessage("대상을 먼저 선택해 주세요!");
       setToastOpen(true);
       return;
@@ -168,8 +169,12 @@ export default function DeokdamWriteModal({
         <div className={styles.future_members_option}>
           <div className={styles.future_members_content}>
             <div className={styles.future_members_text}>
-              <span className={styles.future_members_label}>참여하는 모든 사람에게 남기기</span>
-              <span className={styles.future_members_hint}>나중에 참여하는 사람도 덕담을 받을 수 있어요</span>
+              <span className={styles.future_members_label}>
+                참여하는 모든 사람에게 남기기
+              </span>
+              <span className={styles.future_members_hint}>
+                나중에 참여하는 사람도 덕담을 받을 수 있어요
+              </span>
             </div>
             <label className={styles.toggle_switch}>
               <input
@@ -207,7 +212,6 @@ export default function DeokdamWriteModal({
             <span className={styles.slider}></span>
           </label>
         </div>
-
 
         {/* 제출 버튼 */}
         <LoadingButton
