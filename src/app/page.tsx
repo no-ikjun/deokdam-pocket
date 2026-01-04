@@ -441,7 +441,7 @@ export default function Home() {
                 />
               </div>
               <div className={styles.cta_texts}>
-                <h3 className={styles.cta_title}>나에게 덕담 남기기</h3>
+                <h3 className={styles.cta_title}>나를 위한 시간</h3>
                 <p className={styles.cta_desc}>목표 · 회고 · 1년 후 나</p>
               </div>
               <span className={styles.cta_arrow}>→</span>
