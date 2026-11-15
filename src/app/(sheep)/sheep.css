@@ -590,3 +590,91 @@
 .sheep-list-item small {
   white-space: normal;
 }
+
+/* ---------- 오늘의 복주머니 ---------- */
+.sheep-pocket {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s-3);
+  text-align: center;
+}
+.sheep-pocket img {
+  max-width: 100%;
+  height: auto;
+}
+.sheep-daily-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s-3);
+  text-align: center;
+  border-width: 2px;
+  animation: sheep-pop 0.35s ease-out;
+}
+.sheep-daily-card[data-gold="true"] {
+  background: linear-gradient(160deg, #fff7dc, #ffffff 60%);
+}
+.sheep-daily-theme {
+  padding: var(--s-1) var(--s-3);
+  border-radius: var(--r-full);
+  color: #ffffff;
+  font-size: var(--t-caption);
+  font-weight: 700;
+}
+.sheep-daily-deokdam {
+  padding: var(--s-4);
+  border-radius: var(--r-md);
+  background: #fff3d6;
+  font-weight: 600;
+}
+.sheep-dex {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+  list-style: none;
+}
+.sheep-dex-head {
+  display: flex;
+  justify-content: space-between;
+  font-variant-numeric: tabular-nums;
+}
+.sheep-dex-head span {
+  font-size: var(--t-caption);
+  color: var(--c-ink-soft);
+}
+.sheep-dex-chips {
+  flex-wrap: wrap;
+}
+.sheep-dex-chips li[data-gold="true"] {
+  background: #fbe3a6;
+  color: var(--c-ink);
+}
+.sheep-gap-top {
+  margin-top: var(--s-4);
+}
+@keyframes sheep-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sheep-daily-card {
+    animation: none;
+  }
+}
+.sheep-dex-head strong {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+}
+.sheep-dex-head i {
+  width: 10px;
+  height: 10px;
+  border-radius: var(--r-full);
+}

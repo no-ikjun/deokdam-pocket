@@ -35,6 +35,9 @@ export default function LandingPage() {
       <Link className="sheep-btn" href="/test">
         테스트 시작하기
       </Link>
+      <Link className="sheep-btn" data-variant="ghost" href="/daily">
+        오늘의 복주머니 열기
+      </Link>
       <footer className="sheep-footer">
         <Link href="/classic">지난 덕담 주머니</Link>
         <Link href="/policy">이용약관 및 개인정보처리방침</Link>

@@ -9,6 +9,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     { url: baseUrl, lastModified: now, changeFrequency: "daily", priority: 1.0 },
     { url: `${baseUrl}/test`, lastModified: now, changeFrequency: "weekly", priority: 0.9 },
+    { url: `${baseUrl}/daily`, lastModified: now, changeFrequency: "daily", priority: 0.8 },
     ...SHEEP_TYPES.map((t) => ({
       url: `${baseUrl}/result/${t.id}`,
       lastModified: now,

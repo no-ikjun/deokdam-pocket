@@ -253,6 +253,9 @@ export default function ResultActions({ typeId, typeName, shareText }: Props) {
       <button type="button" className="sheep-btn" data-variant="ghost" onClick={shareLink}>
         내 결과 링크 보내기
       </button>
+      <Link className="sheep-btn" data-variant="ghost" href="/daily">
+        오늘의 복주머니 열기
+      </Link>
       <Link className="sheep-link" href="/test">
         테스트 다시 하기
       </Link>
