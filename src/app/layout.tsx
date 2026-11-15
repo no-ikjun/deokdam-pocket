@@ -1,16 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import Image from "next/image";
-import styles from "./page.module.css";
-import backgroundImg from "../../public/images/background.webp";
 import { Analytics } from "@vercel/analytics/react";
-import dynamic from "next/dynamic";
 import { GoogleAdSense } from "@/components/adsense/adsense";
-
-// Render client-side bootstrap without SSR
-const AuthBootstrap = dynamic(() => import("@/components/auth/AuthBootstrap"), {
-  ssr: false,
-});
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://deokdam.app"),
@@ -120,13 +111,6 @@ export default function RootLayout({
         />
       </head>
       <body>
-        <Image
-          className={styles.background_img}
-          src={backgroundImg}
-          alt="img"
-        />
-        {/* Initialize auth state on the client */}
-        <AuthBootstrap />
         {children}
         <Analytics />
       </body>
