@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import dynamic from "next/dynamic";
 import styles from "./legacy.module.css";
@@ -7,6 +8,11 @@ import backgroundImg from "../../../public/images/background.webp";
 const AuthBootstrap = dynamic(() => import("@/components/auth/AuthBootstrap"), {
   ssr: false,
 });
+
+export const metadata: Metadata = {
+  title: { absolute: "덕담 주머니" },
+  description: "덕담 주머니를 만들고 새해 덕담을 모아 보세요!",
+};
 
 export default function LegacyLayout({
   children,

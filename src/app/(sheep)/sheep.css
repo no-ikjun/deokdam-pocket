@@ -128,3 +128,294 @@
     transition: none;
   }
 }
+
+/* ---------- 공통 ---------- */
+.sheep-eyebrow {
+  font-size: var(--t-caption);
+  font-weight: 700;
+  color: var(--c-ink-soft);
+  letter-spacing: 0.02em;
+}
+.sheep-h2 {
+  font-size: var(--t-lead);
+  font-weight: 800;
+  margin-bottom: var(--s-3);
+}
+.sheep-hint {
+  margin-top: var(--s-3);
+  font-size: var(--t-caption);
+  color: var(--c-ink-soft);
+}
+.sheep-link {
+  align-self: center;
+  padding: var(--s-3);
+  color: var(--c-ink-soft);
+  font-size: var(--t-caption);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.sheep-center {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-2);
+  text-align: center;
+}
+.sheep-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+.sheep-art {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+/* ---------- 랜딩 ---------- */
+.sheep-landing {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-4);
+  text-align: center;
+}
+.sheep-facts {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--s-2);
+  list-style: none;
+}
+.sheep-facts li,
+.sheep-chips li {
+  padding: var(--s-1) var(--s-3);
+  border-radius: var(--r-full);
+  background: var(--c-surface-sunk);
+  font-size: var(--t-caption);
+  font-weight: 600;
+  color: var(--c-ink-soft);
+}
+.sheep-footer {
+  display: flex;
+  justify-content: center;
+  gap: var(--s-4);
+  font-size: var(--t-caption);
+}
+.sheep-footer a {
+  color: var(--c-ink-faint);
+}
+
+/* ---------- 테스트 ---------- */
+.sheep-progress {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+}
+.sheep-back {
+  width: 44px;
+  height: 44px;
+  margin-left: calc(var(--s-3) * -1);
+  border: 0;
+  background: none;
+  font-size: 1.25rem;
+  color: var(--c-ink);
+  cursor: pointer;
+}
+.sheep-back:disabled {
+  visibility: hidden;
+}
+.sheep-progress-bar {
+  flex: 1;
+  height: 8px;
+  border-radius: var(--r-full);
+  background: var(--c-surface-sunk);
+  overflow: hidden;
+}
+.sheep-progress-bar span {
+  display: block;
+  height: 100%;
+  border-radius: var(--r-full);
+  background: var(--c-primary);
+  transition: width 0.25s ease;
+}
+.sheep-progress-count {
+  min-width: 3.5em;
+  text-align: right;
+  font-size: var(--t-caption);
+  font-weight: 700;
+  color: var(--c-ink-soft);
+  font-variant-numeric: tabular-nums;
+}
+.sheep-question {
+  margin-top: var(--s-6);
+  min-height: 3.2em;
+  font-size: var(--t-title);
+  font-weight: 800;
+  line-height: 1.35;
+  outline: none;
+}
+.sheep-options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+}
+.sheep-option {
+  width: 100%;
+  min-height: 64px;
+  padding: var(--s-4) var(--s-5);
+  border: 2px solid var(--c-line);
+  border-radius: var(--r-md);
+  background: var(--c-surface);
+  color: var(--c-ink);
+  font: inherit;
+  font-size: var(--t-lead);
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.12s ease, background 0.12s ease;
+}
+.sheep-option:focus-visible {
+  outline: 3px solid var(--c-accent);
+  outline-offset: 2px;
+}
+.sheep-option[data-picked="true"] {
+  border-color: var(--c-primary);
+  background: #fdeceb;
+}
+@media (hover: hover) {
+  .sheep-option:hover {
+    border-color: var(--c-primary);
+  }
+}
+
+/* ---------- 결과 ---------- */
+.sheep-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s-2);
+  text-align: center;
+  border-width: 2px;
+}
+.sheep-summary {
+  font-size: var(--t-lead);
+  font-weight: 600;
+  color: var(--c-ink-soft);
+}
+.sheep-chips {
+  display: flex;
+  gap: var(--s-2);
+  margin-top: var(--s-2);
+  list-style: none;
+}
+.sheep-points {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+  list-style: none;
+}
+.sheep-points li {
+  position: relative;
+  padding-left: 1.75em;
+  font-weight: 600;
+}
+.sheep-points li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: var(--c-primary);
+  font-weight: 800;
+}
+.sheep-fortune {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+}
+.sheep-fortune dt {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 700;
+}
+.sheep-fortune dd {
+  margin-top: var(--s-1);
+  color: var(--c-ink-soft);
+}
+.sheep-stars {
+  color: var(--c-accent);
+  letter-spacing: 2px;
+}
+.sheep-stars-off {
+  color: var(--c-line);
+}
+.sheep-lucky {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--s-2);
+  text-align: center;
+}
+.sheep-lucky div {
+  padding: var(--s-3) var(--s-2);
+  border-radius: var(--r-md);
+  background: var(--c-surface-sunk);
+}
+.sheep-lucky dt {
+  font-size: var(--t-caption);
+  color: var(--c-ink-soft);
+}
+.sheep-lucky dd {
+  margin-top: var(--s-1);
+  font-weight: 700;
+}
+.sheep-deokdam {
+  background: #fff3d6;
+  border-color: #f4dc9f;
+}
+.sheep-deokdam p {
+  font-size: var(--t-lead);
+  font-weight: 600;
+}
+.sheep-match {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s-3);
+}
+.sheep-match-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s-1);
+  padding: var(--s-3);
+  border-radius: var(--r-md);
+  background: var(--c-surface-sunk);
+  color: var(--c-ink);
+  text-decoration: none;
+  text-align: center;
+}
+.sheep-match-label {
+  font-size: var(--t-caption);
+  color: var(--c-ink-soft);
+}
+.sheep-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+  min-height: 56px;
+}
+.sheep-notice {
+  min-height: 1.5em;
+  text-align: center;
+  font-size: var(--t-caption);
+  color: var(--c-ink-soft);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sheep-progress-bar span,
+  .sheep-option {
+    transition: none;
+  }
+}

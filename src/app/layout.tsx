@@ -1,52 +1,50 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Analytics } from "@vercel/analytics/react";
+import { SEASON } from "@/config/season";
 import { GoogleAdSense } from "@/components/adsense/adsense";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://deokdam.app"),
-  title: "덕담 주머니",
-  description: "덕담 주머니를 만들고 새해 덕담을 모아 보세요!",
+  metadataBase: new URL(SEASON.siteUrl),
+  title: { default: SEASON.title, template: `%s | ${SEASON.title}` },
+  description: SEASON.description,
   keywords: [
-    "을사년",
+    `${SEASON.year}년 운세`,
+    SEASON.ganji,
+    "신년운세",
+    "유형 테스트",
+    "양띠 해",
     "새해 덕담",
-    "행복한 새해",
-    "덕담 나눔",
-    "새해 축하",
-    "덕담 주머니",
-    "새해 소망",
-    "온라인 커뮤니티",
-    "기부 프로젝트",
-    "2025년 새해",
-    "새해 인사",
+    "궁합 테스트",
+    SEASON.serviceName,
   ],
-  authors: [{ name: "덕담 주머니" }],
-  creator: "덕담 주머니",
-  publisher: "덕담 주머니",
+  authors: [{ name: SEASON.serviceName }],
+  creator: SEASON.serviceName,
+  publisher: SEASON.serviceName,
   openGraph: {
     type: "website",
     locale: "ko_KR",
-    url: "https://deokdam.app",
-    siteName: "덕담 주머니",
-    title: "덕담 주머니",
-    description: "덕담 주머니를 만들고 새해 덕담을 모아 보세요!",
+    url: SEASON.siteUrl,
+    siteName: SEASON.serviceName,
+    title: SEASON.title,
+    description: SEASON.description,
     images: [
       {
-        url: "https://deokdam.app/opengraph-image",
+        url: `${SEASON.siteUrl}/opengraph-image`,
         width: 1200,
         height: 630,
-        alt: "덕담 주머니",
+        alt: SEASON.title,
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "덕담 주머니",
-    description: "덕담 주머니를 만들고 새해 덕담을 모아 보세요!",
-    images: ["https://deokdam.app/opengraph-image"],
+    title: SEASON.title,
+    description: SEASON.description,
+    images: [`${SEASON.siteUrl}/opengraph-image`],
   },
   alternates: {
-    canonical: "https://deokdam.app",
+    canonical: SEASON.siteUrl,
   },
   robots: {
     index: true,
@@ -72,7 +70,7 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const baseUrl = "https://deokdam.app";
+  const baseUrl = SEASON.siteUrl;
 
   // Organization 스키마
   const organizationSchema = {
@@ -81,7 +79,7 @@ export default function RootLayout({
     name: "덕담 주머니",
     url: baseUrl,
     logo: "https://d3ob3cint7tr3s.cloudfront.net/deokdam_pocket.png",
-    description: "덕담 주머니를 만들고 새해 덕담을 모아 보세요!",
+    description: SEASON.description,
   };
 
   // WebSite 스키마
@@ -90,7 +88,7 @@ export default function RootLayout({
     "@type": "WebSite",
     name: "덕담 주머니",
     url: baseUrl,
-    description: "덕담 주머니를 만들고 새해 덕담을 모아 보세요!",
+    description: SEASON.description,
   };
 
   return (

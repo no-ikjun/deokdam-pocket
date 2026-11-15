@@ -1,11 +1,12 @@
-import { QUESTIONS } from "@/sheep/data/questions";
+import type { Metadata } from "next";
+import TestClient from "./TestClient";
+import { SEASON } from "@/config/season";
 
-// 테스트 화면 뼈대. 문항 진행 UI는 1단계에서 만든다.
+export const metadata: Metadata = {
+  title: "테스트",
+  alternates: { canonical: `${SEASON.siteUrl}/test` },
+};
+
 export default function TestPage() {
-  return (
-    <>
-      <h1 className="sheep-title">테스트</h1>
-      <p className="sheep-lead">{QUESTIONS.length}문항 준비 중</p>
-    </>
-  );
+  return <TestClient />;
 }
