@@ -58,6 +58,12 @@ export async function POST(req: NextRequest) {
       // user_chunks 데이터 삭제 (AI 학습 데이터)
       await client.sql`DELETE FROM user_chunks WHERE user_id = ${user_uuid}`;
 
+      // 2027 시즌 기록: 알림 동의와 복주머니 도감은 지우고,
+      // 테스트 결과는 친구의 궁합·무리 화면이 깨지지 않도록 계정 연결만 끊는다.
+      await client.sql`DELETE FROM sheep_recheck_optin WHERE user_uuid = ${user_uuid}`;
+      await client.sql`DELETE FROM sheep_daily_draw WHERE user_uuid = ${user_uuid}`;
+      await client.sql`UPDATE sheep_result SET user_uuid = NULL WHERE user_uuid = ${user_uuid}`;
+
       // pocket 관련 처리
       // 1. 사용자가 만든 주머니는 soft delete (disabled = true)
       const madePockets = await client.sql`

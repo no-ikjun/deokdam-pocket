@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "check:sheep": "esbuild scripts/check-sheep.ts --bundle --platform=node --alias:@=./src --outfile=node_modules/.cache/check-sheep.cjs --log-level=warning && node node_modules/.cache/check-sheep.cjs"
   },
   "dependencies": {
     "@react-email/render": "^2.0.0",

@@ -11,6 +11,7 @@ import {
   saveNickname,
 } from "@/sheep/client-store";
 import { track } from "@/sheep/events";
+import KakaoShareButton from "@/sheep/KakaoShareButton";
 import type { SheepTypeId } from "@/sheep/data/types";
 
 type Props = { typeId: SheepTypeId; typeName: string; shareText: string };
@@ -171,6 +172,16 @@ export default function ResultActions({ typeId, typeName, shareText }: Props) {
       <button type="button" className="sheep-btn" onClick={shareStory} disabled={busy}>
         {busy ? "이미지 만드는 중…" : "스토리용 이미지 공유하기"}
       </button>
+      <KakaoShareButton
+        label="카카오톡으로 결과 보내기"
+        title={`나는 ${typeName}!`}
+        description={shareText}
+        path={`/result/${typeId}`}
+        imagePath={`/result/${typeId}/image/og`}
+        buttonTitle="나도 테스트하기"
+        event="share_link"
+        eventProps={{ type: typeId }}
+      />
       {pairOpen ? (
         <div className="sheep-inline-form">
           <label className="sheep-field">

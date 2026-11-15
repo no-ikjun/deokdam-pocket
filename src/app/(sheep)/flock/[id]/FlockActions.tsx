@@ -12,6 +12,7 @@ import {
   setPendingFlock,
 } from "@/sheep/client-store";
 import { track } from "@/sheep/events";
+import KakaoShareButton from "@/sheep/KakaoShareButton";
 import type { SheepTypeId } from "@/sheep/data/types";
 
 type Props = {
@@ -96,6 +97,20 @@ export default function FlockActions({ flockId, flockName, kind, isMember, isFul
   if (isMember) {
     return (
       <div className="sheep-actions">
+        <KakaoShareButton
+          label={kind === "family" ? "카카오톡으로 가족 초대하기" : "카카오톡 단톡방에 올리기"}
+          title={`${flockName} 양 무리`}
+          description={
+            kind === "family"
+              ? "우리 가족은 어떤 양 무리일까? 다들 들어와!"
+              : "우리 방은 어떤 양 무리일까? 다들 들어와!"
+          }
+          path={`/flock/${flockId}`}
+          imagePath="/opengraph-image"
+          buttonTitle="무리에 합류하기"
+          event="share_link"
+          eventProps={{ kind: "flock" }}
+        />
         <button type="button" className="sheep-btn" onClick={share}>
           {kind === "family" ? "가족에게 링크 보내기" : "단톡방에 링크 올리기"}
         </button>
