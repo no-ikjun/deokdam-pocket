@@ -6,7 +6,9 @@ import { QUESTIONS } from "@/sheep/data/questions";
 import { scoreAnswers } from "@/sheep/scoring";
 import {
   completePair,
+  joinFlock,
   saveMyResult,
+  takePendingFlock,
   takePendingPair,
 } from "@/sheep/client-store";
 import { track } from "@/sheep/events";
@@ -57,7 +59,17 @@ export default function TestClient() {
       const pending = takePendingPair();
       const pairUrl =
         pending && resultId ? await completePair(pending, resultId) : null;
-      router.push(pairUrl ?? `/result/${type.id}`);
+      // 무리 링크로 들어온 경우에는 합류한 뒤 무리 화면으로 이동한다.
+      const flock = takePendingFlock();
+      const flockUrl =
+        !pairUrl && flock && resultId ? await joinFlock(flock, resultId) : null;
+      const joinedUrl = pairUrl ?? flockUrl;
+      if (joinedUrl) {
+        // 방금 보고 온 초대 화면이 브라우저에 남아 있어, 새로 받아오도록 주소를 직접 바꾼다.
+        window.location.assign(joinedUrl);
+        return;
+      }
+      router.push(`/result/${type.id}`);
     },
     [router]
   );

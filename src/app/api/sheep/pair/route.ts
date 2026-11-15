@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { sql } from "@vercel/postgres";
+import { sql } from "@/sheep/server/db";
 import { verifyToken } from "@/utils/auth";
 import { readAnonId } from "@/sheep/server/anon";
 import { cleanNickname, getResult } from "@/sheep/server/queries";

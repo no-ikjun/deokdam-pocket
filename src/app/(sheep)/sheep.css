@@ -514,3 +514,79 @@
   border-radius: var(--r-md);
   background: var(--c-surface);
 }
+
+/* ---------- 양 무리 ---------- */
+.sheep-flock-headline {
+  margin-top: var(--s-2);
+  padding: var(--s-3) var(--s-4);
+  border-radius: var(--r-md);
+  background: var(--c-surface-sunk);
+  font-weight: 700;
+}
+.sheep-list-item b {
+  flex-shrink: 0;
+  max-width: 7.5em;
+  text-align: right;
+  font-size: var(--t-caption);
+}
+.sheep-bars {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  margin-bottom: var(--s-4);
+}
+.sheep-bar {
+  display: flex;
+  gap: 2px;
+  height: 32px;
+  border-radius: var(--r-sm);
+  overflow: hidden;
+}
+.sheep-bar span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  flex-basis: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--c-ink);
+  background: #f6cfa0;
+}
+.sheep-bar span:nth-child(2) {
+  background: #f3e2c8;
+}
+.sheep-bar span:nth-child(3) {
+  background: #e7ddd2;
+}
+.sheep-fortune dt span {
+  color: var(--c-primary);
+  font-variant-numeric: tabular-nums;
+}
+.sheep-toggle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s-2);
+}
+.sheep-toggle button {
+  min-height: 44px;
+  border: 2px solid var(--c-line);
+  border-radius: var(--r-md);
+  background: var(--c-surface);
+  color: var(--c-ink-soft);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+.sheep-toggle button[aria-checked="true"] {
+  border-color: var(--c-primary);
+  color: var(--c-primary);
+  background: #fdeceb;
+}
+
+/* 무리 구성원 목록은 역할 설명이 잘리지 않게 줄바꿈을 허용한다. */
+.sheep-list-item small {
+  white-space: normal;
+}

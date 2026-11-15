@@ -113,3 +113,62 @@ export async function completePair(
     return null;
   }
 }
+
+/** 무리 링크로 들어와 테스트를 시작한 경우, 테스트가 끝난 뒤 이어서 합류하기 위한 정보 */
+export type PendingFlock = { flockId: string; nickname: string };
+
+const PENDING_FLOCK_KEY = "sheep:pending-flock";
+
+export function setPendingFlock(pending: PendingFlock): void {
+  try {
+    window.sessionStorage.setItem(PENDING_FLOCK_KEY, JSON.stringify(pending));
+  } catch {}
+}
+
+export function takePendingFlock(): PendingFlock | null {
+  try {
+    const raw = window.sessionStorage.getItem(PENDING_FLOCK_KEY);
+    window.sessionStorage.removeItem(PENDING_FLOCK_KEY);
+    return raw ? (JSON.parse(raw) as PendingFlock) : null;
+  } catch {
+    return null;
+  }
+}
+
+/** 무리에 합류하고 무리 주소를 돌려준다. 실패하면 null. */
+export async function joinFlock(
+  pending: PendingFlock,
+  resultId: string
+): Promise<string | null> {
+  try {
+    const res = await fetch(`/api/sheep/flock/${pending.flockId}/join`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ nickname: pending.nickname, resultId }),
+    });
+    return res.ok ? `/flock/${pending.flockId}` : null;
+  } catch {
+    return null;
+  }
+}
+
+/** 무리를 만들고 무리 주소를 돌려준다. 실패하면 null. */
+export async function createFlock(input: {
+  name: string;
+  kind: "chat" | "family";
+  nickname: string;
+  resultId: string;
+}): Promise<string | null> {
+  try {
+    const res = await fetch("/api/sheep/flock", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input),
+    });
+    if (!res.ok) return null;
+    const { flockId } = await res.json();
+    return flockId ? `/flock/${flockId}` : null;
+  } catch {
+    return null;
+  }
+}

@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
+  createFlock,
   ensureSavedResult,
   loadMyResult,
   loadNickname,
@@ -25,6 +27,10 @@ export default function ResultActions({ typeId, typeName, shareText }: Props) {
   const [pairOpen, setPairOpen] = useState(false);
   const [nickname, setNickname] = useState("");
   const [pairLink, setPairLink] = useState<string | null>(null);
+  const router = useRouter();
+  const [flockOpen, setFlockOpen] = useState(false);
+  const [flockName, setFlockName] = useState("");
+  const [flockKind, setFlockKind] = useState<"chat" | "family">("chat");
 
   useEffect(() => {
     const my = loadMyResult();
@@ -119,6 +125,29 @@ export default function ResultActions({ typeId, typeName, shareText }: Props) {
     }
   };
 
+  const makeFlock = async () => {
+    if (busy) return;
+    const name = flockName.trim();
+    const nick = nickname.trim();
+    if (!name || !nick) {
+      setNotice("무리 이름과 내 별명을 적어주세요.");
+      return;
+    }
+    setBusy(true);
+    setNotice("");
+    const saved = await ensureSavedResult();
+    saveNickname(nick);
+    const url = saved?.resultId
+      ? await createFlock({ name, kind: flockKind, nickname: nick, resultId: saved.resultId })
+      : null;
+    if (url) {
+      router.push(url);
+    } else {
+      setBusy(false);
+      setNotice("무리를 만들지 못했어요. 잠시 후 다시 시도해 주세요.");
+    }
+  };
+
   // 브라우저 저장소를 읽기 전에는 버튼 자리를 비워 깜빡임을 줄인다.
   if (mine === undefined) return <div className="sheep-actions" aria-hidden />;
 
@@ -166,6 +195,54 @@ export default function ResultActions({ typeId, typeName, shareText }: Props) {
           onClick={() => setPairOpen(true)}
         >
           친구랑 궁합 보기
+        </button>
+      )}
+      {flockOpen ? (
+        <div className="sheep-inline-form">
+          <div className="sheep-toggle" role="radiogroup" aria-label="무리 종류">
+            {(["chat", "family"] as const).map((k) => (
+              <button
+                key={k}
+                type="button"
+                role="radio"
+                aria-checked={flockKind === k}
+                onClick={() => setFlockKind(k)}
+              >
+                {k === "chat" ? "단톡방" : "가족"}
+              </button>
+            ))}
+          </div>
+          <label className="sheep-field">
+            <span>무리 이름</span>
+            <input
+              value={flockName}
+              onChange={(e) => setFlockName(e.target.value)}
+              maxLength={20}
+              placeholder={flockKind === "chat" ? "예: 고등학교 동창방" : "예: 우리 가족"}
+            />
+          </label>
+          <label className="sheep-field">
+            <span>무리에서 쓸 내 이름 또는 별명</span>
+            <input
+              value={nickname}
+              onChange={(e) => setNickname(e.target.value)}
+              maxLength={12}
+              placeholder="친구가 알아볼 이름"
+              autoComplete="nickname"
+            />
+          </label>
+          <button type="button" className="sheep-btn" onClick={makeFlock} disabled={busy}>
+            {busy ? "무리 만드는 중…" : "양 무리 만들기"}
+          </button>
+        </div>
+      ) : (
+        <button
+          type="button"
+          className="sheep-btn"
+          data-variant="ghost"
+          onClick={() => setFlockOpen(true)}
+        >
+          단톡방 양 무리 만들기
         </button>
       )}
       {pairLink && (

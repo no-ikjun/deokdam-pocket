@@ -1,4 +1,4 @@
-import { sql } from "@vercel/postgres";
+import { sql } from "@/sheep/server/db";
 import { validate as isUuid } from "uuid";
 import { isSheepTypeId, type SheepTypeId } from "@/sheep/data/types";
 
@@ -76,4 +76,39 @@ export async function listPairsByInviter(
       inviteeTypeId: r.type_id as SheepTypeId,
       inviteeNickname: r.invitee_nickname,
     }));
+}
+
+export type StoredFlock = {
+  flockId: string;
+  kind: "chat" | "family";
+  name: string;
+  /** 들어온 순서 */
+  members: { anonId: string; nickname: string; typeId: SheepTypeId }[];
+};
+
+export async function getFlock(flockId: string): Promise<StoredFlock | null> {
+  if (!isUuid(flockId)) return null;
+  const flock = await sql`
+    SELECT flock_id, kind, name FROM sheep_flock WHERE flock_id = ${flockId}
+  `;
+  if (!flock.rows[0]) return null;
+  const members = await sql`
+    SELECT m.anon_id, m.nickname, r.type_id
+    FROM sheep_flock_member m
+    JOIN sheep_result r ON r.result_id = m.result_id
+    WHERE m.flock_id = ${flockId}
+    ORDER BY m.joined_at, m.anon_id
+  `;
+  return {
+    flockId: flock.rows[0].flock_id,
+    kind: flock.rows[0].kind === "family" ? "family" : "chat",
+    name: flock.rows[0].name,
+    members: members.rows
+      .filter((r) => isSheepTypeId(r.type_id))
+      .map((r) => ({
+        anonId: r.anon_id,
+        nickname: r.nickname,
+        typeId: r.type_id as SheepTypeId,
+      })),
+  };
 }
