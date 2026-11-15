@@ -4,7 +4,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { QUESTIONS } from "@/sheep/data/questions";
 import { scoreAnswers } from "@/sheep/scoring";
-import { saveMyResult } from "@/sheep/client-store";
+import {
+  completePair,
+  saveMyResult,
+  takePendingPair,
+} from "@/sheep/client-store";
 import { track } from "@/sheep/events";
 
 const ADVANCE_DELAY_MS = 220;
@@ -49,7 +53,11 @@ export default function TestClient() {
         resultId,
         at: new Date().toISOString(),
       });
-      router.push(`/result/${type.id}`);
+      // 궁합 링크로 들어온 경우에는 궁합 결과로 바로 이동한다.
+      const pending = takePendingPair();
+      const pairUrl =
+        pending && resultId ? await completePair(pending, resultId) : null;
+      router.push(pairUrl ?? `/result/${type.id}`);
     },
     [router]
   );
