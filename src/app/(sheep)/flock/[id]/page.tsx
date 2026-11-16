@@ -71,7 +71,7 @@ export default async function FlockPage({ params }: Props) {
             return (
               <li key={i}>
                 <Link href={`/result/${type.id}`} className="sheep-list-item">
-                  <img src={sheepDataUri(TYPE_CONTENT[type.id].color)} alt="" width={56} height={56} />
+                  <img src={sheepDataUri(type.id, TYPE_CONTENT[type.id].color)} alt="" width={56} height={56} />
                   <span>
                     <strong>{m.nickname}</strong>
                     <small>

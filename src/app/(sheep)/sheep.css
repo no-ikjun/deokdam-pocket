@@ -678,3 +678,476 @@
   height: 10px;
   border-radius: var(--r-full);
 }
+
+/* =========================================================
+   제목 글꼴: 공유 이미지와 같은 둥근 글꼴을 화면 제목에도 쓴다.
+   ========================================================= */
+@font-face {
+  font-family: "Ssurround";
+  src: url("/fonts/Cafe24Ssurround-subset.woff2") format("woff2");
+  font-display: swap;
+  font-weight: 400 900;
+}
+.sheep-root {
+  --f-display: "Ssurround", "Pretendard", -apple-system, "Apple SD Gothic Neo", sans-serif;
+  --c-outline: #2b2118;
+}
+.sheep-title,
+.sheep-h2,
+.sheep-question,
+.sheep-btn {
+  font-family: var(--f-display);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+.sheep-btn {
+  border: 3px solid var(--c-outline);
+  border-radius: 18px;
+  box-shadow: 0 5px 0 var(--c-outline);
+  min-height: 60px;
+  transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.15s ease;
+}
+.sheep-btn:active {
+  transform: translateY(4px);
+  box-shadow: 0 1px 0 var(--c-outline);
+}
+.sheep-btn[data-variant="ghost"] {
+  border: 3px solid var(--c-outline);
+}
+
+/* =========================================================
+   결과 화면 (rs-)
+   유형 대표색(--t-main)이 머리 전체를 채우고, 구획마다 모양을 다르게 한다.
+   ========================================================= */
+.rs {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-6);
+  /* 화면 가장자리까지 색을 채우기 위해 바깥 여백을 지운다 */
+  margin: calc(var(--s-5) * -1) calc(var(--s-4) * -1) 0;
+}
+.rs > * {
+  margin-left: var(--s-4);
+  margin-right: var(--s-4);
+}
+
+.rs-hero {
+  position: relative;
+  overflow: hidden;
+  margin: 0;
+  padding: var(--s-6) var(--s-4) var(--s-6);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  background: var(--t-main);
+  color: var(--t-on);
+  border-bottom: 4px solid var(--c-outline);
+  border-radius: 0 0 36px 36px;
+}
+.rs-hero::before,
+.rs-hero::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  background: var(--t-glow);
+}
+.rs-hero::before {
+  width: 260px;
+  height: 260px;
+  top: -110px;
+  left: -90px;
+}
+.rs-hero::after {
+  width: 170px;
+  height: 170px;
+  bottom: 70px;
+  right: -70px;
+}
+.rs-hero > * {
+  position: relative;
+  z-index: 1;
+}
+.rs-hero-tag {
+  padding: 6px 16px;
+  border-radius: var(--r-full);
+  background: var(--c-outline);
+  color: #ffffff;
+  font-family: var(--f-display);
+  font-size: var(--t-caption);
+}
+.rs-hero-art {
+  display: grid;
+  place-items: center;
+  width: min(72vw, 300px);
+  aspect-ratio: 1;
+  margin-top: var(--s-4);
+  border: 4px solid var(--c-outline);
+  border-radius: 50%;
+  background: #ffffff;
+  animation: rs-pop 0.5s cubic-bezier(0.2, 1.4, 0.4, 1) both;
+}
+.rs-hero-art img {
+  width: 90%;
+  height: auto;
+  animation: rs-bob 3.2s ease-in-out 0.6s infinite;
+}
+.rs-hero-name {
+  margin-top: var(--s-4);
+  font-family: var(--f-display);
+  font-weight: 400;
+  font-size: clamp(2.25rem, 11vw, 3rem);
+  line-height: 1.15;
+}
+.rs-hero-summary {
+  position: relative;
+  margin-top: var(--s-3);
+  padding: var(--s-3) var(--s-4);
+  border: 3px solid var(--c-outline);
+  border-radius: 18px;
+  background: #ffffff;
+  color: var(--c-ink);
+  font-weight: 700;
+  font-size: var(--t-lead);
+  line-height: 1.4;
+}
+.rs-hero-chips {
+  display: flex;
+  gap: var(--s-2);
+  margin-top: var(--s-4);
+  list-style: none;
+}
+.rs-hero-chips li {
+  padding: 4px 14px;
+  border: 2px solid currentColor;
+  border-radius: var(--r-full);
+  font-family: var(--f-display);
+  font-size: var(--t-caption);
+}
+
+.rs-h2 {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s-2);
+  margin-bottom: var(--s-3);
+  font-family: var(--f-display);
+  font-weight: 400;
+  font-size: 1.375rem;
+}
+.rs-h2 small {
+  font-family: "Pretendard", sans-serif;
+  font-size: var(--t-caption);
+  font-weight: 600;
+  color: var(--c-ink-faint);
+}
+
+/* 완전 나잖아: 살짝 기울어진 쪽지 세 장 */
+.rs-notes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+  list-style: none;
+}
+.rs-notes li {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  padding: var(--s-4);
+  border: 3px solid var(--c-outline);
+  border-radius: 18px;
+  background: var(--t-soft);
+  font-weight: 700;
+  line-height: 1.45;
+}
+.rs-notes li:nth-child(1) {
+  transform: rotate(-1.2deg);
+}
+.rs-notes li:nth-child(2) {
+  transform: rotate(0.9deg);
+  background: #ffffff;
+}
+.rs-notes li:nth-child(3) {
+  transform: rotate(-0.6deg);
+}
+.rs-notes b {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 3px solid var(--c-outline);
+  border-radius: 50%;
+  background: var(--t-main);
+  color: var(--t-on);
+  font-family: var(--f-display);
+  font-weight: 400;
+}
+
+/* 운세: 줄마다 양털 점수 */
+.rs-fortune {
+  border: 3px solid var(--c-outline);
+  border-radius: 22px;
+  background: #ffffff;
+  overflow: hidden;
+}
+.rs-fortune > div {
+  padding: var(--s-4);
+}
+.rs-fortune > div + div {
+  border-top: 2px dashed var(--c-line);
+}
+.rs-fortune dt {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--f-display);
+  font-size: var(--t-lead);
+}
+.rs-fortune dd {
+  margin-top: var(--s-2);
+  color: var(--c-ink-soft);
+}
+.rs-wool {
+  display: inline-flex;
+  gap: 5px;
+}
+.rs-wool i {
+  width: 18px;
+  height: 18px;
+  border: 2.5px solid var(--c-outline);
+  border-radius: 50%;
+  background: #ffffff;
+}
+.rs-wool i[data-on="true"] {
+  background: var(--t-main);
+}
+
+/* 행운: 아이콘 타일 세 개 */
+.rs-lucky {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--s-2);
+}
+.rs-lucky > div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: var(--s-4) var(--s-2);
+  border: 3px solid var(--c-outline);
+  border-radius: 18px;
+  background: var(--t-soft);
+  text-align: center;
+  color: var(--t-deep);
+}
+.rs-lucky dt {
+  margin-top: var(--s-1);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--c-ink-soft);
+}
+.rs-lucky dd {
+  font-family: var(--f-display);
+  color: var(--c-ink);
+  line-height: 1.3;
+}
+
+/* 덕담: 금색 복주머니 카드 */
+.rs-deokdam {
+  position: relative;
+  margin-top: var(--s-5);
+  padding: 52px var(--s-5) var(--s-5);
+  border: 3px solid var(--c-outline);
+  border-radius: 22px;
+  background: #ffd766;
+  box-shadow: 0 6px 0 var(--c-outline);
+  text-align: center;
+}
+.rs-deokdam img {
+  position: absolute;
+  top: -44px;
+  left: 50%;
+  width: 84px;
+  height: 84px;
+  transform: translateX(-50%) rotate(-6deg);
+}
+.rs-deokdam h2 {
+  font-size: var(--t-caption);
+  font-weight: 700;
+  color: #7a5a12;
+}
+.rs-deokdam p {
+  margin-top: var(--s-2);
+  font-family: var(--f-display);
+  font-size: 1.25rem;
+  line-height: 1.5;
+}
+
+/* 궁합 미리보기 */
+.rs-match {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s-3);
+}
+.rs-match-item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s-1);
+  padding: var(--s-5) var(--s-2) var(--s-3);
+  border: 3px solid var(--c-outline);
+  border-radius: 18px;
+  color: var(--c-ink);
+  text-decoration: none;
+}
+.rs-match-item strong {
+  font-family: var(--f-display);
+  font-weight: 400;
+}
+.rs-match-badge {
+  position: absolute;
+  top: -12px;
+  padding: 2px 12px;
+  border: 2.5px solid var(--c-outline);
+  border-radius: var(--r-full);
+  background: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+.rs-match-badge[data-tone="good"] {
+  background: #c9f0d0;
+}
+.rs-match-badge[data-tone="bad"] {
+  background: #ffd2cf;
+}
+
+/* 친구랑 더 놀기: 2×2 타일 */
+.rs-tiles {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s-3);
+}
+.rs-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: var(--s-4);
+  border: 3px solid var(--c-outline);
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow: 0 4px 0 var(--c-outline);
+  color: var(--c-ink);
+  font: inherit;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+}
+.rs-tile:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 var(--c-outline);
+}
+.rs-tile[aria-expanded="true"] {
+  background: var(--t-soft);
+}
+.rs-tile:focus-visible {
+  outline: 3px solid var(--c-accent);
+  outline-offset: 2px;
+}
+.rs-tile svg {
+  color: var(--t-deep);
+  margin-bottom: var(--s-1);
+}
+.rs-tile strong {
+  font-family: var(--f-display);
+  font-weight: 400;
+}
+.rs-tile small {
+  font-size: 0.75rem;
+  color: var(--c-ink-soft);
+}
+.rs .sheep-inline-form {
+  margin-top: var(--s-3);
+  border: 3px solid var(--c-outline);
+  border-radius: 18px;
+}
+.rs-links {
+  display: flex;
+  justify-content: center;
+  gap: var(--s-4);
+  margin-top: var(--s-4);
+  font-size: var(--t-caption);
+}
+.rs-links a {
+  color: var(--c-ink-soft);
+  text-underline-offset: 3px;
+}
+
+/* 화면 아래에 붙어 있는 공유 버튼.
+   body에 overflow-x: hidden이 걸려 있어 sticky가 동작하지 않으므로 fixed로 띄우고,
+   본문 끝에 그만큼 여백을 둔다. */
+.rs {
+  padding-bottom: 120px;
+}
+.rs-dock {
+  position: fixed;
+  left: 50%;
+  bottom: 0;
+  z-index: 5;
+  width: min(100%, var(--shell-width));
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  margin: 0;
+  padding: var(--s-5) var(--s-4) calc(var(--s-4) + env(safe-area-inset-bottom, 0px));
+  background: linear-gradient(to top, var(--c-bg) 70%, rgba(255, 248, 238, 0));
+  pointer-events: none;
+}
+.rs-dock > * {
+  pointer-events: auto;
+}
+.rs-dock .sheep-notice:empty {
+  display: none;
+}
+.rs-dock .sheep-notice {
+  min-height: 0;
+  padding: var(--s-2) var(--s-3);
+  border-radius: var(--r-md);
+  background: var(--c-outline);
+  color: #ffffff;
+}
+.rs > .sheep-link {
+  align-self: center;
+}
+
+@keyframes rs-pop {
+  /* 투명도는 건드리지 않는다. 애니메이션이 멈춘 환경에서도 그림이 보여야 한다. */
+  from {
+    transform: scale(0.7) rotate(-8deg);
+  }
+  to {
+    transform: scale(1) rotate(0);
+  }
+}
+@keyframes rs-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rs-hero-art,
+  .rs-hero-art img {
+    animation: none;
+  }
+  .sheep-btn,
+  .rs-tile {
+    transition: none;
+  }
+}

@@ -80,7 +80,7 @@ export default async function PairInvitePage({ params, searchParams }: Props) {
               return (
                 <li key={p.pairId}>
                   <Link href={`/pair/r/${p.pairId}`} className="sheep-list-item">
-                    <img src={sheepDataUri(TYPE_CONTENT[friend.id].color)} alt="" width={56} height={56} />
+                    <img src={sheepDataUri(friend.id, TYPE_CONTENT[friend.id].color)} alt="" width={56} height={56} />
                     <span>
                       <strong>{p.inviteeNickname ?? friend.name}</strong>
                       <small>
@@ -113,7 +113,7 @@ export default async function PairInvitePage({ params, searchParams }: Props) {
         </h1>
         <img
           className="sheep-art"
-          src={sheepDataUri(content.color)}
+          src={sheepDataUri(type.id, content.color)}
           alt={`${type.name} 캐릭터`}
           width={200}
           height={200}

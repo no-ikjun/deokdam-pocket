@@ -16,7 +16,7 @@ export default function LandingPage() {
         <h1 className="sheep-title">나는 어떤 {SEASON.animal}?</h1>
         <img
           className="sheep-art"
-          src={sheepDataUri("#D93A3F")}
+          src={sheepDataUri("class-president", "#D93A3F")}
           alt="빨간 목도리를 한 양"
           width={240}
           height={240}

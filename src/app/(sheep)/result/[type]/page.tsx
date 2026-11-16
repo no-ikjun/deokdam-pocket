@@ -1,4 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
+import type { CSSProperties } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -11,6 +12,7 @@ import {
 import { FORTUNE_LABEL, TYPE_CONTENT } from "@/sheep/data/content";
 import { bestMatch, worstMatch } from "@/sheep/pair";
 import { sheepDataUri } from "@/sheep/art";
+import { paletteVars, typePalette } from "@/sheep/palette";
 import { SEASON } from "@/config/season";
 import ResultActions from "./ResultActions";
 
@@ -47,14 +49,28 @@ export function generateMetadata({
   };
 }
 
-function Stars({ count }: { count: number }) {
+/** 별점 대신 쓰는 양털 점 5개 */
+function Wool({ count }: { count: number }) {
   return (
-    <span className="sheep-stars" role="img" aria-label={`별 5개 중 ${count}개`}>
-      <span aria-hidden>{"★".repeat(count)}</span>
-      <span aria-hidden className="sheep-stars-off">
-        {"★".repeat(5 - count)}
-      </span>
+    <span className="rs-wool" role="img" aria-label={`5점 중 ${count}점`}>
+      {[0, 1, 2, 3, 4].map((i) => (
+        <i key={i} data-on={i < count} aria-hidden />
+      ))}
     </span>
+  );
+}
+
+const ICONS = {
+  month: "M7 3v3M17 3v3M4 9h16M6 5h12a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Z",
+  item: "M4 10h16v10H4zM3 7h18v3H3zM12 7v13M12 7c-1-4-6-4-5-1 .5 1.5 3 1 5 1Zm0 0c1-4 6-4 5-1-.5 1.5-3 1-5 1Z",
+  place: "M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Zm0-8.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z",
+} as const;
+
+function Icon({ d }: { d: string }) {
+  return (
+    <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <path d={d} />
+    </svg>
   );
 }
 
@@ -62,47 +78,57 @@ export default function ResultPage({ params }: { params: { type: string } }) {
   if (!isSheepTypeId(params.type)) notFound();
   const type = getSheepType(params.type);
   const content = TYPE_CONTENT[type.id];
-  const best = bestMatch(type);
-  const worst = worstMatch(type);
+  const palette = typePalette(type.id);
+  const matches = [
+    { label: "찰떡궁합", tone: "good", t: bestMatch(type) },
+    { label: "상극", tone: "bad", t: worstMatch(type) },
+  ] as const;
 
   return (
-    <>
-      <section className="sheep-card sheep-hero" style={{ borderColor: content.color }}>
-        <p className="sheep-eyebrow">
+    <div className="rs" style={paletteVars(palette) as CSSProperties}>
+      <section className="rs-hero">
+        <p className="rs-hero-tag">
           {SEASON.year} {SEASON.ganji}, 나는
         </p>
-        <img
-          className="sheep-art"
-          src={sheepDataUri(content.color)}
-          alt={`${type.name} 캐릭터`}
-          width={220}
-          height={220}
-        />
-        <h1 className="sheep-title">{type.name}</h1>
-        <p className="sheep-summary">“{content.summary}”</p>
-        <ul className="sheep-chips" aria-label="성향">
+        <div className="rs-hero-art">
+          <img
+            src={sheepDataUri(type.id, content.color)}
+            alt={`${type.name} 캐릭터`}
+            width={260}
+            height={260}
+          />
+        </div>
+        <h1 className="rs-hero-name">{type.name}</h1>
+        <p className="rs-hero-summary">{content.summary}</p>
+        <ul className="rs-hero-chips" aria-label="성향">
           <li>{AXIS_LABEL[type.energy]}</li>
           <li>{AXIS_LABEL[type.planning]}</li>
           <li>{AXIS_LABEL[type.relation]}</li>
         </ul>
       </section>
 
-      <section className="sheep-card">
-        <h2 className="sheep-h2">완전 나잖아?</h2>
-        <ul className="sheep-points">
-          {content.points.map((point) => (
-            <li key={point}>{point}</li>
+      <section className="rs-block">
+        <h2 className="rs-h2">완전 나잖아?</h2>
+        <ol className="rs-notes">
+          {content.points.map((point, i) => (
+            <li key={point}>
+              <b aria-hidden>{i + 1}</b>
+              <span>{point}</span>
+            </li>
           ))}
-        </ul>
+        </ol>
       </section>
 
-      <section className="sheep-card">
-        <h2 className="sheep-h2">{SEASON.year} 운세</h2>
-        <dl className="sheep-fortune">
+      <section className="rs-block">
+        <h2 className="rs-h2">
+          {SEASON.year} 운세 <small>{SEASON.ganji}</small>
+        </h2>
+        <dl className="rs-fortune">
           {(["love", "money", "work"] as const).map((key) => (
             <div key={key}>
               <dt>
-                {FORTUNE_LABEL[key]} <Stars count={content.fortune[key].stars} />
+                <span>{FORTUNE_LABEL[key]}</span>
+                <Wool count={content.fortune[key].stars} />
               </dt>
               <dd>{content.fortune[key].text}</dd>
             </div>
@@ -110,44 +136,52 @@ export default function ResultPage({ params }: { params: { type: string } }) {
         </dl>
       </section>
 
-      <section className="sheep-card">
-        <h2 className="sheep-h2">행운을 부르는 것들</h2>
-        <dl className="sheep-lucky">
+      <section className="rs-block">
+        <h2 className="rs-h2">행운을 부르는 것들</h2>
+        <dl className="rs-lucky">
           <div>
-            <dt>달</dt>
+            <Icon d={ICONS.month} />
+            <dt>행운의 달</dt>
             <dd>{type.luckyMonth}월</dd>
           </div>
           <div>
+            <Icon d={ICONS.item} />
             <dt>아이템</dt>
             <dd>{content.luckyItem}</dd>
           </div>
           <div>
+            <Icon d={ICONS.place} />
             <dt>장소</dt>
             <dd>{content.luckyPlace}</dd>
           </div>
         </dl>
       </section>
 
-      <section className="sheep-card sheep-deokdam">
-        <h2 className="sheep-h2">올해 나에게 필요한 덕담</h2>
+      <section className="rs-deokdam">
+        <img src="/images/3d_pocket.png" alt="" width={84} height={84} />
+        <h2>올해 나에게 필요한 덕담</h2>
         <p>{content.deokdam}</p>
       </section>
 
-      <section className="sheep-card">
-        <h2 className="sheep-h2">나와 맞는 양, 안 맞는 양</h2>
-        <div className="sheep-match">
-          {[
-            { label: "찰떡궁합", t: best },
-            { label: "상극", t: worst },
-          ].map(({ label, t }) => (
-            <Link key={label} href={`/result/${t.id}`} className="sheep-match-item">
+      <section className="rs-block">
+        <h2 className="rs-h2">나와 맞는 양, 안 맞는 양</h2>
+        <div className="rs-match">
+          {matches.map(({ label, tone, t }) => (
+            <Link
+              key={label}
+              href={`/result/${t.id}`}
+              className="rs-match-item"
+              style={{ background: typePalette(t.id).soft }}
+            >
+              <span className="rs-match-badge" data-tone={tone}>
+                {label}
+              </span>
               <img
-                src={sheepDataUri(TYPE_CONTENT[t.id].color)}
+                src={sheepDataUri(t.id, TYPE_CONTENT[t.id].color)}
                 alt=""
-                width={88}
-                height={88}
+                width={112}
+                height={112}
               />
-              <span className="sheep-match-label">{label}</span>
               <strong>{t.name}</strong>
             </Link>
           ))}
@@ -160,6 +194,6 @@ export default function ResultPage({ params }: { params: { type: string } }) {
         typeName={type.name}
         shareText={`${SEASON.year} ${SEASON.ganji}, 나는 ${type.name}! “${content.summary}”`}
       />
-    </>
+    </div>
   );
 }

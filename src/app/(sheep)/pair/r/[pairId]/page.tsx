@@ -56,7 +56,7 @@ export default async function PairResultPage({ params }: Props) {
         <div className="sheep-duo">
           {people.map(({ type, nickname }, i) => (
             <Link key={i} href={`/result/${type.id}`} className="sheep-duo-item">
-              <img src={sheepDataUri(TYPE_CONTENT[type.id].color)} alt="" width={120} height={120} />
+              <img src={sheepDataUri(type.id, TYPE_CONTENT[type.id].color)} alt="" width={120} height={120} />
               <strong>{nickname ?? type.name}</strong>
               {nickname && <small>{type.name}</small>}
             </Link>
