@@ -1,12 +1,13 @@
 "use client";
 
 /* eslint-disable @next/next/no-img-element */
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, type CSSProperties } from "react";
 import Link from "next/link";
 import { CARDS, CARD_THEMES, getCard } from "@/sheep/data/cards";
 import { loadMyResult } from "@/sheep/client-store";
 import type { SheepTypeId } from "@/sheep/data/types";
 import { SEASON } from "@/config/season";
+import { paletteOf, paletteVars } from "@/sheep/palette";
 
 type State = {
   phase: "before" | "open" | "after";
@@ -20,7 +21,8 @@ type State = {
   email: string | null;
 };
 
-const koreanDate = (d: string) => `${Number(d.slice(5, 7))}월 ${Number(d.slice(8))}일`;
+const koreanDate = (d: string) =>
+  `${Number(d.slice(5, 7))}월 ${Number(d.slice(8))}일`;
 
 function startKakaoLogin() {
   try {
@@ -127,84 +129,109 @@ export default function DailyClient() {
   const owned = new Set(state.draws.map((d) => d.cardId));
 
   return (
-    <>
-      <header>
-        <p className="sheep-eyebrow">
+    <div
+      className="rs rs--flow"
+      style={paletteVars(paletteOf("#F2B33D")) as CSSProperties}
+    >
+      <section className="rs-hero">
+        <p className="rs-hero-tag">
           {koreanDate(state.openDate)} ~ {koreanDate(state.endDate)}, 하루 한 번
         </p>
-        <h1 className="sheep-title">오늘의 복주머니</h1>
-      </header>
+        <h1 className="rs-hero-name" data-size="sm">
+          오늘의 복주머니
+        </h1>
 
-      {state.phase === "before" && (
-        <section className="sheep-card sheep-pocket">
-          <img src="/images/3d_pocket.png" alt="" width={160} height={160} />
-          <p className="sheep-lead">{koreanDate(state.openDate)}부터 열 수 있어요.</p>
-        </section>
-      )}
+        {todayCard ? (
+          <article
+            className="dc"
+            data-gold={todayCard.gold}
+            style={{ "--dc": todayCard.color } as CSSProperties}
+            aria-live="polite"
+          >
+            <span className="dc-theme">
+              {todayCard.gold ? "황금 카드 · " : ""}
+              {todayCard.themeLabel}
+            </span>
+            <h2 className="dc-name">{todayCard.name}</h2>
+            <p className="dc-fortune">{todayCard.fortune}</p>
+            <p className="dc-deokdam">{todayCard.deokdam}</p>
+          </article>
+        ) : (
+          <img
+            className="dp-pocket"
+            data-ready={state.phase === "open"}
+            src="/images/3d_pocket.png"
+            alt=""
+            width={190}
+            height={190}
+          />
+        )}
 
-      {state.phase === "after" && !todayCard && (
-        <section className="sheep-card sheep-pocket">
-          <p className="sheep-lead">이번 시즌 복주머니는 설날에 끝났어요. 모은 카드는 아래에 남아 있어요.</p>
-        </section>
-      )}
-
-      {state.phase === "open" && !todayCard && (
-        <section className="sheep-card sheep-pocket">
-          <img src="/images/3d_pocket.png" alt="" width={160} height={160} />
-          <p className="sheep-lead">오늘의 운세와 덕담이 들어 있어요.</p>
-          <button type="button" className="sheep-btn" onClick={open} disabled={opening}>
+        {state.phase === "before" && (
+          <p className="rs-hero-summary">
+            {koreanDate(state.openDate)}부터 열 수 있어요
+          </p>
+        )}
+        {state.phase === "after" && !todayCard && (
+          <p className="rs-hero-summary">
+            이번 시즌은 설날에 끝났어요. 모은 카드는 아래에 남아 있어요.
+          </p>
+        )}
+        {state.phase === "open" && !todayCard && (
+          <button
+            type="button"
+            className="sheep-btn dp-open"
+            onClick={open}
+            disabled={opening}
+          >
             {opening ? "여는 중…" : "복주머니 열기"}
           </button>
-        </section>
-      )}
+        )}
+        {todayCard && <p className="rs-hero-note">내일 또 하나 열 수 있어요</p>}
+      </section>
 
-      {todayCard && (
-        <section
-          className="sheep-card sheep-daily-card"
-          data-gold={todayCard.gold}
-          style={{ borderColor: todayCard.color }}
-          aria-live="polite"
-        >
-          <span className="sheep-daily-theme" style={{ background: todayCard.color }}>
-            {todayCard.gold ? "황금 카드 · " : ""}
-            {todayCard.themeLabel}
-          </span>
-          <h2 className="sheep-title">{todayCard.name}</h2>
-          <p className="sheep-summary">{todayCard.fortune}</p>
-          <p className="sheep-daily-deokdam">{todayCard.deokdam}</p>
-          <p className="sheep-hint">내일 또 하나 열 수 있어요.</p>
-        </section>
-      )}
-
-      <section className="sheep-card">
-        <h2 className="sheep-h2">
-          복주머니 도감 {owned.size} / {CARDS.length}
+      <section className="rs-block">
+        <h2 className="rs-h2">
+          복주머니 도감{" "}
+          <small>
+            {owned.size} / {CARDS.length}
+          </small>
         </h2>
-        <ul className="sheep-dex">
+        <ul className="dx">
           {CARD_THEMES.map((theme) => {
             const cards = CARDS.filter((c) => c.theme === theme.key);
             const have = cards.filter((c) => owned.has(c.id));
+            const left = cards.length - have.length;
             return (
-              <li key={theme.key}>
-                <div className="sheep-dex-head">
+              <li
+                key={theme.key}
+                style={{ "--dc": theme.color } as CSSProperties}
+              >
+                <div className="dx-head">
                   <strong>
-                    <i style={{ background: theme.color }} aria-hidden />
+                    <i aria-hidden />
                     {theme.label}
                   </strong>
                   <span>
                     {have.length} / {cards.length}
                   </span>
                 </div>
-                {have.length > 0 ? (
-                  <ul className="sheep-chips sheep-dex-chips">
+                {have.length > 0 && (
+                  <ul className="dx-grid">
                     {have.map((c) => (
-                      <li key={c.id} data-gold={c.gold}>
+                      <li key={c.id} className="dx-card" data-gold={c.gold}>
                         {c.name}
                       </li>
                     ))}
+                    {left > 0 && (
+                      <li
+                        className="dx-card dx-card--back"
+                        aria-label={`아직 못 모은 카드 ${left}장`}
+                      >
+                        ?<small>{left}장</small>
+                      </li>
+                    )}
                   </ul>
-                ) : (
-                  <p className="sheep-hint">아직 모은 카드가 없어요.</p>
                 )}
               </li>
             );
@@ -212,17 +239,25 @@ export default function DailyClient() {
         </ul>
       </section>
 
-      <section className="sheep-card">
+      <section className="rs-block sheep-card">
         {state.loggedIn ? (
           <>
             <h2 className="sheep-h2">1년 뒤에 다시 만나요</h2>
             <p>
-              {SEASON.year}년 말에 “올해 운세 얼마나 맞았어?”를 확인할 수 있게 이메일로 알려드려요.
+              {SEASON.year}년 말에 “올해 운세 얼마나 맞았어?”를 확인할 수 있게
+              이메일로 알려드려요.
             </p>
             {state.optin ? (
               <div className="sheep-actions sheep-gap-top">
-                <p className="sheep-hint">알림을 받기로 했어요. ({state.email})</p>
-                <button type="button" className="sheep-btn" data-variant="ghost" onClick={() => void saveOptin(false)}>
+                <p className="sheep-hint">
+                  알림을 받기로 했어요. ({state.email})
+                </p>
+                <button
+                  type="button"
+                  className="sheep-btn"
+                  data-variant="ghost"
+                  onClick={() => void saveOptin(false)}
+                >
                   알림 끄기
                 </button>
               </div>
@@ -238,7 +273,11 @@ export default function DailyClient() {
                     autoComplete="email"
                   />
                 </label>
-                <button type="button" className="sheep-btn" onClick={() => void saveOptin(true)}>
+                <button
+                  type="button"
+                  className="sheep-btn"
+                  onClick={() => void saveOptin(true)}
+                >
                   1년 뒤 알림 받기
                 </button>
               </div>
@@ -248,10 +287,17 @@ export default function DailyClient() {
           <>
             <h2 className="sheep-h2">도감을 잃어버리지 않으려면</h2>
             <p>
-              카카오 로그인을 하면 휴대폰을 바꿔도 도감이 남고, 1년 뒤 “운세 얼마나 맞았어?” 알림도 받을 수 있어요. 로그인하지 않아도 복주머니는 열 수 있어요.
+              카카오 로그인을 하면 휴대폰을 바꿔도 도감이 남고, 1년 뒤 “운세
+              얼마나 맞았어?” 알림도 받을 수 있어요. 로그인하지 않아도
+              복주머니는 열 수 있어요.
             </p>
             <div className="sheep-actions sheep-gap-top">
-              <button type="button" className="sheep-btn" data-variant="kakao" onClick={startKakaoLogin}>
+              <button
+                type="button"
+                className="sheep-btn"
+                data-variant="kakao"
+                onClick={startKakaoLogin}
+              >
                 카카오로 로그인하기
               </button>
             </div>
@@ -263,10 +309,14 @@ export default function DailyClient() {
         <p className="sheep-notice" role="status" aria-live="polite">
           {notice}
         </p>
-        <Link className="sheep-btn" data-variant="ghost" href={mine ? `/result/${mine}` : "/test"}>
+        <Link
+          className="sheep-btn"
+          data-variant="ghost"
+          href={mine ? `/result/${mine}` : "/test"}
+        >
           {mine ? "내 양 결과 보기" : "나는 어떤 양일까? 테스트하기"}
         </Link>
       </div>
-    </>
+    </div>
   );
 }

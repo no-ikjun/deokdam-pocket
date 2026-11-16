@@ -29,6 +29,7 @@ export default function ResultActions({ typeId, typeName, shareText }: Props) {
   const [nickname, setNickname] = useState("");
   const [pairLink, setPairLink] = useState<string | null>(null);
   const router = useRouter();
+  const [celebrate, setCelebrate] = useState(false);
   const [flockOpen, setFlockOpen] = useState(false);
   const [flockName, setFlockName] = useState("");
   const [flockKind, setFlockKind] = useState<"chat" | "family">("chat");
@@ -39,6 +40,14 @@ export default function ResultActions({ typeId, typeName, shareText }: Props) {
     setNickname(loadNickname());
     if (my?.resultId) setPairLink(`/pair/${my.resultId}`);
     track("result_view", { type: typeId, own: my?.typeId === typeId });
+    // 테스트를 막 끝내고 들어왔을 때만 색종이를 한 번 뿌린다.
+    try {
+      if (window.sessionStorage.getItem("sheep:celebrate")) {
+        window.sessionStorage.removeItem("sheep:celebrate");
+        setCelebrate(true);
+        window.setTimeout(() => setCelebrate(false), 3200);
+      }
+    } catch {}
   }, [typeId]);
 
   const shareStory = async () => {
@@ -172,6 +181,21 @@ export default function ResultActions({ typeId, typeName, shareText }: Props) {
 
   return (
     <>
+      {celebrate && (
+        <div className="rs-confetti" aria-hidden>
+          {CONFETTI.map((c, i) => (
+            <i
+              key={i}
+              style={{
+                left: `${c.left}%`,
+                background: c.color,
+                animationDelay: `${c.delay}s`,
+                transform: `rotate(${c.tilt}deg)`,
+              }}
+            />
+          ))}
+        </div>
+      )}
       <section className="rs-block">
         <h2 className="rs-h2">친구랑 더 놀기</h2>
         <div className="rs-tiles">
@@ -298,6 +322,15 @@ export default function ResultActions({ typeId, typeName, shareText }: Props) {
     </>
   );
 }
+
+// 색종이 18장: 위치와 색을 고정해 두어 서버와 브라우저가 같은 모양을 그린다.
+const CONFETTI_COLORS = ["#D93A3F", "#F2B33D", "#3B7DD8", "#2FA37C", "#EC6A8C", "#8A63D2"];
+const CONFETTI = Array.from({ length: 18 }, (_, i) => ({
+  left: (i * 37 + 11) % 100,
+  delay: ((i * 7) % 10) / 10,
+  tilt: (i * 47) % 360,
+  color: CONFETTI_COLORS[i % CONFETTI_COLORS.length],
+}));
 
 const TILE = {
   pair: "M12 20s-7-4.4-7-9.5A3.5 3.5 0 0 1 12 8a3.5 3.5 0 0 1 7 2.5C19 15.6 12 20 12 20Z",

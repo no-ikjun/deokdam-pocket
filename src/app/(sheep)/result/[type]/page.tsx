@@ -11,7 +11,7 @@ import {
 } from "@/sheep/data/types";
 import { FORTUNE_LABEL, TYPE_CONTENT } from "@/sheep/data/content";
 import { bestMatch, worstMatch } from "@/sheep/pair";
-import { sheepDataUri } from "@/sheep/art";
+import { sheepSrc } from "@/sheep/art";
 import { paletteVars, typePalette } from "@/sheep/palette";
 import { SEASON } from "@/config/season";
 import ResultActions from "./ResultActions";
@@ -92,7 +92,7 @@ export default function ResultPage({ params }: { params: { type: string } }) {
         </p>
         <div className="rs-hero-art">
           <img
-            src={sheepDataUri(type.id, content.color)}
+            src={sheepSrc(type.id)}
             alt={`${type.name} 캐릭터`}
             width={260}
             height={260}
@@ -177,7 +177,7 @@ export default function ResultPage({ params }: { params: { type: string } }) {
                 {label}
               </span>
               <img
-                src={sheepDataUri(t.id, TYPE_CONTENT[t.id].color)}
+                src={sheepSrc(t.id)}
                 alt=""
                 width={112}
                 height={112}

@@ -1,9 +1,10 @@
 /* eslint-disable @next/next/no-img-element */
+import type { CSSProperties } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getSheepType } from "@/sheep/data/types";
-import { TYPE_CONTENT } from "@/sheep/data/content";
-import { sheepDataUri } from "@/sheep/art";
+import { sheepSrc } from "@/sheep/art";
+import { paletteOf, paletteVars } from "@/sheep/palette";
 import { readAnonId } from "@/sheep/server/anon";
 import { getFlock } from "@/sheep/server/queries";
 import { FLOCK_MAX_MEMBERS, assignRoles, readFlock } from "@/sheep/flock";
@@ -13,6 +14,10 @@ import FlockActions from "./FlockActions";
 export const dynamic = "force-dynamic";
 
 type Props = { params: { id: string } };
+
+/** 무리 화면은 풀밭 초록으로 통일한다. */
+const FLOCK_COLOR = "#3FA66B";
+const HERD_MAX = 5;
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const flock = await getFlock(params.id).catch(() => null);
@@ -51,27 +56,39 @@ export default async function FlockPage({ params }: Props) {
   const roles = assignRoles(members);
   const reading = readFlock(members, flock.kind);
   const kindLabel = flock.kind === "family" ? "우리 가족 양 무리" : "단톡방 양 무리";
+  const herd = members.slice(0, HERD_MAX);
+  const more = members.length - herd.length;
 
   return (
-    <>
-      <section className="sheep-card sheep-hero">
-        <p className="sheep-eyebrow">
+    <div className="rs rs--flow" style={paletteVars(paletteOf(FLOCK_COLOR)) as CSSProperties}>
+      <section className="rs-hero">
+        <p className="rs-hero-tag">
           {SEASON.year} {kindLabel}
         </p>
-        <h1 className="sheep-title">{flock.name}</h1>
-        <p className="sheep-summary">양 {flock.members.length}마리</p>
-        {reading && <p className="sheep-flock-headline">{reading.headline}</p>}
+        <h1 className="rs-hero-name" data-size="sm">
+          {flock.name}
+        </h1>
+        <div className="fl-herd" aria-hidden>
+          {herd.map((m, i) => (
+            <span key={i} className="pr-face">
+              <img src={sheepSrc(m.typeId)} alt="" width={60} height={60} />
+            </span>
+          ))}
+          {more > 0 && <span className="pr-face fl-more">+{more}</span>}
+        </div>
+        <p className="rs-hero-note">양 {members.length}마리</p>
+        {reading && <p className="rs-hero-summary">{reading.headline}</p>}
       </section>
 
-      <section className="sheep-card">
-        <h2 className="sheep-h2">무리 구성원과 역할</h2>
-        <ul className="sheep-list">
+      <section className="rs-block">
+        <h2 className="rs-h2">구성원과 역할</h2>
+        <ul className="pr-list">
           {members.map((m, i) => {
             const type = getSheepType(m.typeId);
             return (
               <li key={i}>
-                <Link href={`/result/${type.id}`} className="sheep-list-item">
-                  <img src={sheepDataUri(type.id, TYPE_CONTENT[type.id].color)} alt="" width={56} height={56} />
+                <Link href={`/result/${type.id}`} className="fl-member">
+                  <img src={sheepSrc(type.id)} alt="" width={56} height={56} />
                   <span>
                     <strong>{m.nickname}</strong>
                     <small>
@@ -88,11 +105,18 @@ export default async function FlockPage({ params }: Props) {
 
       {reading && reading.size >= 2 && (
         <>
-          <section className="sheep-card">
-            <h2 className="sheep-h2">{SEASON.year} 무리 운세</h2>
-            <div className="sheep-bars">
+          <section className="rs-block">
+            <h2 className="rs-h2">
+              {SEASON.year} 무리 운세 <small>{SEASON.ganji}</small>
+            </h2>
+            <div className="fl-bars">
               {reading.shares.map((row, i) => (
-                <div key={i} className="sheep-bar" role="img" aria-label={row.map((s) => `${s.label} ${s.percent}%`).join(", ")}>
+                <div
+                  key={i}
+                  className="fl-bar"
+                  role="img"
+                  aria-label={row.map((s) => `${s.label} ${s.percent}%`).join(", ")}
+                >
                   {row
                     .filter((s) => s.percent > 0)
                     .map((s) => (
@@ -103,26 +127,33 @@ export default async function FlockPage({ params }: Props) {
                 </div>
               ))}
             </div>
-            <ul className="sheep-points">
-              {reading.lines.map((line) => (
-                <li key={line.title}>{line.text}</li>
+            <ol className="rs-notes">
+              {reading.lines.map((line, i) => (
+                <li key={line.title}>
+                  <b aria-hidden>{i + 1}</b>
+                  <span>{line.text}</span>
+                </li>
               ))}
-            </ul>
+            </ol>
           </section>
 
-          <section className="sheep-card">
-            <h2 className="sheep-h2">이 무리가 같이 하면 좋은 일</h2>
-            <p>{reading.together}</p>
-            <p className="sheep-hint">무리 행운의 달은 {reading.luckyMonth}월이에요.</p>
+          <section className="rs-block">
+            <h2 className="rs-h2">이 무리가 같이 하면 좋은 일</h2>
+            <p className="pr-quote">{reading.together}</p>
+            <div className="pr-month">
+              <b>{reading.luckyMonth}월</b>
+              <p>이 무리의 행운의 달이에요. 약속은 이때 잡아보세요.</p>
+            </div>
           </section>
 
           {reading.bestDuo && (
-            <section className="sheep-card">
-              <h2 className="sheep-h2">무리 안 콤비</h2>
-              <dl className="sheep-fortune">
+            <section className="rs-block">
+              <h2 className="rs-h2">무리 안 콤비</h2>
+              <dl className="rs-fortune">
                 <div>
                   <dt>
-                    찰떡 콤비 <span>{reading.bestDuo.score}점</span>
+                    <span>찰떡 콤비</span>
+                    <em>{reading.bestDuo.score}점</em>
                   </dt>
                   <dd>
                     {reading.bestDuo.a} × {reading.bestDuo.b}: {reading.bestDuo.name}
@@ -131,7 +162,8 @@ export default async function FlockPage({ params }: Props) {
                 {reading.worstDuo && (
                   <div>
                     <dt>
-                      티격태격 콤비 <span>{reading.worstDuo.score}점</span>
+                      <span>티격태격 콤비</span>
+                      <em>{reading.worstDuo.score}점</em>
                     </dt>
                     <dd>
                       {reading.worstDuo.a} × {reading.worstDuo.b}: {reading.worstDuo.name}
@@ -142,8 +174,9 @@ export default async function FlockPage({ params }: Props) {
             </section>
           )}
 
-          <section className="sheep-card sheep-deokdam">
-            <h2 className="sheep-h2">무리에게 건네는 덕담</h2>
+          <section className="rs-deokdam">
+            <img src="/images/3d_pocket.png" alt="" width={84} height={84} />
+            <h2>무리에게 건네는 덕담</h2>
             <p>{reading.deokdam}</p>
           </section>
         </>
@@ -156,6 +189,6 @@ export default async function FlockPage({ params }: Props) {
         isMember={isMember}
         isFull={flock.members.length >= FLOCK_MAX_MEMBERS}
       />
-    </>
+    </div>
   );
 }

@@ -295,3 +295,8 @@ export function sheepSvg(typeId: SheepTypeId, accent: string): string {
 export function sheepDataUri(typeId: SheepTypeId, accent: string): string {
   return `data:image/svg+xml,${encodeURIComponent(sheepSvg(typeId, accent))}`;
 }
+
+/** 화면에서 쓰는 캐릭터 이미지 주소. 공유 이미지는 sheepDataUri를 쓴다. */
+export function sheepSrc(typeId: SheepTypeId): string {
+  return `/art/${typeId}`;
+}
