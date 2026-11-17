@@ -1228,7 +1228,8 @@
   display: flex;
   gap: var(--s-3);
   width: max-content;
-  padding: 6px 0;
+  /* 짝수 번째 원은 8px 내려가 있고 그림자가 4px 더 있어서, 아래 여백을 넉넉히 둔다 */
+  padding: 6px 0 18px;
   animation: lp-march 36s linear infinite;
 }
 .lp-parade-item {
