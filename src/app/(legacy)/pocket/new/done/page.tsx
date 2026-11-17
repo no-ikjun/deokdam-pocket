@@ -4,7 +4,7 @@ import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import styles from "./page.module.css";
 import Image from "next/image";
-import InviteModal from "@/app/social/components/invite_modal";
+import InviteModal from "@/app/(legacy)/social/components/invite_modal";
 import Modal from "@/components/modal/modal";
 import ToastPopup from "@/components/toastPopup/toastPopup";
 import ConfettiEffect from "@/components/confetti/ConfettiEffect";

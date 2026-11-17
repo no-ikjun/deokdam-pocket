@@ -1,4 +1,7 @@
 User-agent: *
 Allow: /
 Disallow: /pocket/
+Disallow: /pair/
+Disallow: /flock/
+Disallow: /api/
 Sitemap: https://deokdam.app/sitemap.xml

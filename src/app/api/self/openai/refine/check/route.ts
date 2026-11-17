@@ -3,6 +3,9 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 
+// 로그인 쿠키와 DB를 쓰므로 빌드 때 미리 실행하지 않는다.
+export const dynamic = "force-dynamic";
+
 // 마지막 chunk 생성 일시 조회
 export async function GET() {
   const client = await db.connect();
